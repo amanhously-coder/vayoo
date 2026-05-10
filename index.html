@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vayoo.ai — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  @view-transition { navigation: auto; }
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --surface-2: #f6f8fd;
+    --border: #dde2ed;
+    --border-strong: #c2c9da;
+    --ink: #18213d;
+    --ink-soft: #233055;
+    --text: #18213d;
+    --text-muted: #54607a;
+    --text-soft: #7d869f;
+    --primary: #3b5cff;
+    --primary-600: #2945e3;
+    --primary-700: #1d34b8;
+    --primary-50: #ecf0ff;
+    --success: #0e8f3e;
+    --success-50: #e1f8ed;
+    --warn: #c2660e;
+    --warn-50: #fff5e0;
+    --danger: #d11f3a;
+    --danger-50: #fde2e6;
+    --c-identity: #6366f1;
+    --c-contact: #0d9488;
+    --c-id: #8b5cf6;
+    --c-bank: #059669;
+    --c-income: #d97706;
+    --c-tags: #e11d48;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --radius-lg: 20px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    font-size: 16px; font-weight: 500; line-height: 1.5;
+    letter-spacing: -0.005em; -webkit-font-smoothing: antialiased;
+  }
+  @keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .main-area > * { animation: pageFadeIn 0.22s ease-out; }
+
+  /* App shell + sidebar (shared) */
+  .app-shell { display: flex; min-height: 100vh; }
+  .sidebar { width: 256px; flex-shrink: 0; background: var(--surface); border-right: 1.5px solid var(--border); position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; z-index: 30; transition: width 0.22s ease; }
+  .sidebar-brand { padding: 20px 22px 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1.5px solid var(--border); }
+  .sidebar-brand .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--c-id)); color: #fff; display: grid; place-items: center; font-weight: 900; font-size: 16px; box-shadow: 0 4px 12px rgba(59,92,255,0.30); }
+  .sidebar-brand .name { font-size: 17px; font-weight: 800; letter-spacing: -0.015em; color: var(--ink); }
+  .sidebar-brand .name span { color: var(--primary); }
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 10px 0; }
+  .nav-section { font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em; padding: 14px 22px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 22px; text-decoration: none; color: var(--text-muted); font-weight: 600; font-size: 14.5px; border-left: 3px solid transparent; cursor: pointer; }
+  .nav-item:hover { background: var(--surface-2); color: var(--ink); }
+  .nav-item.active { background: linear-gradient(90deg, rgba(59,92,255,0.08), rgba(59,92,255,0)); color: var(--primary-600); border-left-color: var(--primary); font-weight: 700; }
+  .nav-item .ico { width: 22px; height: 22px; display: grid; place-items: center; flex-shrink: 0; }
+  .nav-item.active .ico { color: var(--primary); }
+  .nav-item .badge { margin-left: auto; background: var(--c-tags); color: #fff; font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 999px; }
+  .nav-sub { padding-left: 32px; display: none; }
+  .nav-item.has-sub.expanded + .nav-sub { display: block; }
+  .nav-sub .nav-item { padding: 7px 22px 7px 32px; font-size: 13.5px; }
+  .nav-item.has-sub .chev { margin-left: auto; transition: transform 0.18s; }
+  .nav-item.has-sub.expanded .chev { transform: rotate(90deg); }
+  .sidebar-profile { border-top: 1.5px solid var(--border); padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
+  .sidebar-profile .pf-avatar { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #1a3dff, #7a2cff); color: #fff; font-weight: 800; font-size: 13px; display: grid; place-items: center; }
+  .sidebar-profile .pf-name { font-weight: 700; font-size: 13.5px; color: var(--ink); }
+  .sidebar-profile .pf-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
+  .sidebar-profile .pf-menu { margin-left: auto; color: var(--text-muted); cursor: pointer; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; }
+  .sidebar-profile .pf-menu:hover { background: var(--surface-2); color: var(--ink); }
+  .main-area { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+  /* Sidebar collapse */
+  .sb-collapse { position: absolute; top: 26px; right: -13px; width: 26px; height: 26px; border-radius: 50%; background: var(--surface); border: 1.5px solid var(--border-strong); color: var(--text-muted); display: grid; place-items: center; cursor: pointer; z-index: 32; transition: transform 0.18s, color 0.18s, border-color 0.18s; box-shadow: 0 2px 6px rgba(24, 33, 61, 0.08); }
+  .sb-collapse:hover { color: var(--primary); border-color: var(--primary); }
+  .sidebar.collapsed .sb-collapse svg { transform: rotate(180deg); }
+  .sidebar.collapsed { width: 68px; }
+  .sidebar.collapsed .sidebar-brand { padding: 20px 0 18px; justify-content: center; }
+  .sidebar.collapsed .sidebar-brand .name { display: none; }
+  .sidebar.collapsed .nav-section { display: none; }
+  .sidebar.collapsed .nav-item { justify-content: center; padding: 10px 0; border-left: 0; position: relative; font-size: 0; line-height: 0; gap: 0; }
+  .sidebar.collapsed .nav-item.active { background: var(--primary-50); }
+  .sidebar.collapsed .nav-item.active::before { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; background: var(--primary); border-radius: 0 3px 3px 0; }
+  .sidebar.collapsed .nav-item > *:not(.ico) { display: none; }
+  .sidebar.collapsed .nav-item .ico { font-size: initial; line-height: 1; }
+  .sidebar.collapsed .nav-sub { display: none !important; }
+  .sidebar.collapsed .sidebar-profile { padding: 14px 0; justify-content: center; }
+  .sidebar.collapsed .sidebar-profile > div:not(.pf-avatar):not(.pf-menu) { display: none; }
+  .sidebar.collapsed .sidebar-profile .pf-menu { display: none; }
+  .sidebar.collapsed .nav-item:hover::after { content: attr(data-label); position: absolute; left: calc(100% + 14px); top: 50%; transform: translateY(-50%); background: var(--ink); color: #fff; font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 6px; white-space: nowrap; z-index: 100; pointer-events: none; }
+  .menu-toggle { display: none; }
+  @media (max-width: 1100px) {
+    .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); transition: transform 0.22s ease; box-shadow: 8px 0 24px rgba(24, 33, 61, 0.10); }
+    .sidebar.open { transform: translateX(0); }
+    .menu-toggle { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); cursor: pointer; color: var(--text); margin-right: 12px; }
+    .sidebar-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 25; display: none; }
+    .sidebar-overlay.show { display: block; }
+  }
+
+  /* Topbar (shared) */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .crumbs { color: var(--text-soft); font-size: 15px; font-weight: 600; }
+  .crumbs a { color: var(--text-soft); text-decoration: none; }
+  .crumbs a:hover { color: var(--text); }
+  .crumbs .current { color: var(--text); font-weight: 700; }
+  .crumbs .sep { margin: 0 10px; }
+  .topbar .right { display: flex; align-items: center; gap: 18px; }
+  .icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; cursor: pointer; color: var(--text-muted); }
+  .icon-btn:hover { border-color: var(--border-strong); color: var(--ink); }
+  .topbar .avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #1a3dff, #7a2cff); color: #fff; font-weight: 800; font-size: 15px; display: grid; place-items: center; box-shadow: 0 4px 12px rgba(26, 61, 255, 0.35); }
+
+  .page { max-width: 1400px; margin: 24px auto 64px; padding: 0 32px; width: 100%; }
+
+  /* Page header */
+  .page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin-bottom: 24px; flex-wrap: wrap; }
+  .page-title { margin: 0 0 4px; font-size: 24px; font-weight: 700; letter-spacing: -0.018em; line-height: 1.15; color: var(--ink); }
+  .page-subtitle { color: var(--text-muted); font-size: 14px; font-weight: 500; margin: 0; }
+  .greet-emoji { display: inline-block; transform-origin: 70% 70%; animation: wave 1.6s 0.3s ease-in-out 1; }
+  @keyframes wave { 0%, 60%, 100% { transform: rotate(0); } 10%, 30%, 50% { transform: rotate(14deg); } 20%, 40% { transform: rotate(-8deg); } }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .btn { border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink); padding: 9px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; letter-spacing: -0.005em; }
+  .btn:hover { border-color: var(--ink); background: var(--surface-2); color: var(--ink); }
+  .btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(59, 92, 255, 0.25); }
+  .btn.primary:hover { background: var(--primary-600); border-color: var(--primary-600); box-shadow: 0 6px 16px rgba(59, 92, 255, 0.30); }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--text-muted); }
+
+  /* KPI tiles */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(24, 33, 61, 0.06); position: relative; overflow: hidden; }
+  .kpi::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--accent, var(--primary)); }
+  .kpi.tint-blue   { --accent: var(--primary);   box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(59, 92, 255, 0.10); }
+  .kpi.tint-emerald{ --accent: var(--c-bank);    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(5, 150, 105, 0.10); }
+  .kpi.tint-teal   { --accent: var(--c-contact); box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(13, 148, 136, 0.10); }
+  .kpi.tint-rose   { --accent: var(--c-tags);    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(225, 29, 72, 0.10); }
+  .kpi .lbl { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .kpi .num { font-size: 28px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; margin-top: 8px; display: flex; align-items: baseline; gap: 10px; color: var(--ink); }
+  .kpi .trend { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 700; color: var(--success); background: var(--success-50); padding: 2px 7px; border-radius: 999px; }
+  .kpi .trend.down { color: var(--danger); background: var(--danger-50); }
+  .kpi .trend.warn { color: var(--warn); background: var(--warn-50); }
+  .kpi .trend svg { width: 11px; height: 11px; }
+
+  /* Two-col layout */
+  .layout { display: grid; grid-template-columns: 1fr 360px; gap: 20px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(24, 33, 61, 0.06); }
+  .card-head { padding: 16px 20px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-head h3 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: -0.005em; color: var(--ink); }
+  .card-head a { font-size: 12.5px; font-weight: 600; color: var(--primary-600); text-decoration: none; }
+  .card-head a:hover { text-decoration: underline; }
+
+  /* Quick actions */
+  .qa-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+  .qa-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 10px; transition: transform 0.12s, box-shadow 0.12s; box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 4px 12px rgba(24, 33, 61, 0.05); position: relative; overflow: hidden; }
+  .qa-card:hover { transform: translateY(-2px); box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 12px 24px rgba(24, 33, 61, 0.10); }
+  .qa-card .qa-icon { width: 40px; height: 40px; border-radius: 11px; background: var(--accent, var(--primary)); color: #fff; display: grid; place-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.10); }
+  .qa-card.qa-loan   { --accent: var(--primary); }
+  .qa-card.qa-cheque { --accent: var(--c-contact); }
+  .qa-card.qa-gold   { --accent: var(--c-income); }
+  .qa-card.qa-fx     { --accent: var(--c-tags); }
+  .qa-card.qa-client { --accent: var(--c-id); }
+  .qa-card .qa-title { font-weight: 800; font-size: 15px; letter-spacing: -0.01em; }
+  .qa-card .qa-sub { font-size: 12.5px; color: var(--text-muted); font-weight: 500; }
+  .qa-card .qa-chev { position: absolute; top: 16px; right: 16px; color: var(--text-soft); transition: transform 0.15s, color 0.15s; }
+  .qa-card:hover .qa-chev { transform: translateX(3px); color: var(--ink); }
+
+  /* Recent clients table */
+  .rc-list { padding: 6px; }
+  .rc-row { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 10px; text-decoration: none; color: var(--text); transition: background 0.12s; }
+  .rc-row:hover { background: var(--surface-2); }
+  .rc-row .rc-avatar { width: 36px; height: 36px; border-radius: 10px; color: #fff; font-weight: 800; font-size: 12.5px; display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 3px 10px rgba(24,33,61,0.15); }
+  .rc-row .rc-name { font-weight: 700; font-size: 14px; color: var(--ink); }
+  .rc-row .rc-meta { font-size: 12px; color: var(--text-muted); margin-top: 1px; font-weight: 500; }
+  .rc-row .rc-amt { margin-left: auto; font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 500; border: 1px solid currentColor; margin-left: 8px; }
+  .status-pill::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .status-pill.s-active   { color: #047857; background: #e1f8ed; }
+  .status-pill.s-pending  { color: #b45309; background: #fff5e0; }
+  .status-pill.s-inactive { color: #475569; background: #f1f5f9; }
+
+  /* Activity feed */
+  .feed { padding: 6px 16px 14px; }
+  .feed-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+  .feed-item:last-child { border-bottom: 0; }
+  .feed-icon { width: 32px; height: 32px; border-radius: 9px; background: var(--accent, var(--primary)); color: #fff; display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+  .feed-item.a-loan   { --accent: var(--primary); }
+  .feed-item.a-cheque { --accent: var(--c-contact); }
+  .feed-item.a-gold   { --accent: var(--c-income); }
+  .feed-item.a-client { --accent: var(--c-id); }
+  .feed-item.a-payment{ --accent: var(--c-bank); }
+  .feed-text { font-size: 13.5px; line-height: 1.4; color: var(--ink); font-weight: 500; }
+  .feed-text strong { font-weight: 700; }
+  .feed-when { font-size: 11.5px; color: var(--text-soft); margin-top: 2px; font-weight: 600; }
+
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; }
+    .qa-grid { grid-template-columns: repeat(2, 1fr); }
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .qa-grid, .kpis { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+<aside class="sidebar" id="sidebar">
+  <button class="sb-collapse" id="sbCollapse" aria-label="Collapse sidebar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <div class="sidebar-brand">
+    <div class="logo">V</div>
+    <div class="name">Vayoo<span>.ai</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Workspace</div>
+    <a class="nav-item active" href="index.html" data-label="Dashboard"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Dashboard</a>
+    <a class="nav-item" href="customer-list.html" data-label="Customers"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Customers <span class="badge">12</span></a>
+    <a class="nav-item" href="#" data-label="Companies"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></span>Companies</a>
+    <div class="nav-section">Operations</div>
+    <a class="nav-item has-sub expanded" data-label="Transactions"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>Transactions <span class="chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></a>
+    <div class="nav-sub">
+      <a class="nav-item" href="#"><span class="ico" style="color:var(--primary);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Loans</a>
+      <a class="nav-item" href="#"><span class="ico" style="color:#0d9488;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Cheque cashing</a>
+      <a class="nav-item" href="#"><span class="ico" style="color:#d97706;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></span>Gold buy</a>
+      <a class="nav-item" href="#"><span class="ico" style="color:#ec4899;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/></svg></span>Currency exchange</a>
+    </div>
+    <a class="nav-item" href="#" data-label="Approvals"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Approvals <span class="badge">5</span></a>
+    <div class="nav-section">Insights</div>
+    <a class="nav-item" href="#" data-label="Reports"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Reports</a>
+    <a class="nav-item" href="#" data-label="Analytics"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Analytics</a>
+    <div class="nav-section">System</div>
+    <a class="nav-item has-sub" data-label="Settings"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Settings <span class="chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></a>
+    <div class="nav-sub">
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>General</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>Team &amp; Users</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>Roles &amp; Permissions</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg></span>Branches</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg></span>Audit log</a>
+    </div>
+  </nav>
+  <div class="sidebar-profile">
+    <div class="pf-avatar">A</div>
+    <div>
+      <div class="pf-name">Aman Singh</div>
+      <div class="pf-role">Admin · Toronto</div>
+    </div>
+    <div class="pf-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></div>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sbOverlay"></div>
+
+<div class="main-area">
+
+<header class="topbar">
+  <div class="crumbs" style="display:flex;align-items:center;">
+    <button class="menu-toggle" id="menuToggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <span class="current">Dashboard</span>
+  </div>
+  <div class="right">
+    <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+    <div class="avatar">A</div>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Good morning, Aman <span class="greet-emoji">👋</span></h1>
+      <p class="page-subtitle">Sunday, May 10 · Here's what's happening across your branches today.</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="customer-list.html">View customers</a>
+      <a class="btn primary" href="register-customer-redesign.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Client
+      </a>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi tint-blue">
+      <div class="lbl">Active customers</div>
+      <div class="num">2,847 <span class="trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 9 12 3 6 9"/><line x1="12" y1="3" x2="12" y2="21"/></svg>12% MoM</span></div>
+    </div>
+    <div class="kpi tint-emerald">
+      <div class="lbl">Active loans</div>
+      <div class="num">$1.84M <span class="trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 9 12 3 6 9"/><line x1="12" y1="3" x2="12" y2="21"/></svg>8.2% MoM</span></div>
+    </div>
+    <div class="kpi tint-teal">
+      <div class="lbl">Cheques cashed (30d)</div>
+      <div class="num">$642K <span class="trend down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 15 12 21 18 15"/><line x1="12" y1="3" x2="12" y2="21"/></svg>3.4% MoM</span></div>
+    </div>
+    <div class="kpi tint-rose">
+      <div class="lbl">Pending KYC review</div>
+      <div class="num">12 <span class="trend warn">action needed</span></div>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="qa-grid">
+    <a class="qa-card qa-client" href="register-customer-redesign.html">
+      <div class="qa-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></div>
+      <div>
+        <div class="qa-title">New Client</div>
+        <div class="qa-sub">Onboard a new customer in &lt;1 min</div>
+      </div>
+      <span class="qa-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </a>
+    <a class="qa-card qa-loan" href="#">
+      <div class="qa-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <div>
+        <div class="qa-title">New loan</div>
+        <div class="qa-sub">Originate a personal loan</div>
+      </div>
+      <span class="qa-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </a>
+    <a class="qa-card qa-cheque" href="#">
+      <div class="qa-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg></div>
+      <div>
+        <div class="qa-title">Cash a cheque</div>
+        <div class="qa-sub">Process cheque cashing</div>
+      </div>
+      <span class="qa-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </a>
+    <a class="qa-card qa-gold" href="#">
+      <div class="qa-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></div>
+      <div>
+        <div class="qa-title">Gold buy quote</div>
+        <div class="qa-sub">Live spot price &amp; offer</div>
+      </div>
+      <span class="qa-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </a>
+  </div>
+
+  <!-- Two-column main content -->
+  <div class="layout">
+    <div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Recent customers</h3>
+          <a href="customer-list.html">View all →</a>
+        </div>
+        <div class="rc-list">
+          <a class="rc-row" href="customer-view.html">
+            <div class="rc-avatar" style="background: linear-gradient(135deg, #3b5cff, #8b5cf6);">AS</div>
+            <div>
+              <div class="rc-name">Aman Singh <span class="status-pill s-active">Active</span></div>
+              <div class="rc-meta">Cheque cashed · 2h ago</div>
+            </div>
+            <div class="rc-amt">$1,240</div>
+          </a>
+          <a class="rc-row" href="customer-view.html">
+            <div class="rc-avatar" style="background: linear-gradient(135deg, #d97706, #be123c);">PK</div>
+            <div>
+              <div class="rc-name">Priya Kapoor <span class="status-pill s-pending">Pending</span></div>
+              <div class="rc-meta">Onboarded · Yesterday</div>
+            </div>
+            <div class="rc-amt">—</div>
+          </a>
+          <a class="rc-row" href="customer-view.html">
+            <div class="rc-avatar" style="background: linear-gradient(135deg, #059669, #0d9488);">MO</div>
+            <div>
+              <div class="rc-name">Marcus Okafor <span class="status-pill s-active">Active</span></div>
+              <div class="rc-meta">Loan payment · 3 days ago</div>
+            </div>
+            <div class="rc-amt">$340</div>
+          </a>
+          <a class="rc-row" href="customer-view.html">
+            <div class="rc-avatar" style="background: linear-gradient(135deg, #e11d48, #be123c);">RT</div>
+            <div>
+              <div class="rc-name">Rosa Torres <span class="status-pill s-inactive">Inactive</span></div>
+              <div class="rc-meta">Profile updated · 1 week ago</div>
+            </div>
+            <div class="rc-amt">—</div>
+          </a>
+          <a class="rc-row" href="customer-view.html">
+            <div class="rc-avatar" style="background: linear-gradient(135deg, #d97706, #b45309);">JL</div>
+            <div>
+              <div class="rc-name">Jianwei Liu <span class="status-pill s-active">Active</span></div>
+              <div class="rc-meta">Gold quote · 2 weeks ago</div>
+            </div>
+            <div class="rc-amt">$1,860</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <div class="card">
+        <div class="card-head">
+          <h3>Activity today</h3>
+          <a href="#">All activity →</a>
+        </div>
+        <div class="feed">
+          <div class="feed-item a-cheque">
+            <div class="feed-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div>
+              <div class="feed-text"><strong>Aman Singh</strong> cashed a cheque for $1,240</div>
+              <div class="feed-when">2 hours ago · by Sarah K.</div>
+            </div>
+          </div>
+          <div class="feed-item a-payment">
+            <div class="feed-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div>
+              <div class="feed-text"><strong>Marcus Okafor</strong> made a $340 loan payment</div>
+              <div class="feed-when">4 hours ago · auto-debit</div>
+            </div>
+          </div>
+          <div class="feed-item a-client">
+            <div class="feed-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></div>
+            <div>
+              <div class="feed-text">New client <strong>Priya Kapoor</strong> registered</div>
+              <div class="feed-when">Yesterday · by Sandeep R.</div>
+            </div>
+          </div>
+          <div class="feed-item a-loan">
+            <div class="feed-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div>
+              <div class="feed-text"><strong>$5,000 loan</strong> approved for Aman Singh</div>
+              <div class="feed-when">Apr 22 · by Vayoolab Admin</div>
+            </div>
+          </div>
+          <div class="feed-item a-gold">
+            <div class="feed-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></div>
+            <div>
+              <div class="feed-text">Gold buy quote of <strong>$1,860</strong> for 22k 18.4g</div>
+              <div class="feed-when">May 9 · for Aman Singh</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+</main>
+
+</div><!-- /.main-area -->
+</div><!-- /.app-shell -->
+
+<script>
+  (function(){
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sbOverlay');
+    const menuToggle = document.getElementById('menuToggle');
+    const sbCollapse = document.getElementById('sbCollapse');
+    if (menuToggle) {
+      menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('show');
+      });
+      overlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+      });
+    }
+    document.querySelectorAll('.nav-item.has-sub').forEach(nav => {
+      nav.addEventListener('click', () => {
+        if (sidebar.classList.contains('collapsed')) return;
+        nav.classList.toggle('expanded');
+      });
+    });
+    try { if (localStorage.getItem('vayoo:sb-collapsed') === '1') sidebar.classList.add('collapsed'); } catch(e) {}
+    if (sbCollapse) {
+      sbCollapse.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle('collapsed');
+        try { localStorage.setItem('vayoo:sb-collapsed', sidebar.classList.contains('collapsed') ? '1' : '0'); } catch(e) {}
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
