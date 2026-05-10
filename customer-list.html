@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vayoo.ai — Customers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  @view-transition { navigation: auto; }
+  @keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .main-area > * { animation: pageFadeIn 0.22s ease-out; }
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --surface-2: #f6f8fd;
+    --border: #dde2ed;
+    --border-strong: #c2c9da;
+    --ink: #18213d;
+    --ink-soft: #233055;
+    --text: #18213d;
+    --text-muted: #54607a;
+    --text-soft: #7d869f;
+    --primary: #3b5cff;
+    --primary-600: #2945e3;
+    --primary-700: #1d34b8;
+    --primary-50: #ecf0ff;
+    --success: #0e8f3e;
+    --success-50: #e1f8e9;
+    --warn: #c2660e;
+    --warn-50: #fff1d6;
+    --danger: #d11f3a;
+    --danger-50: #fde2e6;
+    --gold: #d97706;
+    --gold-50: #fff1d6;
+    --c-identity: #6366f1;
+    --c-contact: #0d9488;
+    --c-id: #8b5cf6;
+    --c-bank: #059669;
+    --c-income: #d97706;
+    --c-tags: #e11d48;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --radius-lg: 20px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: -0.005em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ========== App shell + sidebar ========== */
+  .app-shell { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 256px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1.5px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 30;
+  }
+  .sidebar-brand {
+    padding: 20px 22px 18px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .sidebar-brand .logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--c-id));
+    color: #fff; display: grid; place-items: center;
+    font-weight: 900; font-size: 16px; letter-spacing: -0.02em;
+    box-shadow: 0 4px 12px rgba(59, 92, 255, 0.30);
+  }
+  .sidebar-brand .name { font-size: 17px; font-weight: 800; letter-spacing: -0.015em; color: var(--ink); }
+  .sidebar-brand .name span { color: var(--primary); }
+
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 10px 0; }
+  .nav-section {
+    font-size: 11px; font-weight: 800; color: var(--text-soft);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 14px 22px 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 22px;
+    text-decoration: none;
+    color: var(--text-muted); font-weight: 600; font-size: 14.5px;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+  }
+  .nav-item:hover { background: var(--surface-2); color: var(--ink); }
+  .nav-item.active {
+    background: linear-gradient(90deg, rgba(59,92,255,0.08), rgba(59,92,255,0));
+    color: var(--primary-600);
+    border-left-color: var(--primary);
+    font-weight: 700;
+  }
+  .nav-item .ico {
+    width: 22px; height: 22px;
+    display: grid; place-items: center;
+    color: currentColor; flex-shrink: 0;
+  }
+  .nav-item.active .ico { color: var(--primary); }
+  .nav-item .badge {
+    margin-left: auto;
+    background: var(--c-tags); color: #fff;
+    font-size: 10.5px; font-weight: 800;
+    padding: 2px 7px; border-radius: 999px;
+  }
+  .nav-item .badge.gray { background: var(--border-strong); color: var(--text-muted); }
+  .nav-sub {
+    padding-left: 32px;
+    display: none;
+  }
+  .nav-item.has-sub.expanded + .nav-sub { display: block; }
+  .nav-sub .nav-item {
+    padding: 7px 22px 7px 32px;
+    font-size: 13.5px; font-weight: 600;
+    border-left: 3px solid transparent;
+  }
+  .nav-sub .nav-item.active {
+    background: transparent;
+    color: var(--primary-600);
+    border-left-color: var(--primary);
+  }
+  .nav-item.has-sub .chev {
+    margin-left: auto;
+    transition: transform 0.18s;
+  }
+  .nav-item.has-sub.expanded .chev { transform: rotate(90deg); }
+
+  .sidebar-profile {
+    border-top: 1.5px solid var(--border);
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sidebar-profile .pf-avatar {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #1a3dff, #7a2cff);
+    color: #fff; font-weight: 800; font-size: 13px;
+    display: grid; place-items: center;
+    box-shadow: 0 3px 10px rgba(26, 61, 255, 0.28);
+  }
+  .sidebar-profile .pf-name { font-weight: 700; font-size: 13.5px; line-height: 1.1; color: var(--ink); }
+  .sidebar-profile .pf-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
+  .sidebar-profile .pf-menu {
+    margin-left: auto;
+    color: var(--text-muted); cursor: pointer;
+    width: 28px; height: 28px; border-radius: 8px;
+    display: grid; place-items: center;
+  }
+  .sidebar-profile .pf-menu:hover { background: var(--surface-2); color: var(--ink); }
+
+  .main-area { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+  /* Sidebar collapse toggle button */
+  .sb-collapse {
+    position: absolute; top: 26px; right: -13px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--surface);
+    border: 1.5px solid var(--border-strong);
+    color: var(--text-muted);
+    display: grid; place-items: center;
+    cursor: pointer;
+    z-index: 32;
+    transition: transform 0.18s, color 0.18s, border-color 0.18s;
+    box-shadow: 0 2px 6px rgba(24, 33, 61, 0.08);
+  }
+  .sb-collapse:hover { color: var(--primary); border-color: var(--primary); }
+  .sidebar.collapsed .sb-collapse svg { transform: rotate(180deg); }
+
+  /* Collapsed sidebar (icon-only) */
+  .sidebar { transition: width 0.22s ease; }
+  .sidebar.collapsed { width: 68px; }
+  .sidebar.collapsed .sidebar-brand { padding: 20px 0 18px; justify-content: center; }
+  .sidebar.collapsed .sidebar-brand .name { display: none; }
+  .sidebar.collapsed .nav-section { display: none; }
+  .sidebar.collapsed .nav-item {
+    justify-content: center;
+    padding: 10px 0;
+    border-left: 0;
+    position: relative;
+    font-size: 0;          /* hide loose text nodes */
+    line-height: 0;
+    gap: 0;
+  }
+  .sidebar.collapsed .nav-item.active {
+    background: var(--primary-50);
+  }
+  .sidebar.collapsed .nav-item.active::before {
+    content: ""; position: absolute; left: 0; top: 8px; bottom: 8px;
+    width: 3px; background: var(--primary); border-radius: 0 3px 3px 0;
+  }
+  .sidebar.collapsed .nav-item > *:not(.ico) { display: none; }
+  .sidebar.collapsed .nav-item .ico { font-size: initial; line-height: 1; }
+  .sidebar.collapsed .nav-sub { display: none !important; }
+  .sidebar.collapsed .sidebar-profile { padding: 14px 0; justify-content: center; }
+  .sidebar.collapsed .sidebar-profile > div:not(.pf-avatar):not(.pf-menu) { display: none; }
+  .sidebar.collapsed .sidebar-profile .pf-menu { display: none; }
+  /* Tooltip for collapsed items */
+  .sidebar.collapsed .nav-item:hover::after {
+    content: attr(data-label);
+    position: absolute;
+    left: calc(100% + 14px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--ink); color: #fff;
+    font-size: 12px; font-weight: 700;
+    padding: 6px 10px; border-radius: 6px;
+    white-space: nowrap; z-index: 100;
+    pointer-events: none;
+  }
+
+  /* Mobile: sidebar collapses */
+  .menu-toggle { display: none; }
+  @media (max-width: 1100px) {
+    .sidebar {
+      position: fixed; left: 0; top: 0;
+      transform: translateX(-100%);
+      transition: transform 0.22s ease;
+      box-shadow: 8px 0 24px rgba(24, 33, 61, 0.10);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .menu-toggle {
+      display: grid; place-items: center;
+      width: 42px; height: 42px; border-radius: 10px;
+      border: 1.5px solid var(--border); background: var(--surface);
+      cursor: pointer; color: var(--text);
+      margin-right: 12px;
+    }
+    .sidebar-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4);
+      z-index: 25; display: none;
+    }
+    .sidebar-overlay.show { display: block; }
+  }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .crumbs { color: var(--text-soft); font-size: 15px; font-weight: 600; }
+  .crumbs a { color: var(--text-soft); text-decoration: none; }
+  .crumbs a:hover { color: var(--text); }
+  .crumbs .current { color: var(--text); font-weight: 700; }
+  .crumbs .sep { margin: 0 10px; }
+  .topbar .right { display: flex; align-items: center; gap: 18px; }
+  .icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; cursor: pointer; color: var(--text-muted); }
+  .icon-btn:hover { border-color: var(--border-strong); color: var(--ink); }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, #1a3dff, #7a2cff);
+    color: #fff; font-weight: 800; font-size: 15px;
+    display: grid; place-items: center;
+    box-shadow: 0 4px 12px rgba(26, 61, 255, 0.35);
+  }
+
+  .page { max-width: 1400px; margin: 24px auto 64px; padding: 0 32px; width: 100%; }
+
+  .page-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 28px; margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .page-title { margin: 0 0 4px; font-size: 24px; font-weight: 700; letter-spacing: -0.018em; line-height: 1.15; color: var(--ink); }
+  .page-subtitle { color: var(--text-muted); font-size: 14px; font-weight: 500; margin: 0; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn {
+    border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink);
+    padding: 9px 16px; border-radius: var(--radius-sm);
+    font-weight: 600; font-size: 14px; cursor: pointer;
+    transition: all 0.15s; display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none;
+    letter-spacing: -0.005em;
+  }
+  .btn:hover { background: var(--surface-2); border-color: var(--ink); color: var(--ink); }
+  .btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(59, 92, 255, 0.25); }
+  .btn.primary:hover { background: var(--primary-600); border-color: var(--primary-600); box-shadow: 0 6px 16px rgba(59, 92, 255, 0.30); }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--text-muted); }
+  .btn.ghost:hover { background: var(--surface-2); color: var(--text); }
+  .btn.sm { padding: 7px 12px; font-size: 13px; }
+
+  /* KPI tiles — softer */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 4px 14px rgba(24, 33, 61, 0.04);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: var(--accent, var(--primary));
+  }
+  .kpi.tint-blue   { --accent: var(--primary);   box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(59, 92, 255, 0.10); }
+  .kpi.tint-teal   { --accent: var(--c-contact); box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(13, 148, 136, 0.10); }
+  .kpi.tint-amber  { --accent: var(--c-income);  box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(217, 119, 6, 0.10); }
+  .kpi.tint-rose   { --accent: var(--c-tags);    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(225, 29, 72, 0.10); }
+  .kpi.tint-violet { --accent: var(--c-id);      box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(139, 92, 246, 0.10); }
+  .kpi.tint-emerald{ --accent: var(--c-bank);    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(5, 150, 105, 0.10); }
+  .kpi .lbl { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .kpi .num { font-size: 28px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; margin-top: 8px; display: flex; align-items: baseline; gap: 10px; color: var(--ink); }
+  .kpi .trend {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 12px; font-weight: 700;
+    color: var(--success);
+    background: var(--success-50);
+    padding: 2px 7px; border-radius: 999px;
+  }
+  .kpi .trend.down { color: var(--danger); background: var(--danger-50); }
+  .kpi .trend.warn { color: var(--warn); background: var(--warn-50); }
+  .kpi .trend svg { width: 11px; height: 11px; }
+  .kpi .num small { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  .kpi .num small.warn { color: var(--warn); }
+  /* Replaced dark "accent" KPI with bright primary-tinted variant */
+  .kpi.accent {
+    background: linear-gradient(135deg, #ecf0ff 0%, #ffffff 100%);
+    border-color: var(--ink);
+  }
+  .kpi.accent::before { background: var(--primary); }
+
+  /* Toolbar */
+  .toolbar {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius) var(--radius) 0 0; padding: 12px 14px;
+    display: flex; gap: 10px; align-items: center;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+    border-bottom: 0;
+  }
+  .search {
+    position: relative; flex: 1; min-width: 240px;
+  }
+  .search input {
+    width: 100%; border: 1px solid var(--border-strong);
+    background: var(--surface);
+    padding: 10px 14px 10px 40px;
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 500;
+    font-family: inherit;
+    color: var(--text);
+  }
+  .search input::placeholder { color: var(--text-soft); font-weight: 500; }
+  .search input:focus { outline: 0; border-color: var(--primary); background: var(--surface); }
+  .search .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text); }
+  .filter-chip {
+    border: 1px solid var(--border-strong); background: var(--surface);
+    color: var(--text); padding: 7px 12px;
+    border-radius: 999px; font-weight: 600; font-size: 13px;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.12s;
+  }
+  .filter-chip:hover { border-color: var(--ink); }
+  .filter-chip.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .filter-chip.active:hover { background: var(--ink-soft); border-color: var(--ink-soft); }
+
+  /* Table */
+  .table-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-top: 0;
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 8px 24px rgba(24, 33, 61, 0.05);
+    overflow: hidden;
+    position: relative;
+  }
+  .table-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: thin;
+  }
+  .table-scroll::-webkit-scrollbar { height: 10px; }
+  .table-scroll::-webkit-scrollbar-track { background: var(--surface-2); }
+  .table-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; }
+  .table-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  table { width: 100%; border-collapse: collapse; min-width: 920px; }
+  /* Sticky first columns (checkbox + customer) */
+  th.check-cell, td.check-cell { position: sticky; left: 0; background: var(--surface); z-index: 2; }
+  thead th.check-cell { background: var(--surface-2); z-index: 3; }
+  th.col-customer, td.col-customer { position: sticky; left: 40px; background: var(--surface); z-index: 2; }
+  thead th.col-customer { background: var(--surface-2); z-index: 3; }
+  tbody tr.selected td.check-cell, tbody tr.selected td.col-customer { background: #f1f4ff; }
+  tbody tr:hover td.check-cell, tbody tr:hover td.col-customer { background: var(--surface-2); }
+  tbody tr.selected:hover td.check-cell, tbody tr.selected:hover td.col-customer { background: #e6ecff; }
+  /* Right shadow when scrollable */
+  td.col-customer::after, th.col-customer::after {
+    content: ""; position: absolute; right: -8px; top: 0; bottom: 0; width: 8px;
+    background: linear-gradient(90deg, rgba(24,33,61,0.04), transparent);
+    pointer-events: none;
+  }
+
+  /* Right-pinned toolbar actions */
+  .toolbar .tb-divider {
+    width: 1.5px; height: 22px; background: var(--border);
+    margin: 0 6px; align-self: center;
+  }
+  .toolbar .tb-right {
+    margin-left: auto;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .tb-icon-btn {
+    width: 36px; height: 36px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.12s;
+    position: relative;
+  }
+  .tb-icon-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .tb-icon-btn.open { background: var(--primary-50); border-color: var(--primary); color: var(--primary-600); }
+  .tb-icon-btn .dot {
+    position: absolute; top: -3px; right: -3px;
+    width: 14px; height: 14px;
+    background: var(--primary); color: #fff;
+    border-radius: 50%; font-size: 9px; font-weight: 800;
+    display: grid; place-items: center;
+    border: 2px solid var(--surface);
+  }
+  .tb-icon-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 8px); right: 0;
+    background: var(--ink); color: #fff;
+    font-size: 11.5px; font-weight: 600;
+    padding: 6px 10px; border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.15s, transform 0.15s;
+    transform: translateY(-4px);
+    z-index: 60;
+  }
+  .tb-icon-btn:hover::after { opacity: 1; transform: translateY(0); }
+
+  /* Customize columns popover */
+  .customize-wrap { position: relative; }
+  .customize-pop {
+    position: absolute;
+    top: calc(100% + 8px); right: 0;
+    width: 320px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 12px 32px rgba(24, 33, 61, 0.10);
+    z-index: 50;
+    display: none;
+    overflow: hidden;
+  }
+  .customize-pop.open { display: block; }
+  .customize-pop .head {
+    padding: 14px 16px;
+    border-bottom: 1.5px solid var(--border);
+    background: var(--surface-2);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .customize-pop .head h4 { margin: 0; font-size: 14px; font-weight: 800; letter-spacing: -0.005em; }
+  .customize-pop .head .reset {
+    font-size: 12px; font-weight: 700;
+    color: var(--primary-600); cursor: pointer;
+    background: transparent; border: 0; padding: 0;
+  }
+  .customize-pop .col-list {
+    max-height: 380px; overflow-y: auto;
+    padding: 6px;
+  }
+  .col-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    user-select: none;
+  }
+  .col-row:hover { background: var(--surface-2); }
+  .col-row.locked { opacity: 0.55; cursor: not-allowed; }
+  .col-row .check { width: 17px; height: 17px; border-radius: 4px; }
+  .col-row .lock { margin-left: auto; color: var(--text-soft); }
+  .col-row .col-name { flex: 1; }
+  .col-row .col-meta {
+    font-size: 11px; color: var(--text-soft); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .customize-pop .foot {
+    padding: 12px 16px;
+    border-top: 1.5px solid var(--border);
+    background: var(--surface-2);
+    display: flex; gap: 8px; justify-content: space-between;
+    font-size: 12px; color: var(--text-muted); font-weight: 600;
+  }
+  .customize-pop .foot .count strong { color: var(--ink); font-weight: 800; }
+  thead th {
+    text-align: left; font-size: 11.5px; text-transform: uppercase;
+    letter-spacing: 0.06em; font-weight: 700; color: var(--text-muted);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  tbody td {
+    padding: 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+    vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr { transition: background 0.12s; }
+  tbody tr:hover { background: var(--surface-2); cursor: pointer; }
+
+  .cust-cell { display: flex; align-items: center; gap: 12px; }
+  .cust-avatar {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: grid; place-items: center;
+    color: #fff; font-weight: 800; font-size: 14px;
+    box-shadow: 0 4px 10px rgba(24, 33, 61, 0.18);
+  }
+  .cust-name { font-weight: 800; font-size: 16px; color: var(--text); letter-spacing: -0.01em; }
+  .cust-id { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    border: 2px solid currentColor;
+  }
+  .pill.green { color: var(--success); background: var(--success-50); }
+  .pill.red { color: var(--danger); background: var(--danger-50); }
+  .pill.warn { color: var(--warn); background: var(--warn-50); }
+  .pill.blue { color: var(--primary-600); background: var(--primary-50); }
+  .pill.gold { color: var(--gold); background: var(--gold-50); }
+  .pill.gray { color: var(--text-muted); background: var(--surface-2); }
+
+  .tag {
+    display: inline-flex; padding: 3px 10px;
+    border-radius: 999px; font-size: 12px; font-weight: 500;
+    border: 1px solid currentColor;
+    background: #f1f5f9; color: #475569;
+    margin-right: 4px;
+  }
+  .tag.color-indigo  { color: #4338ca; background: #eef0ff; }
+  .tag.color-teal    { color: #0f766e; background: #e0f7f4; }
+  .tag.color-violet  { color: #6d28d9; background: #f3edff; }
+  .tag.color-emerald { color: #047857; background: #e1f8ed; }
+  .tag.color-amber   { color: #b45309; background: #fff5e0; }
+  .tag.color-rose    { color: #be123c; background: #fde2e6; }
+  .tag.color-blue    { color: #1d34b8; background: #ecf0ff; }
+  .tag.color-pink    { color: #be185d; background: #fce7f3; }
+  .tag.color-slate   { color: #475569; background: #f1f5f9; }
+
+  .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+  .row-action {
+    width: 32px; height: 32px; border-radius: 7px;
+    border: 1px solid var(--border-strong); background: var(--surface);
+    display: grid; place-items: center; cursor: pointer; color: var(--text-muted);
+    transition: all 0.12s;
+  }
+  .row-action:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .row-action.danger:hover { background: var(--danger); border-color: var(--danger); }
+
+  /* Checkboxes */
+  .check {
+    appearance: none;
+    width: 18px; height: 18px;
+    border: 2px solid var(--border-strong);
+    border-radius: 5px;
+    background: var(--surface);
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+    transition: border-color 0.12s, background 0.12s;
+  }
+  .check:hover { border-color: var(--primary); }
+  .check:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  .check:checked::after {
+    content: ""; position: absolute; inset: 0;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4'><polyline points='20 6 9 17 4 12'/></svg>") center/12px no-repeat;
+  }
+  .check.indeterminate {
+    background: var(--primary); border-color: var(--primary);
+  }
+  .check.indeterminate::after {
+    content: ""; position: absolute; inset: 0;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4'><line x1='5' y1='12' x2='19' y2='12'/></svg>") center/12px no-repeat;
+  }
+  .check-cell { width: 40px; padding-right: 0 !important; }
+  tbody tr.selected td { background: #f1f4ff; }
+  tbody tr.selected:hover td { background: #e6ecff; }
+
+  /* Status pill (separate from risk pill) */
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px 4px 9px; border-radius: 999px;
+    font-size: 12.5px; font-weight: 500;
+    letter-spacing: 0;
+    border: 1px solid currentColor;
+  }
+  .status-pill::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor;
+  }
+  .status-pill.s-active   { color: #047857; background: #e1f8ed; }
+  .status-pill.s-pending  { color: #b45309; background: #fff5e0; }
+  .status-pill.s-inactive { color: #475569; background: #f1f5f9; }
+
+  /* Verification badges next to phone / email */
+  .verify {
+    display: inline-grid; place-items: center;
+    width: 16px; height: 16px; border-radius: 50%;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .verify.verified { background: var(--success); color: #fff; }
+  .verify.pending  { background: var(--warn); color: #fff; }
+
+  .contact-line {
+    display: flex; align-items: center; gap: 0;
+    font-weight: 600;
+  }
+  .contact-line.email {
+    font-size: 12px; color: var(--text-muted); margin-top: 4px;
+  }
+
+  /* Row menu (dropdown) */
+  .row-menu-wrap { position: relative; display: inline-block; }
+  .menu-trigger {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px solid transparent; background: transparent;
+    display: grid; place-items: center; cursor: pointer; color: var(--text-muted);
+    transition: all 0.12s;
+  }
+  .menu-trigger:hover { background: var(--surface-2); color: var(--ink); }
+  .menu-trigger.open { background: var(--surface-2); color: var(--ink); border-color: var(--border-strong); }
+  .menu {
+    position: absolute; right: 0; top: calc(100% + 6px);
+    min-width: 240px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 12px 32px rgba(24, 33, 61, 0.10);
+    padding: 6px;
+    z-index: 50;
+    display: none;
+    text-align: left;
+  }
+  .menu.open { display: block; }
+  .menu-section {
+    font-size: 11px; font-weight: 800; color: var(--text-soft);
+    text-transform: uppercase; letter-spacing: 0.07em;
+    padding: 8px 12px 4px;
+  }
+  .menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .menu-item:hover { background: var(--surface-2); }
+  .menu-item .ico {
+    width: 26px; height: 26px; border-radius: 7px;
+    display: grid; place-items: center;
+    background: var(--surface-2); color: var(--text);
+    flex-shrink: 0;
+  }
+  .menu-item.c-loan    .ico { background: #ecf0ff; color: var(--primary-600); }
+  .menu-item.c-cheque  .ico { background: #e0f7f4; color: #0f766e; }
+  .menu-item.c-gold    .ico { background: #fff5e0; color: #b45309; }
+  .menu-item.c-fx      .ico { background: #fce7f3; color: #be185d; }
+  .menu-item.c-message .ico { background: #f3edff; color: #6d28d9; }
+  .menu-item.c-edit    .ico { background: #eef0ff; color: #4338ca; }
+  .menu-item.c-view    .ico { background: #f1f5f9; color: var(--text-muted); }
+  .menu-item.danger { color: var(--danger); }
+  .menu-item.danger .ico { background: var(--danger-50); color: var(--danger); }
+  .menu-item.danger:hover { background: var(--danger-50); }
+  .menu-divider { height: 1px; background: var(--border); margin: 4px 6px; }
+
+  /* Bulk action bar */
+  .bulk-bar {
+    display: none;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    align-items: center; gap: 10px;
+    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 6px 18px rgba(59, 92, 255, 0.08);
+    flex-wrap: wrap;
+  }
+  .bulk-bar.visible { display: flex; }
+  .bulk-bar .count {
+    font-size: 13px; font-weight: 700;
+    background: var(--primary-50);
+    color: var(--primary-600);
+    padding: 4px 10px; border-radius: 999px;
+    border: 1px solid var(--primary-100);
+  }
+  .bulk-bar .count strong { color: var(--primary-600); }
+  .bulk-bar .label-text { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+  .bulk-bar .spacer { flex: 1; }
+  .bulk-bar .btn { padding: 7px 12px; font-size: 13px; }
+  .bulk-bar .btn.danger { color: var(--danger); border-color: var(--danger-50); background: var(--danger-50); }
+  .bulk-bar .btn.danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+  .bulk-bar .btn.clear { background: transparent; color: var(--text-muted); border-color: transparent; }
+  .bulk-bar .btn.clear:hover { color: var(--ink); background: var(--surface-2); }
+
+  /* Bulk dropdown wrapper (Change status / Assign officer) */
+  .bulk-dd-wrap { position: relative; }
+  .bulk-dd {
+    position: absolute; top: calc(100% + 6px); right: 0;
+    min-width: 220px;
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 6px;
+    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 12px 32px rgba(24, 33, 61, 0.10);
+    display: none; z-index: 60;
+  }
+  .bulk-dd.open { display: block; }
+  .bulk-dd .menu-item { color: var(--text); }
+  .bulk-dd .menu-item:hover { background: var(--surface-2); }
+
+  .pagination {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--surface-2);
+    border-top: 1.5px solid var(--border);
+    font-weight: 600; font-size: 14px; color: var(--text-muted);
+  }
+  .pagination .pages { display: flex; gap: 6px; }
+  .page-btn {
+    width: 34px; height: 34px; border-radius: 8px;
+    border: 1.5px solid var(--border-strong); background: var(--surface);
+    font-weight: 700; cursor: pointer; font-family: inherit; font-size: 13px;
+    color: var(--text);
+  }
+  .page-btn:hover { border-color: var(--ink); }
+  .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  .money { font-weight: 800; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 900px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .page-title { font-size: 32px; }
+    .col-hide { display: none; }
+  }
+  @media (max-width: 600px) {
+    .kpis { grid-template-columns: 1fr; }
+    .col-hide-sm { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+<aside class="sidebar" id="sidebar">
+  <button class="sb-collapse" id="sbCollapse" aria-label="Collapse sidebar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <div class="sidebar-brand">
+    <div class="logo">V</div>
+    <div class="name">Vayoo<span>.ai</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Workspace</div>
+    <a class="nav-item" href="index.html" data-label="Dashboard"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Dashboard</a>
+    <a class="nav-item active" href="customer-list.html" data-label="Customers"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Customers <span class="badge">12</span></a>
+    <a class="nav-item" href="#" data-label="Companies"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/><line x1="9" y1="9" x2="9" y2="9"/><line x1="9" y1="12" x2="9" y2="12"/><line x1="9" y1="15" x2="9" y2="15"/><line x1="9" y1="18" x2="9" y2="18"/></svg></span>Companies</a>
+
+    <div class="nav-section">Operations</div>
+    <a class="nav-item has-sub expanded" id="navTransactions" data-label="Transactions"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>Transactions <span class="chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></a>
+    <div class="nav-sub">
+      <a class="nav-item" href="#"><span class="ico" style="color:var(--primary);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Loans</a>
+      <a class="nav-item" href="#"><span class="ico" style="color:#0d9488;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Cheque cashing</a>
+      <a class="nav-item" href="#"><span class="ico" style="color:#d97706;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></span>Gold buy</a>
+      <a class="nav-item" href="#"><span class="ico" style="color:#ec4899;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/></svg></span>Currency exchange</a>
+    </div>
+    <a class="nav-item" href="#" data-label="Approvals"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Approvals <span class="badge">5</span></a>
+
+    <div class="nav-section">Insights</div>
+    <a class="nav-item" href="#" data-label="Reports"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>Reports</a>
+    <a class="nav-item" href="#" data-label="Analytics"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Analytics</a>
+
+    <div class="nav-section">System</div>
+    <a class="nav-item has-sub" data-label="Settings"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Settings <span class="chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></a>
+    <div class="nav-sub">
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>General</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>Team &amp; Users</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>Roles &amp; Permissions</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/></svg></span>Branches</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg></span>Audit log</a>
+    </div>
+  </nav>
+  <div class="sidebar-profile">
+    <div class="pf-avatar">A</div>
+    <div>
+      <div class="pf-name">Aman Singh</div>
+      <div class="pf-role">Admin · Toronto</div>
+    </div>
+    <div class="pf-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></div>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sbOverlay"></div>
+
+<div class="main-area">
+
+<header class="topbar">
+  <div class="crumbs" style="display:flex;align-items:center;">
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <a href="index.html">Dashboard</a> <span class="sep">/</span> <span class="current">Customers</span>
+  </div>
+  <div class="right">
+    <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+    <div class="avatar">A</div>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Customers</h1>
+      <p class="page-subtitle">2,847 total · 134 added this month · 12 flagged for review</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export</button>
+      <a class="btn primary" href="register-customer-redesign.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Client
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI tiles -->
+  <div class="kpis">
+    <div class="kpi accent">
+      <div class="lbl">Active customers</div>
+      <div class="num">2,847 <span class="trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 9 12 3 6 9"/><line x1="12" y1="3" x2="12" y2="21"/></svg>12% MoM</span></div>
+    </div>
+    <div class="kpi tint-emerald">
+      <div class="lbl">Active loans</div>
+      <div class="num">$1.84M <span class="trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 9 12 3 6 9"/><line x1="12" y1="3" x2="12" y2="21"/></svg>8.2% MoM</span></div>
+    </div>
+    <div class="kpi tint-teal">
+      <div class="lbl">Cheques cashed (30d)</div>
+      <div class="num">$642K <span class="trend down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 15 12 21 18 15"/><line x1="12" y1="3" x2="12" y2="21"/></svg>3.4% MoM</span></div>
+    </div>
+    <div class="kpi tint-rose">
+      <div class="lbl">Pending KYC review</div>
+      <div class="num">12 <span class="trend warn">action needed</span></div>
+    </div>
+  </div>
+
+  <!-- Bulk action bar (visible when rows selected) -->
+  <div class="bulk-bar" id="bulkBar">
+    <span class="count"><strong id="bulkCount">0</strong> selected</span>
+    <span class="label-text">Bulk actions:</span>
+
+    <button class="btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download list</button>
+
+    <div class="bulk-dd-wrap">
+      <button class="btn" id="bulkStatusBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Change status <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="bulk-dd" id="bulkStatusDD">
+        <div class="menu-item"><span class="ico" style="background:#e1f8ed;color:#047857;">●</span>Set Active</div>
+        <div class="menu-item"><span class="ico" style="background:#fff5e0;color:#b45309;">●</span>Set Pending</div>
+        <div class="menu-item"><span class="ico" style="background:#f1f5f9;color:#475569;">●</span>Set Inactive</div>
+      </div>
+    </div>
+
+    <div class="bulk-dd-wrap">
+      <button class="btn" id="bulkOfficerBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg> Assign loan officer <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="bulk-dd" id="bulkOfficerDD">
+        <div class="menu-item"><span class="ico" style="background:linear-gradient(135deg,#3b5cff,#8b5cf6);color:#fff;font-weight:800;font-size:11px;">SK</span>Sarah Kapoor</div>
+        <div class="menu-item"><span class="ico" style="background:linear-gradient(135deg,#0d9488,#059669);color:#fff;font-weight:800;font-size:11px;">SR</span>Sandeep Rao</div>
+        <div class="menu-item"><span class="ico" style="background:linear-gradient(135deg,#d97706,#e11d48);color:#fff;font-weight:800;font-size:11px;">JM</span>Jenna Marquez</div>
+        <div class="menu-divider"></div>
+        <div class="menu-item"><span class="ico">+</span>Auto-assign by branch</div>
+      </div>
+    </div>
+
+    <button class="btn danger"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Deactivate</button>
+
+    <span class="spacer"></span>
+    <button class="btn clear" id="bulkClear">Clear selection</button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input placeholder="Search by name, phone, email, or ID number…" />
+    </div>
+    <button class="filter-chip active">All <span style="background: rgba(255,255,255,0.2); padding: 1px 8px; border-radius: 999px; margin-left: 4px;">2,847</span></button>
+    <button class="filter-chip"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#047857;margin-right:6px;"></span>Active <span style="color:var(--text-muted);font-weight:500;margin-left:2px;">2,612</span></button>
+    <button class="filter-chip"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#b45309;margin-right:6px;"></span>Pending <span style="color:var(--text-muted);font-weight:500;margin-left:2px;">189</span></button>
+    <button class="filter-chip"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#475569;margin-right:6px;"></span>Inactive <span style="color:var(--text-muted);font-weight:500;margin-left:2px;">46</span></button>
+
+    <div class="tb-right">
+      <button class="tb-icon-btn" id="filterBtn" data-tooltip="Advanced filters">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        <span class="dot">2</span>
+      </button>
+      <span class="tb-divider"></span>
+      <div class="customize-wrap">
+        <button class="tb-icon-btn" id="customizeBtn" data-tooltip="Customize columns">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+        </button>
+        <div class="customize-pop" id="customizePop">
+        <div class="head">
+          <h4>Visible columns</h4>
+          <button class="reset" id="resetCols">Reset to default</button>
+        </div>
+        <div class="col-list" id="colList">
+          <!-- Locked default columns -->
+          <label class="col-row locked">
+            <input type="checkbox" class="check" checked disabled />
+            <span class="col-name">Customer</span>
+            <span class="lock"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="status" checked />
+            <span class="col-name">Status</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="contact" checked />
+            <span class="col-name">Contact</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="tags" checked />
+            <span class="col-name">Tags</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="risk" checked />
+            <span class="col-name">Risk</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="balance" checked />
+            <span class="col-name">Open balance</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="activity" checked />
+            <span class="col-name">Last activity</span>
+          </label>
+
+          <!-- Optional columns (off by default) -->
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="ltv" />
+            <span class="col-name">Lifetime value</span>
+            <span class="col-meta">$</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="since" />
+            <span class="col-name">Customer since</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="branch" />
+            <span class="col-name">Branch</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="officer" />
+            <span class="col-name">Assigned officer</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="lastloan" />
+            <span class="col-name">Last loan amount</span>
+            <span class="col-meta">$</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="idtype" />
+            <span class="col-name">ID type</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="source" />
+            <span class="col-name">Source / Referral</span>
+          </label>
+          <label class="col-row">
+            <input type="checkbox" class="check" data-col="optin" />
+            <span class="col-name">Marketing opt-in</span>
+          </label>
+        </div>
+        <div class="foot">
+          <span class="count"><strong id="visCount">7</strong> of 14 columns visible</span>
+          <span style="color:var(--text-soft);">Saved per user</span>
+        </div>
+      </div>
+      </div><!-- /.customize-wrap -->
+    </div><!-- /.tb-right -->
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <div class="table-scroll" id="tableScroll">
+    <table id="custTable">
+      <thead>
+        <tr>
+          <th class="check-cell"><input type="checkbox" class="check" id="checkAll" /></th>
+          <th class="col-customer">Customer</th>
+          <th data-col="status">Status</th>
+          <th data-col="contact" class="col-hide-sm">Contact</th>
+          <th data-col="tags" class="col-hide">Tags</th>
+          <th data-col="risk">Risk</th>
+          <th data-col="balance" class="col-hide">Open balance</th>
+          <th data-col="activity" class="col-hide">Last activity</th>
+          <th data-col="ltv" hidden>Lifetime value</th>
+          <th data-col="since" hidden>Customer since</th>
+          <th data-col="branch" hidden>Branch</th>
+          <th data-col="officer" hidden>Assigned officer</th>
+          <th data-col="lastloan" hidden>Last loan</th>
+          <th data-col="idtype" hidden>ID type</th>
+          <th data-col="source" hidden>Source</th>
+          <th data-col="optin" hidden>Opt-in</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="rowsBody">
+
+        <tr>
+          <td class="check-cell"><input type="checkbox" class="check row-check" /></td>
+          <td class="col-customer">
+            <div class="cust-cell">
+              <div class="cust-avatar" style="background: linear-gradient(135deg, #3b5cff, #8b5cf6);">AS</div>
+              <div>
+                <div class="cust-name">Aman Singh</div>
+                <div class="cust-id">#VC-10284 · ON Driver's License</div>
+              </div>
+            </div>
+          </td>
+          <td data-col="status"><span class="status-pill s-active">Active</span></td>
+          <td data-col="contact" class="col-hide-sm">
+            <div class="contact-line">+1 (416) 555-2841<span class="verify verified" title="Verified"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+            <div class="contact-line email">aman@example.com<span class="verify verified" title="Verified"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+          </td>
+          <td data-col="tags" class="col-hide"><span class="tag color-violet">VIP</span><span class="tag color-indigo">Repeat borrower</span></td>
+          <td data-col="risk"><span class="pill green">Low</span></td>
+          <td data-col="balance" class="col-hide money">$8,420.00</td>
+          <td data-col="activity" class="col-hide" style="color: var(--text-muted); font-weight: 600;">2h ago</td>
+          <td data-col="ltv" hidden class="money">$42,180</td>
+          <td data-col="since" hidden style="color: var(--text-muted); font-weight: 600;">Mar 2024</td>
+          <td data-col="branch" hidden style="font-weight: 600;">Toronto Downtown</td>
+          <td data-col="officer" hidden><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;"><span style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#3b5cff,#8b5cf6);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800;">SK</span>Sarah Kapoor</span></td>
+          <td data-col="lastloan" hidden class="money">$5,000</td>
+          <td data-col="idtype" hidden style="font-weight: 600;">Driver's License</td>
+          <td data-col="source" hidden style="color: var(--text-muted); font-weight: 600;">Walk-in</td>
+          <td data-col="optin" hidden><span class="status-pill s-active" style="font-size:10.5px;">Yes</span></td>
+          <td style="text-align: right;">
+            <div class="row-menu-wrap">
+              <button class="menu-trigger" aria-label="Actions"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+              <div class="menu">
+                <a class="menu-item c-view" href="customer-view.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>View profile</a>
+                <a class="menu-item c-edit" href="customer-edit.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>Edit details</a>
+                <div class="menu-divider"></div>
+                <div class="menu-section">New transaction</div>
+                <a class="menu-item c-loan" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>New loan</a>
+                <a class="menu-item c-cheque" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg></span>Cash a cheque</a>
+                <a class="menu-item c-gold" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></span>Gold buy quote</a>
+                <a class="menu-item c-fx" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>Currency exchange</a>
+                <div class="menu-divider"></div>
+                <a class="menu-item c-message" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Send message</a>
+                <a class="menu-item danger" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span>Deactivate customer</a>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="check-cell"><input type="checkbox" class="check row-check" /></td>
+          <td class="col-customer">
+            <div class="cust-cell">
+              <div class="cust-avatar" style="background: linear-gradient(135deg, #d97706, #be123c);">PK</div>
+              <div>
+                <div class="cust-name">Priya Kapoor</div>
+                <div class="cust-id">#VC-10283 · Passport (IN)</div>
+              </div>
+            </div>
+          </td>
+          <td data-col="status"><span class="status-pill s-pending">Pending</span></td>
+          <td data-col="contact" class="col-hide-sm">
+            <div class="contact-line">+1 (905) 555-7720<span class="verify verified" title="Verified"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+            <div class="contact-line email">priya.k@example.com<span class="verify pending" title="Pending verification"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span></div>
+          </td>
+          <td data-col="tags" class="col-hide"><span class="tag color-amber">Gold buy</span><span class="tag color-emerald">New client</span></td>
+          <td data-col="risk"><span class="pill warn">Medium</span></td>
+          <td data-col="balance" class="col-hide money">$0.00</td>
+          <td data-col="activity" class="col-hide" style="color: var(--text-muted); font-weight: 600;">Yesterday</td>
+          <td data-col="ltv" hidden class="money">$1,840</td>
+          <td data-col="since" hidden style="color: var(--text-muted); font-weight: 600;">May 2026</td>
+          <td data-col="branch" hidden style="font-weight: 600;">Mississauga</td>
+          <td data-col="officer" hidden><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;"><span style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#0d9488,#059669);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800;">SR</span>Sandeep Rao</span></td>
+          <td data-col="lastloan" hidden class="money" style="color: var(--text-soft);">—</td>
+          <td data-col="idtype" hidden style="font-weight: 600;">Passport (IN)</td>
+          <td data-col="source" hidden style="color: var(--text-muted); font-weight: 600;">Referral · Aman S.</td>
+          <td data-col="optin" hidden><span class="status-pill s-active" style="font-size:10.5px;">Yes</span></td>
+          <td style="text-align: right;">
+            <div class="row-menu-wrap">
+              <button class="menu-trigger"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+              <div class="menu">
+                <a class="menu-item c-view" href="customer-view.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>View profile</a>
+                <a class="menu-item c-edit" href="customer-edit.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>Edit details</a>
+                <div class="menu-divider"></div>
+                <div class="menu-section">New transaction</div>
+                <a class="menu-item c-loan" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>New loan</a>
+                <a class="menu-item c-cheque" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg></span>Cash a cheque</a>
+                <a class="menu-item c-gold" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></span>Gold buy quote</a>
+                <a class="menu-item c-fx" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>Currency exchange</a>
+                <div class="menu-divider"></div>
+                <a class="menu-item c-message" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Send message</a>
+                <a class="menu-item danger" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span>Deactivate customer</a>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="check-cell"><input type="checkbox" class="check row-check" /></td>
+          <td class="col-customer">
+            <div class="cust-cell">
+              <div class="cust-avatar" style="background: linear-gradient(135deg, #059669, #0d9488);">MO</div>
+              <div>
+                <div class="cust-name">Marcus Okafor</div>
+                <div class="cust-id">#VC-10281 · ON Photo Card</div>
+              </div>
+            </div>
+          </td>
+          <td data-col="status"><span class="status-pill s-active">Active</span></td>
+          <td data-col="contact" class="col-hide-sm">
+            <div class="contact-line">+1 (647) 555-1903<span class="verify verified" title="Verified"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+            <div class="contact-line email">m.okafor@example.com<span class="verify verified" title="Verified"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+          </td>
+          <td data-col="tags" class="col-hide"><span class="tag color-teal">Cheque services</span><span class="tag color-blue">Verified income</span></td>
+          <td data-col="risk"><span class="pill green">Low</span></td>
+          <td data-col="balance" class="col-hide money">$2,150.00</td>
+          <td data-col="activity" class="col-hide" style="color: var(--text-muted); font-weight: 600;">3 days ago</td>
+          <td data-col="ltv" hidden class="money">$18,420</td>
+          <td data-col="since" hidden style="color: var(--text-muted); font-weight: 600;">Aug 2023</td>
+          <td data-col="branch" hidden style="font-weight: 600;">Toronto Downtown</td>
+          <td data-col="officer" hidden><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;"><span style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#3b5cff,#8b5cf6);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800;">SK</span>Sarah Kapoor</span></td>
+          <td data-col="lastloan" hidden class="money">$2,150</td>
+          <td data-col="idtype" hidden style="font-weight: 600;">ON Photo Card</td>
+          <td data-col="source" hidden style="color: var(--text-muted); font-weight: 600;">Google Ad</td>
+          <td data-col="optin" hidden><span class="status-pill s-active" style="font-size:10.5px;">Yes</span></td>
+          <td style="text-align: right;">
+            <div class="row-menu-wrap">
+              <button class="menu-trigger"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+              <div class="menu">
+                <a class="menu-item c-view" href="customer-view.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>View profile</a>
+                <a class="menu-item c-edit" href="customer-edit.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>Edit details</a>
+                <div class="menu-divider"></div>
+                <div class="menu-section">New transaction</div>
+                <a class="menu-item c-loan" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>New loan</a>
+                <a class="menu-item c-cheque" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg></span>Cash a cheque</a>
+                <a class="menu-item c-gold" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></span>Gold buy quote</a>
+                <a class="menu-item c-fx" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>Currency exchange</a>
+                <div class="menu-divider"></div>
+                <a class="menu-item c-message" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Send message</a>
+                <a class="menu-item danger" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span>Deactivate customer</a>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="check-cell"><input type="checkbox" class="check row-check" /></td>
+          <td class="col-customer">
+            <div class="cust-cell">
+              <div class="cust-avatar" style="background: linear-gradient(135deg, #e11d48, #be123c);">RT</div>
+              <div>
+                <div class="cust-name">Rosa Torres</div>
+                <div class="cust-id">#VC-10279 · PR Card</div>
+              </div>
+            </div>
+          </td>
+          <td data-col="status"><span class="status-pill s-inactive">Inactive</span></td>
+          <td data-col="contact" class="col-hide-sm">
+            <div class="contact-line">+1 (416) 555-9088<span class="verify pending" title="Pending verification"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span></div>
+            <div class="contact-line email">rosa.t@example.com<span class="verify verified" title="Verified"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+          </td>
+          <td data-col="tags" class="col-hide"><span class="tag color-rose">High value</span><span class="tag color-pink">FX</span></td>
+          <td data-col="risk"><span class="pill red">High</span></td>
+          <td data-col="balance" class="col-hide money">$12,800.00</td>
+          <td data-col="activity" class="col-hide" style="color: var(--text-muted); font-weight: 600;">1 week ago</td>
+          <td data-col="ltv" hidden class="money">$76,300</td>
+          <td data-col="since" hidden style="color: var(--text-muted); font-weight: 600;">Jan 2022</td>
+          <td data-col="branch" hidden style="font-weight: 600;">Brampton</td>
+          <td data-col="officer" hidden><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;"><span style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#d97706,#e11d48);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800;">JM</span>Jenna Marquez</span></td>
+          <td data-col="lastloan" hidden class="money">$12,800</td>
+          <td data-col="idtype" hidden style="font-weight: 600;">PR Card</td>
+          <td data-col="source" hidden style="color: var(--text-muted); font-weight: 600;">Walk-in</td>
+          <td data-col="optin" hidden><span class="status-pill s-inactive" style="font-size:10.5px;">No</span></td>
+          <td style="text-align: right;">
+            <div class="row-menu-wrap">
+              <button class="menu-trigger"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+              <div class="menu">
+                <a class="menu-item c-view" href="customer-view.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>View profile</a>
+                <a class="menu-item c-edit" href="customer-edit.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>Edit details</a>
+                <div class="menu-divider"></div>
+                <a class="menu-item" href="#"><span class="ico" style="background:#e1f8ed;color:#047857;">●</span>Re-activate</a>
+                <a class="menu-item c-message" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Send message</a>
+                <a class="menu-item danger" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg></span>Delete permanently</a>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="check-cell"><input type="checkbox" class="check row-check" /></td>
+          <td class="col-customer">
+            <div class="cust-cell">
+              <div class="cust-avatar" style="background: linear-gradient(135deg, #d97706, #b45309);">JL</div>
+              <div>
+                <div class="cust-name">Jianwei Liu</div>
+                <div class="cust-id">#VC-10277 · Passport (CN)</div>
+              </div>
+            </div>
+          </td>
+          <td data-col="status"><span class="status-pill s-active">Active</span></td>
+          <td data-col="contact" class="col-hide-sm">
+            <div class="contact-line">+1 (905) 555-3344<span class="verify verified" title="Verified"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+            <div class="contact-line email">j.liu@example.com<span class="verify pending" title="Pending verification"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span></div>
+          </td>
+          <td data-col="tags" class="col-hide"><span class="tag color-amber">Gold buy</span><span class="tag color-violet">VIP</span></td>
+          <td data-col="risk"><span class="pill green">Low</span></td>
+          <td data-col="balance" class="col-hide money">$0.00</td>
+          <td data-col="activity" class="col-hide" style="color: var(--text-muted); font-weight: 600;">2 weeks ago</td>
+          <td data-col="ltv" hidden class="money">$54,920</td>
+          <td data-col="since" hidden style="color: var(--text-muted); font-weight: 600;">Jul 2021</td>
+          <td data-col="branch" hidden style="font-weight: 600;">Mississauga</td>
+          <td data-col="officer" hidden><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;"><span style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#3b5cff,#8b5cf6);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800;">SK</span>Sarah Kapoor</span></td>
+          <td data-col="lastloan" hidden class="money" style="color: var(--text-soft);">—</td>
+          <td data-col="idtype" hidden style="font-weight: 600;">Passport (CN)</td>
+          <td data-col="source" hidden style="color: var(--text-muted); font-weight: 600;">Branch visit</td>
+          <td data-col="optin" hidden><span class="status-pill s-active" style="font-size:10.5px;">Yes</span></td>
+          <td style="text-align: right;">
+            <div class="row-menu-wrap">
+              <button class="menu-trigger"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+              <div class="menu">
+                <a class="menu-item c-view" href="customer-view.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>View profile</a>
+                <a class="menu-item c-edit" href="customer-edit.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>Edit details</a>
+                <div class="menu-divider"></div>
+                <div class="menu-section">New transaction</div>
+                <a class="menu-item c-loan" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>New loan</a>
+                <a class="menu-item c-cheque" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg></span>Cash a cheque</a>
+                <a class="menu-item c-gold" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></span>Gold buy quote</a>
+                <a class="menu-item c-fx" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>Currency exchange</a>
+                <div class="menu-divider"></div>
+                <a class="menu-item c-message" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Send message</a>
+                <a class="menu-item danger" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span>Deactivate customer</a>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="check-cell"><input type="checkbox" class="check row-check" /></td>
+          <td class="col-customer">
+            <div class="cust-cell">
+              <div class="cust-avatar" style="background: linear-gradient(135deg, #6366f1, #4338ca);">DS</div>
+              <div>
+                <div class="cust-name">Devon Sharma</div>
+                <div class="cust-id">#VC-10275 · Driver's License</div>
+              </div>
+            </div>
+          </td>
+          <td data-col="status"><span class="status-pill s-inactive">Inactive</span></td>
+          <td data-col="contact" class="col-hide-sm">
+            <div class="contact-line">+1 (416) 555-6677<span class="verify verified" title="Verified"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+            <div class="contact-line email">devon.s@example.com<span class="verify verified" title="Verified"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+          </td>
+          <td data-col="tags" class="col-hide"><span class="tag color-teal">Cheque services</span></td>
+          <td data-col="risk"><span class="pill warn">Medium</span></td>
+          <td data-col="balance" class="col-hide money">$3,400.00</td>
+          <td data-col="activity" class="col-hide" style="color: var(--text-muted); font-weight: 600;">3 weeks ago</td>
+          <td data-col="ltv" hidden class="money">$3,400</td>
+          <td data-col="since" hidden style="color: var(--text-muted); font-weight: 600;">Oct 2025</td>
+          <td data-col="branch" hidden style="font-weight: 600;">Toronto Downtown</td>
+          <td data-col="officer" hidden><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;"><span style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#0d9488,#059669);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800;">SR</span>Sandeep Rao</span></td>
+          <td data-col="lastloan" hidden class="money">$3,400</td>
+          <td data-col="idtype" hidden style="font-weight: 600;">Driver's License</td>
+          <td data-col="source" hidden style="color: var(--text-muted); font-weight: 600;">Referral</td>
+          <td data-col="optin" hidden><span class="status-pill s-inactive" style="font-size:10.5px;">No</span></td>
+          <td style="text-align: right;">
+            <div class="row-menu-wrap">
+              <button class="menu-trigger"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+              <div class="menu">
+                <a class="menu-item c-view" href="customer-view.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>View profile</a>
+                <a class="menu-item c-edit" href="customer-edit.html"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>Edit details</a>
+                <div class="menu-divider"></div>
+                <a class="menu-item" href="#"><span class="ico" style="background:#e1f8ed;color:#047857;">●</span>Re-activate</a>
+                <a class="menu-item c-message" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Send message</a>
+                <a class="menu-item danger" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg></span>Delete permanently</a>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+    </div><!-- /.table-scroll -->
+
+    <div class="pagination">
+      <div>Showing <strong style="color: var(--text);">1–6</strong> of <strong style="color: var(--text);">2,847</strong> customers</div>
+      <div class="pages">
+        <button class="page-btn">‹</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">…</button>
+        <button class="page-btn">475</button>
+        <button class="page-btn">›</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+</div><!-- /.main-area -->
+</div><!-- /.app-shell -->
+
+<script>
+  (function(){
+    // ===== Row click navigates to view (but ignore checkbox / menu / link clicks) =====
+    document.querySelectorAll('#rowsBody tr').forEach(tr => {
+      tr.addEventListener('click', (e) => {
+        const t = e.target;
+        if (t.closest('.row-menu-wrap') || t.closest('input') || t.closest('a') || t.closest('button')) return;
+        location.href = 'customer-view.html';
+      });
+    });
+
+    // ===== Action menu (per row) =====
+    document.querySelectorAll('.row-menu-wrap').forEach(wrap => {
+      const trigger = wrap.querySelector('.menu-trigger');
+      const menu = wrap.querySelector('.menu');
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Close any other open menus
+        document.querySelectorAll('.menu.open').forEach(m => { if (m !== menu) m.classList.remove('open'); });
+        document.querySelectorAll('.menu-trigger.open').forEach(t => { if (t !== trigger) t.classList.remove('open'); });
+        menu.classList.toggle('open');
+        trigger.classList.toggle('open');
+      });
+    });
+
+    // ===== Bulk dropdowns (Change status / Assign officer) =====
+    function wireBulkDD(btnId, ddId) {
+      const btn = document.getElementById(btnId);
+      const dd  = document.getElementById(ddId);
+      if (!btn || !dd) return;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.bulk-dd.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
+        dd.classList.toggle('open');
+      });
+    }
+    wireBulkDD('bulkStatusBtn', 'bulkStatusDD');
+    wireBulkDD('bulkOfficerBtn', 'bulkOfficerDD');
+
+    // ===== Close menus / dropdowns on outside click =====
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.menu.open').forEach(m => m.classList.remove('open'));
+      document.querySelectorAll('.menu-trigger.open').forEach(t => t.classList.remove('open'));
+      document.querySelectorAll('.bulk-dd.open').forEach(d => d.classList.remove('open'));
+    });
+
+    // ===== Multi-select =====
+    const checkAll = document.getElementById('checkAll');
+    const rowChecks = Array.from(document.querySelectorAll('.row-check'));
+    const bulkBar  = document.getElementById('bulkBar');
+    const bulkCount = document.getElementById('bulkCount');
+    const bulkClear = document.getElementById('bulkClear');
+
+    function syncBulkBar() {
+      const checked = rowChecks.filter(c => c.checked);
+      const count = checked.length;
+      bulkCount.textContent = count;
+      bulkBar.classList.toggle('visible', count > 0);
+      // Mark selected rows
+      rowChecks.forEach(c => {
+        const tr = c.closest('tr');
+        tr.classList.toggle('selected', c.checked);
+      });
+      // Header check state
+      checkAll.classList.remove('indeterminate');
+      if (count === 0) { checkAll.checked = false; }
+      else if (count === rowChecks.length) { checkAll.checked = true; }
+      else { checkAll.checked = false; checkAll.classList.add('indeterminate'); }
+    }
+
+    checkAll.addEventListener('change', () => {
+      const v = checkAll.checked;
+      rowChecks.forEach(c => { c.checked = v; });
+      syncBulkBar();
+    });
+    rowChecks.forEach(c => c.addEventListener('change', syncBulkBar));
+    bulkClear.addEventListener('click', () => {
+      rowChecks.forEach(c => { c.checked = false; });
+      syncBulkBar();
+    });
+
+    // Click on header checkbox shouldn't bubble to row click
+    document.querySelectorAll('.check-cell').forEach(td => {
+      td.addEventListener('click', e => e.stopPropagation());
+    });
+
+    // ===== Sidebar mobile toggle + has-sub expand + collapse =====
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sbOverlay');
+    const menuToggle = document.getElementById('menuToggle');
+    const sbCollapse = document.getElementById('sbCollapse');
+    if (menuToggle) {
+      menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('show');
+      });
+      overlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+      });
+    }
+    document.querySelectorAll('.nav-item.has-sub').forEach(nav => {
+      nav.addEventListener('click', () => {
+        if (sidebar.classList.contains('collapsed')) return; // no-op when collapsed
+        nav.classList.toggle('expanded');
+      });
+    });
+    // Collapse toggle (persisted in localStorage)
+    try {
+      if (localStorage.getItem('vayoo:sb-collapsed') === '1') sidebar.classList.add('collapsed');
+    } catch(e) {}
+    if (sbCollapse) {
+      sbCollapse.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle('collapsed');
+        try {
+          localStorage.setItem('vayoo:sb-collapsed', sidebar.classList.contains('collapsed') ? '1' : '0');
+        } catch(e) {}
+      });
+    }
+
+    // ===== Customize columns =====
+    const customizeBtn = document.getElementById('customizeBtn');
+    const customizePop = document.getElementById('customizePop');
+    const visCount = document.getElementById('visCount');
+    const colChecks = customizePop.querySelectorAll('input[data-col]');
+    const defaultsOn = ['status','contact','tags','risk','balance','activity'];
+
+    customizeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = customizePop.classList.toggle('open');
+      customizeBtn.classList.toggle('open', isOpen);
+    });
+    customizePop.addEventListener('click', e => e.stopPropagation());
+    document.addEventListener('click', () => {
+      customizePop.classList.remove('open');
+      customizeBtn.classList.remove('open');
+    });
+
+    function applyCol(col, on) {
+      document.querySelectorAll('[data-col="' + col + '"]').forEach(el => {
+        if (on) el.removeAttribute('hidden'); else el.setAttribute('hidden', '');
+      });
+    }
+    function refreshCount() {
+      const n = 1 /* Customer */ + Array.from(colChecks).filter(c => c.checked).length;
+      visCount.textContent = n;
+    }
+    colChecks.forEach(cb => {
+      cb.addEventListener('change', () => {
+        applyCol(cb.dataset.col, cb.checked);
+        refreshCount();
+      });
+    });
+    document.getElementById('resetCols').addEventListener('click', () => {
+      colChecks.forEach(cb => {
+        cb.checked = defaultsOn.includes(cb.dataset.col);
+        applyCol(cb.dataset.col, cb.checked);
+      });
+      refreshCount();
+    });
+  })();
+</script>
+
+</body>
+</html>
