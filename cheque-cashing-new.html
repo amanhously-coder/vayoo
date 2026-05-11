@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vayoo.ai — New Cheque Cashing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  @view-transition { navigation: auto; }
+  @keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .main-area > * { animation: pageFadeIn 0.22s ease-out; }
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --surface-2: #f6f8fd;
+    --border: #dde2ed;
+    --border-strong: #c2c9da;
+    --ink: #18213d;
+    --ink-soft: #233055;
+    --text: #18213d;
+    --text-muted: #54607a;
+    --text-soft: #7d869f;
+    --primary: #3b5cff;
+    --primary-600: #2945e3;
+    --primary-700: #1d34b8;
+    --primary-50: #ecf0ff;
+    --primary-100: #d6deff;
+    --success: #0e8f3e;
+    --success-50: #e1f8ed;
+    --warn: #c2660e;
+    --warn-50: #fff5e0;
+    --danger: #d11f3a;
+    --danger-50: #fde2e6;
+    --c-identity: #6366f1;
+    --c-contact: #0d9488;
+    --c-id: #8b5cf6;
+    --c-bank: #059669;
+    --c-income: #d97706;
+    --c-tags: #e11d48;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --radius-lg: 20px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 16px; font-weight: 500; line-height: 1.5; letter-spacing: -0.005em; -webkit-font-smoothing: antialiased; }
+
+  /* App shell + sidebar (shared) */
+  .app-shell { display: flex; min-height: 100vh; }
+  .sidebar { width: 256px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; z-index: 30; transition: width 0.22s ease; }
+  .sidebar-brand { padding: 20px 22px 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+  .sidebar-brand .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--c-id)); color: #fff; display: grid; place-items: center; font-weight: 900; font-size: 16px; box-shadow: 0 4px 12px rgba(59,92,255,0.30); }
+  .sidebar-brand .name { font-size: 17px; font-weight: 800; letter-spacing: -0.015em; color: var(--ink); }
+  .sidebar-brand .name span { color: var(--primary); }
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 10px 0; }
+  .nav-section { font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em; padding: 14px 22px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 22px; text-decoration: none; color: var(--text-muted); font-weight: 600; font-size: 14.5px; border-left: 3px solid transparent; cursor: pointer; }
+  .nav-item:hover { background: var(--surface-2); color: var(--ink); }
+  .nav-item.active { background: linear-gradient(90deg, rgba(59,92,255,0.08), rgba(59,92,255,0)); color: var(--primary-600); border-left-color: var(--primary); font-weight: 700; }
+  .nav-item .ico { width: 22px; height: 22px; display: grid; place-items: center; flex-shrink: 0; }
+  .nav-item.active .ico { color: var(--primary); }
+  .nav-item .badge { margin-left: auto; background: var(--c-tags); color: #fff; font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 999px; }
+  .nav-sub { padding-left: 32px; display: none; }
+  .nav-item.has-sub.expanded + .nav-sub { display: block; }
+  .nav-sub .nav-item { padding: 7px 22px 7px 32px; font-size: 13.5px; }
+  .nav-item.has-sub .chev { margin-left: auto; transition: transform 0.18s; }
+  .nav-item.has-sub.expanded .chev { transform: rotate(90deg); }
+  .sidebar-profile { border-top: 1px solid var(--border); padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
+  .sidebar-profile .pf-avatar { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #1a3dff, #7a2cff); color: #fff; font-weight: 800; font-size: 13px; display: grid; place-items: center; }
+  .sidebar-profile .pf-name { font-weight: 700; font-size: 13.5px; color: var(--ink); }
+  .sidebar-profile .pf-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
+  .sidebar-profile .pf-menu { margin-left: auto; color: var(--text-muted); cursor: pointer; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; }
+  .sidebar-profile .pf-menu:hover { background: var(--surface-2); color: var(--ink); }
+  .main-area { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .sb-collapse { position: absolute; top: 26px; right: -13px; width: 26px; height: 26px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border-strong); color: var(--text-muted); display: grid; place-items: center; cursor: pointer; z-index: 32; transition: transform 0.18s, color 0.18s, border-color 0.18s; box-shadow: 0 2px 6px rgba(24, 33, 61, 0.08); }
+  .sb-collapse:hover { color: var(--primary); border-color: var(--primary); }
+  .sidebar.collapsed .sb-collapse svg { transform: rotate(180deg); }
+  .sidebar.collapsed { width: 68px; }
+  .sidebar.collapsed .sidebar-brand { padding: 20px 0 18px; justify-content: center; }
+  .sidebar.collapsed .sidebar-brand .name { display: none; }
+  .sidebar.collapsed .nav-section { display: none; }
+  .sidebar.collapsed .nav-item { justify-content: center; padding: 10px 0; border-left: 0; position: relative; font-size: 0; line-height: 0; gap: 0; }
+  .sidebar.collapsed .nav-item.active { background: var(--primary-50); }
+  .sidebar.collapsed .nav-item.active::before { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; background: var(--primary); border-radius: 0 3px 3px 0; }
+  .sidebar.collapsed .nav-item > *:not(.ico) { display: none; }
+  .sidebar.collapsed .nav-item .ico { font-size: initial; line-height: 1; }
+  .sidebar.collapsed .nav-sub { display: none !important; }
+  .sidebar.collapsed .sidebar-profile { padding: 14px 0; justify-content: center; }
+  .sidebar.collapsed .sidebar-profile > div:not(.pf-avatar):not(.pf-menu) { display: none; }
+  .sidebar.collapsed .sidebar-profile .pf-menu { display: none; }
+  .sidebar.collapsed .nav-item:hover::after { content: attr(data-label); position: absolute; left: calc(100% + 14px); top: 50%; transform: translateY(-50%); background: var(--ink); color: #fff; font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 6px; white-space: nowrap; z-index: 100; pointer-events: none; }
+  .menu-toggle { display: none; }
+  @media (max-width: 1100px) {
+    .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); transition: transform 0.22s ease; box-shadow: 8px 0 24px rgba(24, 33, 61, 0.10); }
+    .sidebar.open { transform: translateX(0); }
+    .menu-toggle { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; color: var(--text); margin-right: 12px; }
+    .sidebar-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 25; display: none; }
+    .sidebar-overlay.show { display: block; }
+  }
+
+  /* Topbar */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .crumbs { color: var(--text-soft); font-size: 15px; font-weight: 600; display:flex; align-items:center; }
+  .crumbs a { color: var(--text-soft); text-decoration: none; }
+  .crumbs a:hover { color: var(--text); }
+  .crumbs .current { color: var(--text); font-weight: 700; }
+  .crumbs .sep { margin: 0 10px; }
+  .topbar .right { display: flex; align-items: center; gap: 18px; }
+  .icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; cursor: pointer; color: var(--text-muted); }
+  .icon-btn:hover { border-color: var(--border-strong); color: var(--ink); }
+  .topbar .avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #1a3dff, #7a2cff); color: #fff; font-weight: 800; font-size: 15px; display: grid; place-items: center; box-shadow: 0 4px 12px rgba(26, 61, 255, 0.35); }
+
+  .page { max-width: 1400px; margin: 24px auto 64px; padding: 0 32px; width: 100%; }
+
+  .page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin-bottom: 24px; flex-wrap: wrap; }
+  .page-title { margin: 0 0 4px; font-size: 24px; font-weight: 700; letter-spacing: -0.018em; line-height: 1.15; color: var(--ink); }
+  .page-subtitle { color: var(--text-muted); font-size: 14px; font-weight: 500; margin: 0; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn { border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink); padding: 9px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; letter-spacing: -0.005em; }
+  .btn:hover { background: var(--surface-2); border-color: var(--ink); color: var(--ink); }
+  .btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(59, 92, 255, 0.25); }
+  .btn.primary:hover { background: var(--primary-600); border-color: var(--primary-600); }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--text-muted); }
+
+  /* Client strip */
+  .client-strip { display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04); }
+  .client-strip .ava { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #3b5cff, #8b5cf6); color: #fff; font-weight: 800; font-size: 14px; display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(139,92,246,0.25); }
+  .client-strip .info .nm { font-weight: 700; font-size: 15px; color: var(--ink); }
+  .client-strip .info .meta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
+  .client-strip .change { margin-left: auto; font-size: 13px; color: var(--primary-600); font-weight: 600; cursor: pointer; text-decoration: none; }
+  .client-strip .change:hover { text-decoration: underline; }
+
+  /* Layout */
+  .layout { display: grid; grid-template-columns: 1fr 360px; gap: 20px; align-items: flex-start; }
+
+  /* Card / section */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 1px 3px rgba(24,33,61,0.04), 0 8px 24px rgba(24,33,61,0.06); overflow: hidden; }
+  .section { padding: 22px 24px; border-bottom: 1px solid var(--border); }
+  .section:last-child { border-bottom: 0; }
+  .section.acc-cheque { border-left: 4px solid var(--c-contact); }
+  .section.acc-payout { border-left: 4px solid var(--c-bank); }
+  .section.acc-notes { border-left: 4px solid #64748b; }
+  .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .section-head h3 { margin: 0; font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .section-head p { margin: 2px 0 0; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .section-icon { width: 36px; height: 36px; border-radius: 10px; color: #fff; display: grid; place-items: center; flex-shrink: 0; }
+  .section.acc-cheque .section-icon { background: var(--c-contact); box-shadow: 0 4px 12px rgba(13,148,136,0.25); }
+  .section.acc-payout .section-icon { background: var(--c-bank); box-shadow: 0 4px 12px rgba(5,150,105,0.25); }
+  .section.acc-notes .section-icon { background: #64748b; box-shadow: 0 4px 12px rgba(100,116,139,0.25); }
+
+  .grid { display: grid; gap: 16px 16px; }
+  .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 13px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em; display: flex; align-items: center; gap: 4px; }
+  .field label .req { color: var(--danger); margin-left: 2px; font-weight: 700; }
+  .field label .opt { color: var(--text-soft); font-weight: 500; margin-left: 6px; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .input, .select, .textarea {
+    width: 100%; border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+    font-size: 14.5px; font-weight: 500; font-family: inherit; color: var(--text);
+    transition: border 0.15s, box-shadow 0.15s;
+  }
+  .input::placeholder, .textarea::placeholder { color: var(--text-soft); font-weight: 500; }
+  .input:focus, .select:focus, .textarea:focus { outline: 0; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 92, 255, 0.14); }
+  .select { appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2354607a' stroke-width='2.5'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+  .input-icon { position: relative; }
+  .input-icon .input { padding-left: 36px; }
+  .input-icon .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-weight: 700; pointer-events: none; }
+  .input-suffix { position: relative; }
+  .input-suffix .input { padding-right: 36px; }
+  .input-suffix .sfx { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-weight: 700; pointer-events: none; font-size: 14px; }
+  .helper { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+  /* Kill number input spinners */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
+  /* Cheque sub-card */
+  .cheque-card {
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    background: var(--surface-2);
+    position: relative;
+  }
+  .cheque-card-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  }
+  .cheque-card-head .num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--c-contact); color: #fff;
+    font-size: 12px; font-weight: 800;
+    display: grid; place-items: center;
+  }
+  .cheque-card-head .lbl { font-weight: 800; font-size: 15px; color: var(--ink); }
+  .cheque-card-head .tag {
+    font-size: 11px; font-weight: 700; padding: 2px 8px;
+    border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em;
+    background: var(--success-50); color: var(--success);
+    border: 1px solid #bbe9c9;
+  }
+  .cheque-card-head .remove {
+    margin-left: auto; cursor: pointer; color: var(--text-muted);
+    background: transparent; border: 0; font-weight: 600; font-size: 13px;
+    padding: 6px 10px; border-radius: 8px; font-family: inherit;
+  }
+  .cheque-card-head .remove:hover { color: var(--danger); background: var(--danger-50); }
+
+  /* Cheque type chips */
+  .type-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .type-chip {
+    background: var(--surface); border: 1px solid var(--border-strong);
+    padding: 6px 12px; border-radius: 999px;
+    font-size: 12.5px; font-weight: 600; color: var(--text-muted);
+    cursor: pointer; font-family: inherit; transition: all 0.12s;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .type-chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .type-chip:hover { border-color: var(--ink); color: var(--ink); }
+  .type-chip.active { color: #fff; }
+  .type-chip.t-personal.active   { background: #475569; border-color: #475569; }
+  .type-chip.t-payroll.active    { background: var(--primary); border-color: var(--primary); }
+  .type-chip.t-government.active { background: var(--c-bank); border-color: var(--c-bank); }
+  .type-chip.t-insurance.active  { background: var(--c-id); border-color: var(--c-id); }
+  .type-chip.t-commission.active { background: var(--c-income); border-color: var(--c-income); }
+
+  /* Issuer search + dropdown */
+  .issuer-wrap { position: relative; }
+  .issuer-dd {
+    position: absolute; left: 0; right: 0; top: calc(100% + 4px);
+    background: var(--surface); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 12px 32px rgba(24,33,61,0.12);
+    max-height: 280px; overflow-y: auto;
+    z-index: 60; display: none;
+  }
+  .issuer-dd.open { display: block; }
+  .issuer-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer; border-bottom: 1px solid var(--border);
+  }
+  .issuer-item:last-child { border-bottom: 0; }
+  .issuer-item:hover { background: var(--surface-2); }
+  .issuer-item .ava {
+    width: 30px; height: 30px; border-radius: 8px;
+    color: #fff; font-weight: 800; font-size: 11.5px;
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .issuer-item .meta { flex: 1; min-width: 0; }
+  .issuer-item .nm { font-weight: 700; font-size: 13.5px; color: var(--ink); }
+  .issuer-item .sub { font-size: 11.5px; color: var(--text-muted); font-weight: 500; }
+  .stat-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 999px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    flex-shrink: 0;
+    border: 0;
+    line-height: 1;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.10);
+  }
+  .stat-pill::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.85);
+  }
+  .stat-trusted { background: var(--success); color: #fff; }
+  .stat-watch   { background: var(--warn); color: #fff; }
+  .stat-blocked { background: var(--danger); color: #fff; }
+  .issuer-item.add-new { color: var(--primary-600); font-weight: 700; padding: 11px 12px; background: var(--surface-2); border-top: 1px solid var(--border); }
+  .issuer-item.add-new:hover { background: var(--primary-50); }
+
+  /* Selected company info card */
+  .company-info {
+    margin-top: 10px;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--surface), var(--surface-2));
+    border: 1px solid var(--border);
+    display: none;
+  }
+  .company-info.show { display: block; }
+  .company-info.s-trusted { border-left: 3px solid var(--success); }
+  .company-info.s-watch   { border-left: 3px solid var(--warn); background: linear-gradient(135deg, var(--warn-50), var(--surface)); }
+  .company-info.s-blocked { border-left: 3px solid var(--danger); background: linear-gradient(135deg, var(--danger-50), var(--surface)); }
+  .ci-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ci-head .ava { width: 34px; height: 34px; border-radius: 9px; color: #fff; font-weight: 800; font-size: 13px; display: grid; place-items: center; flex-shrink: 0; }
+  .ci-head .nm { font-weight: 800; font-size: 14.5px; color: var(--ink); flex: 1; min-width: 100px; }
+  .ci-stars { display: inline-flex; align-items: center; gap: 2px; color: #d97706; font-size: 13px; font-weight: 700; }
+  .ci-stars .num { color: var(--ink); font-weight: 800; margin-left: 4px; font-size: 13px; }
+  .ci-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px 0; border-top: 1px dashed var(--border); border-bottom: 1px dashed var(--border); margin-bottom: 10px; }
+  .ci-stat { font-size: 11.5px; }
+  .ci-stat .k { color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 10.5px; }
+  .ci-stat .v { color: var(--ink); font-weight: 800; margin-top: 3px; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .ci-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ci-actions button {
+    background: var(--surface); border: 1px solid var(--border-strong); color: var(--ink);
+    padding: 6px 11px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 5px;
+  }
+  .ci-actions button:hover { border-color: var(--ink); background: var(--surface-2); }
+  .ci-warn {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 10px 12px; margin-top: 10px;
+    background: var(--danger-50); border: 1px solid #f5b3bd; border-radius: 8px;
+    font-size: 12.5px; color: var(--danger); font-weight: 600; line-height: 1.4;
+  }
+  .ci-warn.warn { background: var(--warn-50); border-color: #f5d394; color: var(--warn); }
+
+  /* Upload zones (front & back) */
+  .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .upload-zone {
+    border: 1.5px dashed var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 20px 14px;
+    background: var(--surface);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.12s;
+    position: relative;
+    overflow: hidden;
+    min-height: 110px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px;
+  }
+  .upload-zone:hover { border-color: var(--primary); background: var(--primary-50); }
+  .upload-zone .ico { color: var(--text-muted); }
+  .upload-zone:hover .ico { color: var(--primary); }
+  .upload-zone .lbl { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .upload-zone .sub { font-size: 11.5px; color: var(--text-muted); font-weight: 500; }
+  .upload-zone input[type="file"] { display: none; }
+  .upload-zone.uploaded { border-style: solid; border-color: var(--success); background: var(--success-50); }
+  .upload-zone.uploaded .ico { color: var(--success); }
+  .upload-zone.uploaded .lbl::before { content: "✓ "; color: var(--success); }
+
+  /* Payout method radio tiles */
+  .payout-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .payout-tile {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 14px 12px;
+    border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: var(--radius-sm); cursor: pointer; transition: all 0.12s;
+    text-align: center;
+  }
+  .payout-tile:hover { border-color: var(--ink); }
+  .payout-tile.active { border-color: var(--c-bank); background: var(--success-50); }
+  .payout-tile .ico { width: 32px; height: 32px; border-radius: 8px; background: var(--surface-2); color: var(--text-muted); display: grid; place-items: center; }
+  .payout-tile.active .ico { background: var(--c-bank); color: #fff; }
+  .payout-tile .lbl { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .payout-tile .sub { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+  /* Add another button */
+  .add-row {
+    border: 1.5px dashed var(--border-strong); background: var(--surface);
+    color: var(--text-muted); font-weight: 600; font-size: 13.5px;
+    padding: 12px; width: 100%; border-radius: var(--radius-sm);
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: inherit;
+  }
+  .add-row:hover { border-color: var(--ink); color: var(--ink); background: var(--surface-2); }
+
+  /* Right summary */
+  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 1px 3px rgba(24,33,61,0.04), 0 8px 24px rgba(24,33,61,0.06); overflow: hidden; position: sticky; top: 88px; }
+  .summary-head { padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--surface-2); display: flex; align-items: center; justify-content: space-between; }
+  .summary-head h4 { margin: 0; font-size: 13px; font-weight: 800; color: var(--ink); text-transform: uppercase; letter-spacing: 0.06em; }
+  .summary-head .pill { font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: #e0f7f4; color: #0f766e; border: 1px solid #b2e5dc; }
+  .summary-body { padding: 18px; }
+  .summary-amt { text-align: center; padding: 8px 0 18px; }
+  .summary-amt .lbl { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .summary-amt .num { font-size: 36px; font-weight: 800; letter-spacing: -0.025em; color: var(--ink); margin-top: 4px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .summary-amt .sub { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 6px; }
+  .summary-list { border-top: 1px dashed var(--border); padding-top: 14px; }
+  .summary-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13.5px; }
+  .summary-row .k { color: var(--text-muted); font-weight: 500; }
+  .summary-row .v { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .summary-row.subtract .v { color: var(--danger); }
+  .summary-row.subtract .v::before { content: "− "; }
+  .summary-row.total { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; }
+  .summary-row.total .k { color: var(--ink); font-weight: 700; }
+  .summary-row.total .v { font-size: 15px; font-weight: 800; color: var(--c-bank); }
+  .summary-actions { padding: 14px 18px; border-top: 1px solid var(--border); background: var(--surface-2); }
+
+  /* Footer bar */
+  .footer-bar { position: sticky; bottom: 20px; margin-top: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 22px; box-shadow: 0 4px 14px rgba(24,33,61,0.08); display: flex; align-items: center; justify-content: space-between; z-index: 5; flex-wrap: wrap; gap: 16px; }
+  .footer-bar .info { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .footer-bar .info strong { color: var(--ink); font-weight: 700; }
+
+  /* ===== Cheque image preview modal ===== */
+  .cheque-modal-bd, .submit-modal-bd {
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 200; padding: 20px;
+    animation: backdropIn 0.18s ease-out;
+  }
+  .cheque-modal-bd.show, .submit-modal-bd.show { display: flex; }
+  @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+  .cheque-modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); width: 100%; max-width: 640px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.30);
+    overflow: hidden; animation: modalIn 0.22s ease-out;
+  }
+  .cm-head {
+    padding: 16px 22px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cm-head h3 { margin: 0; font-size: 15px; font-weight: 700; color: var(--ink); }
+  .cm-head .x { background: transparent; border: 0; cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 6px; }
+  .cm-head .x:hover { background: var(--surface-2); color: var(--ink); }
+  .cm-body { padding: 22px; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); }
+
+  /* Stylized cheque mock */
+  .cheque-mock {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 18px;
+    font-family: 'Inter', sans-serif;
+    color: #0f172a;
+    position: relative;
+    box-shadow: 0 8px 20px rgba(15,23,42,0.10);
+  }
+  .cheque-mock::after {
+    content: "VOID"; position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-size: 96px; font-weight: 900; color: rgba(225, 29, 72, 0.10);
+    transform: rotate(-15deg); pointer-events: none;
+  }
+  .cm-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .cm-row .from { font-size: 12px; }
+  .cm-row .from .name { font-weight: 800; font-size: 14px; }
+  .cm-row .num { font-size: 13px; color: #64748b; font-weight: 700; text-align: right; }
+  .cm-row .num strong { color: #0f172a; }
+  .cm-pay { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-top: 1px dashed #cbd5e1; border-bottom: 1px dashed #cbd5e1; margin: 10px 0; }
+  .cm-pay .lbl { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+  .cm-pay .name { flex: 1; font-weight: 700; font-size: 15px; border-bottom: 1px solid #94a3b8; padding-bottom: 2px; }
+  .cm-pay .amt { font-weight: 800; font-size: 18px; padding: 4px 12px; border: 1.5px solid #0f172a; border-radius: 6px; font-variant-numeric: tabular-nums; }
+  .cm-words { font-size: 13px; color: #334155; padding: 8px 0; border-bottom: 1px solid #94a3b8; font-style: italic; }
+  .cm-foot { display: flex; justify-content: space-between; margin-top: 14px; align-items: flex-end; }
+  .cm-foot .micr { font-family: 'Courier New', monospace; font-size: 13px; color: #0f172a; letter-spacing: 1px; }
+  .cm-foot .sig { font-family: 'Brush Script MT', cursive; font-size: 22px; color: #1d4ed8; padding: 0 16px; border-bottom: 1px solid #94a3b8; }
+
+  /* Submit success modal (reused) */
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 100%; max-width: 520px; box-shadow: 0 24px 60px rgba(15,23,42,0.30); overflow: hidden; animation: modalIn 0.22s ease-out; }
+  .modal-head { text-align: center; padding: 28px 28px 20px; background: linear-gradient(180deg, var(--success-50) 0%, var(--surface) 100%); border-bottom: 1px solid var(--border); }
+  .modal-head .check { width: 56px; height: 56px; border-radius: 50%; background: var(--success); color: #fff; display: grid; place-items: center; margin: 0 auto 14px; box-shadow: 0 8px 22px rgba(14,143,62,0.28); }
+  .modal-head h2 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+  .modal-head .ref { margin-top: 4px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .modal-head .ref strong { color: var(--ink); font-weight: 700; }
+  .modal-body { padding: 22px 24px; }
+  .modal-body .question { font-size: 13.5px; font-weight: 600; color: var(--ink); margin: 0 0 14px; }
+  .modal-actions { display: flex; flex-direction: column; gap: 10px; }
+  .ma { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; text-align: left; transition: all 0.15s; font-family: inherit; width: 100%; }
+  .ma:hover { border-color: var(--ink); background: var(--surface-2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,33,61,0.06); }
+  .ma .ico-wrap { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; color: #fff; flex-shrink: 0; }
+  .ma.ma-print  .ico-wrap { background: linear-gradient(135deg, #475569, #1e293b); }
+  .ma.ma-receipt .ico-wrap { background: linear-gradient(135deg, var(--c-contact), #0f766e); }
+  .ma.ma-email  .ico-wrap { background: linear-gradient(135deg, var(--primary), var(--c-id)); }
+  .ma .meta { flex: 1; }
+  .ma .meta .t { font-size: 14.5px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .ma .meta .s { font-size: 12.5px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+  .ma .chev { color: var(--text-soft); flex-shrink: 0; }
+  .ma:hover .chev { color: var(--ink); }
+  .ma.ma-recommended { border-color: var(--c-bank); background: linear-gradient(135deg, var(--success-50), var(--surface)); }
+  .ma .badge-rec { background: var(--c-bank); color: #fff; font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; margin-left: 8px; }
+  .modal-foot { padding: 14px 22px; border-top: 1px solid var(--border); background: var(--surface-2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 12.5px; color: var(--text-muted); font-weight: 500; }
+  .modal-close { background: transparent; border: 0; cursor: pointer; color: var(--text-muted); font-weight: 700; font-size: 13px; padding: 6px 12px; border-radius: 8px; font-family: inherit; }
+  .modal-close:hover { background: var(--surface); color: var(--ink); }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: var(--radius); box-shadow: 0 12px 32px rgba(15,23,42,0.30); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; z-index: 250; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  .toast .ico { width: 22px; height: 22px; border-radius: 50%; background: var(--success); display: grid; place-items: center; flex-shrink: 0; }
+
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; }
+    .summary-card { position: relative; top: 0; }
+    .grid.cols-2, .grid.cols-3, .upload-grid, .payout-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+<aside class="sidebar" id="sidebar">
+  <button class="sb-collapse" id="sbCollapse" aria-label="Collapse sidebar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <div class="sidebar-brand">
+    <div class="logo">V</div>
+    <div class="name">Vayoo<span>.ai</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Workspace</div>
+    <a class="nav-item" href="index.html" data-label="Dashboard"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Dashboard</a>
+    <a class="nav-item" href="client-list.html" data-label="Clients"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Clients <span class="badge">12</span></a>
+    <a class="nav-item" href="companies-list.html" data-label="Companies"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></span>Companies</a>
+    <div class="nav-section">Operations</div>
+    <a class="nav-item has-sub expanded" data-label="Transactions"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>Transactions <span class="chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></a>
+    <div class="nav-sub">
+      <a class="nav-item" href="loan-new.html" data-label="Loans"><span class="ico" style="color:var(--primary);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Loans</a>
+      <a class="nav-item active" href="cheque-cashing-new.html" data-label="Cheque cashing"><span class="ico" style="color:#0d9488;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Cheque cashing</a>
+      <a class="nav-item" href="#" data-label="Gold buy"><span class="ico" style="color:#d97706;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></span>Gold buy</a>
+      <a class="nav-item" href="#" data-label="Currency exchange"><span class="ico" style="color:#ec4899;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/></svg></span>Currency exchange</a>
+    </div>
+    <a class="nav-item" href="#" data-label="Approvals"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Approvals <span class="badge">5</span></a>
+    <div class="nav-section">Insights</div>
+    <a class="nav-item" href="#" data-label="Reports"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Reports</a>
+    <a class="nav-item" href="#" data-label="Analytics"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Analytics</a>
+    <div class="nav-section">System</div>
+    <a class="nav-item has-sub" data-label="Settings"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/></svg></span>Settings <span class="chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></a>
+    <div class="nav-sub">
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>General</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>Team &amp; Users</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>Roles &amp; Permissions</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg></span>Branches</a>
+    </div>
+  </nav>
+  <div class="sidebar-profile">
+    <div class="pf-avatar">A</div>
+    <div>
+      <div class="pf-name">Aman Singh</div>
+      <div class="pf-role">Admin · Toronto</div>
+    </div>
+    <div class="pf-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></div>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sbOverlay"></div>
+
+<div class="main-area">
+
+<header class="topbar">
+  <div class="crumbs">
+    <button class="menu-toggle" id="menuToggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <a href="index.html">Dashboard</a><span class="sep">/</span>
+    <a href="client-list.html">Clients</a><span class="sep">/</span>
+    <a href="client-view.html">Aman Singh</a><span class="sep">/</span>
+    <span class="current">New Cheque Cashing</span>
+  </div>
+  <div class="right">
+    <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+    <div class="avatar">A</div>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">New Cheque Cashing</h1>
+      <p class="page-subtitle">Cash one or more cheques in a single transaction. Fees and net payout calculate live.</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn ghost" href="client-list.html">Cancel</a>
+      <button class="btn">Save draft</button>
+    </div>
+  </div>
+
+  <!-- Client strip -->
+  <div class="client-strip">
+    <div class="ava">AS</div>
+    <div class="info">
+      <div class="nm">Aman Singh <span style="font-size:11px;color:var(--success);background:#e1f8ed;padding:2px 8px;border-radius:999px;font-weight:700;margin-left:6px;border:1px solid #bbe9c9;">● Active</span></div>
+      <div class="meta">#VC-10284 · KYC verified · 14 cheques cashed lifetime · Last: 2h ago</div>
+    </div>
+    <a class="change" href="client-list.html">Change client →</a>
+  </div>
+
+  <div class="layout">
+    <div>
+
+      <!-- ===== Cheques ===== -->
+      <div class="card">
+        <div class="section acc-cheque">
+          <div class="section-head">
+            <div class="section-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
+            </div>
+            <div>
+              <h3>Cheques in this transaction</h3>
+              <p>Add one or more cheques. Each can have its own issuer, type, and fees.</p>
+            </div>
+          </div>
+
+          <div id="chequesContainer">
+            <!-- cheque-card 1 (template instance) -->
+          </div>
+
+          <button type="button" class="add-row" id="addChequeBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add another cheque
+          </button>
+        </div>
+
+        <!-- ===== Payout ===== -->
+        <div class="section acc-payout">
+          <div class="section-head">
+            <div class="section-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94"/><path d="M9.69 8h11.48"/></svg>
+            </div>
+            <div>
+              <h3>Payout to client</h3>
+              <p>Choose how the net amount is delivered.</p>
+            </div>
+          </div>
+
+          <div class="field" style="margin-bottom: 14px;">
+            <label>Method <span class="req">*</span></label>
+            <div class="payout-grid" id="payoutGrid">
+              <label class="payout-tile active" data-method="cash">
+                <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94"/><path d="M9.69 8h11.48"/></svg></span>
+                <span class="lbl">Cash</span>
+                <span class="sub">In-person at branch</span>
+              </label>
+              <label class="payout-tile" data-method="etransfer">
+                <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+                <span class="lbl">E-transfer</span>
+                <span class="sub">Email transfer to client</span>
+              </label>
+              <label class="payout-tile" data-method="bank">
+                <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
+                <span class="lbl">Bank Transfer</span>
+                <span class="sub">Direct deposit</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="grid cols-2">
+            <div class="field" id="payoutDestField">
+              <label>Cash given by</label>
+              <select class="select"><option>Aman Singh (you)</option><option>Sarah Kapoor</option><option>Sandeep Rao</option></select>
+              <div class="helper">Logged on the receipt and audit trail.</div>
+            </div>
+            <div class="field">
+              <label>Payout amount</label>
+              <div class="input-icon"><span class="ico">$</span><input class="input" id="payoutAmount" value="0.00" /></div>
+              <div class="helper">Auto-fills from net payout below — override only if releasing partial.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Notes ===== -->
+        <div class="section acc-notes">
+          <div class="section-head">
+            <div class="section-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div>
+              <h3>Internal notes</h3>
+              <p>Anything reviewers, oncall staff, or auditors should know.</p>
+            </div>
+          </div>
+          <textarea class="textarea" rows="3" placeholder="Notes about ID checks, special handling, payee verification, etc…"></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right summary -->
+    <aside>
+      <div class="summary-card">
+        <div class="summary-head">
+          <h4>Transaction summary</h4>
+          <span class="pill">Cheque cashing</span>
+        </div>
+        <div class="summary-body">
+          <div class="summary-amt">
+            <div class="lbl">Net payout to client</div>
+            <div class="num" id="sumNet">$0.00</div>
+            <div class="sub" id="sumCount">0 cheques in this transaction</div>
+          </div>
+          <div class="summary-list">
+            <div class="summary-row"><span class="k">Total face value</span><span class="v" id="sumFace">$0.00</span></div>
+            <div class="summary-row subtract"><span class="k">Service fees (sum)</span><span class="v" id="sumService">$0.00</span></div>
+            <div class="summary-row subtract"><span class="k">Admin fees (sum)</span><span class="v" id="sumAdmin">$0.00</span></div>
+            <div class="summary-row total"><span class="k">Net payout</span><span class="v" id="sumNet2">$0.00</span></div>
+          </div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn primary" id="submitBtn" style="width:100%;justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Submit
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Sticky footer -->
+  <div class="footer-bar">
+    <div class="info">
+      <strong>Cheque cashing</strong> — <span id="footMethod">Cash</span> · Net <strong id="footNet">$0.00</strong>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <a class="btn ghost" href="client-list.html">Cancel</a>
+      <button class="btn">Save draft</button>
+      <button class="btn primary" id="footSubmitBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Submit
+      </button>
+    </div>
+  </div>
+
+</main>
+
+</div>
+</div>
+
+<!-- Cheque image preview modal -->
+<div class="cheque-modal-bd" id="chequeModal">
+  <div class="cheque-modal">
+    <div class="cm-head">
+      <h3 id="cmTitle">Last cheque from Acme Corporation</h3>
+      <button class="x" id="cmClose">✕</button>
+    </div>
+    <div class="cm-body">
+      <div class="cheque-mock">
+        <div class="cm-row">
+          <div class="from">
+            <div class="name" id="cmName">Acme Corporation</div>
+            <div style="color:#64748b;">100 Front St W, Toronto, ON M5J 1E3</div>
+          </div>
+          <div class="num">
+            <strong id="cmChequeNum">#000847</strong><br/>
+            <span id="cmDate">2026-05-08</span>
+          </div>
+        </div>
+        <div class="cm-pay">
+          <span class="lbl">Pay to the order of</span>
+          <span class="name">Aman Singh</span>
+          <span class="amt">$<span id="cmAmt">4,250.00</span></span>
+        </div>
+        <div class="cm-words" id="cmWords">Four thousand two hundred fifty and 00/100 — — — — — — — DOLLARS</div>
+        <div class="cm-foot">
+          <span class="micr">⑆ 00123 ⑆ 003 ⑈ ••••4567 ⑈</span>
+          <span class="sig">Authorized</span>
+        </div>
+      </div>
+      <div style="margin-top:16px;font-size:12.5px;color:var(--text-muted);font-weight:500;text-align:center;">
+        This is the most recent cheque cashed for this issuer in the system. Verify endorsement and signature against the physical cheque.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Submit success modal -->
+<div class="submit-modal-bd" id="submitModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <h2>Cheques cashed</h2>
+      <div class="ref">Reference <strong id="modalRef">#CC-58193</strong> · Aman Singh · <span id="modalCount">2 cheques</span> · Net <strong id="modalNet">$X,XXX.XX</strong></div>
+    </div>
+    <div class="modal-body">
+      <p class="question">How would you like to share the receipt?</p>
+      <div class="modal-actions">
+        <button type="button" class="ma ma-print" data-action="print">
+          <span class="ico-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>
+          <span class="meta"><span class="t">Print receipt</span><span class="s">Print at the branch and hand to client.</span></span>
+          <span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </button>
+        <button type="button" class="ma ma-receipt ma-recommended" data-action="print-email">
+          <span class="ico-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+          <span class="meta"><span class="t">Print and email a copy <span class="badge-rec">Recommended</span></span><span class="s">Print here and email PDF to <strong>aman@example.com</strong>.</span></span>
+          <span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </button>
+        <button type="button" class="ma ma-email" data-action="email">
+          <span class="ico-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></span>
+          <span class="meta"><span class="t">Email receipt only</span><span class="s">Send PDF receipt to client without printing.</span></span>
+          <span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span>Receipts are also saved to the transaction record.</span>
+      <button type="button" class="modal-close" id="modalCloseBtn">Skip for now</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+  <span id="toastMsg">Done.</span>
+</div>
+
+<script>
+  // Sidebar
+  (function(){
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sbOverlay');
+    const menuToggle = document.getElementById('menuToggle');
+    const sbCollapse = document.getElementById('sbCollapse');
+    if (menuToggle) {
+      menuToggle.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+      overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+    }
+    document.querySelectorAll('.nav-item.has-sub').forEach(nav => {
+      nav.addEventListener('click', () => { if (sidebar.classList.contains('collapsed')) return; nav.classList.toggle('expanded'); });
+    });
+    try { if (localStorage.getItem('vayoo:sb-collapsed') === '1') sidebar.classList.add('collapsed'); } catch(e){}
+    if (sbCollapse) {
+      sbCollapse.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle('collapsed');
+        try { localStorage.setItem('vayoo:sb-collapsed', sidebar.classList.contains('collapsed') ? '1' : '0'); } catch(e){}
+      });
+    }
+  })();
+
+  // ===== Mock company database =====
+  const COMPANIES = [
+    { id: 'acme',    name: 'Acme Corporation',     status: 'trusted', rating: 4.2, cleared: 284000, count: 47, last90: 12, lastDate: '2026-05-08', lastAmount: 4250, lastChequeNum: '000847', type: 'payroll',    color: '#3b5cff' },
+    { id: 'tech',    name: 'Tech Solutions Inc.',  status: 'trusted', rating: 4.8, cleared: 612000, count: 89, last90: 23, lastDate: '2026-05-09', lastAmount: 5800, lastChequeNum: '012412', type: 'payroll',    color: '#6366f1' },
+    { id: 'gov',     name: 'Government of Canada', status: 'trusted', rating: 5.0, cleared: 1200000, count: 142, last90: 38, lastDate: '2026-05-09', lastAmount: 1850, lastChequeNum: 'GOV-984221', type: 'government', color: '#059669' },
+    { id: 'sun',     name: 'Sunshine Insurance',   status: 'trusted', rating: 4.5, cleared: 92000, count: 18, last90: 4, lastDate: '2026-05-01', lastAmount: 3400, lastChequeNum: '208741', type: 'insurance',   color: '#8b5cf6' },
+    { id: 'quick',   name: 'Quick Cash Express',   status: 'watch',   rating: 2.1, cleared: 18400, count: 8,  last90: 6, lastDate: '2026-05-07', lastAmount: 480,   lastChequeNum: '003012', type: 'personal',    color: '#c2660e' },
+    { id: 'abc',     name: 'ABC Construction Ltd.',status: 'watch',   rating: 3.0, cleared: 24800, count: 11, last90: 5, lastDate: '2026-04-22', lastAmount: 2100,  lastChequeNum: 'ABC-1142', type: 'commission',  color: '#d97706' },
+    { id: 'blocked', name: 'BlockedCo Ltd.',       status: 'blocked', rating: 1.0, cleared: 5200,  count: 3,  last90: 0, lastDate: '2026-02-15', lastAmount: 1500,  lastChequeNum: '000301', type: 'personal',    color: '#475569' },
+  ];
+
+  function fmt(n) { return '$' + (n||0).toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function todayISO() { const d = new Date(); return d.toISOString().slice(0,10); }
+  function initials(name) { return name.split(/\s+/).map(s => s[0]).slice(0,2).join('').toUpperCase(); }
+  function statusLabel(s) { return ({trusted:'Trusted', watch:'Watch', blocked:'Blocked'})[s] || s; }
+  function stars(rating) {
+    const full = Math.floor(rating);
+    const half = rating - full >= 0.5;
+    let s = '';
+    for (let i = 0; i < 5; i++) s += i < full ? '★' : (i === full && half ? '⭒' : '☆');
+    return s;
+  }
+
+  // ===== Cheque card factory =====
+  let chequeCount = 0;
+  const container = document.getElementById('chequesContainer');
+
+  function buildChequeCard() {
+    chequeCount++;
+    const idx = chequeCount;
+    const card = document.createElement('div');
+    card.className = 'cheque-card';
+    card.dataset.idx = idx;
+    card.innerHTML = `
+      <div class="cheque-card-head">
+        <span class="num">${idx}</span>
+        <span class="lbl">Cheque ${idx}</span>
+        <span class="tag" data-tag-issuer style="display:none;">— select issuer —</span>
+        <button type="button" class="remove" ${idx === 1 ? 'style="visibility:hidden;"' : ''}>Remove</button>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Cheque issuer (company) <span class="req">*</span></label>
+          <div class="issuer-wrap">
+            <input class="input" type="text" data-field="issuer" placeholder="Type a company name…" autocomplete="off" />
+            <div class="issuer-dd"></div>
+          </div>
+          <div class="company-info" data-field="company-info"></div>
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Type of cheque <span class="req">*</span></label>
+          <div class="type-chips" data-field="type-chips">
+            <button type="button" class="type-chip t-personal"   data-type="personal">Personal</button>
+            <button type="button" class="type-chip t-payroll active" data-type="payroll">Payroll</button>
+            <button type="button" class="type-chip t-government" data-type="government">Government</button>
+            <button type="button" class="type-chip t-insurance"  data-type="insurance">Insurance</button>
+            <button type="button" class="type-chip t-commission" data-type="commission">Commission</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Date cheque issued <span class="req">*</span></label>
+          <input class="input" type="date" data-field="dateIssued" value="${todayISO()}" />
+        </div>
+        <div class="field">
+          <label>Transaction date <span class="opt">Defaults to today</span></label>
+          <input class="input" type="date" data-field="dateTxn" value="${todayISO()}" />
+        </div>
+        <div class="field">
+          <label>Cheque # <span class="req">*</span></label>
+          <input class="input" type="text" data-field="chequeNum" placeholder="e.g. 001234" />
+        </div>
+        <div class="field">
+          <label>Cheque amount <span class="req">*</span></label>
+          <div class="input-icon"><span class="ico">$</span><input class="input" type="number" step="0.01" data-field="amount" placeholder="0.00" value="0" /></div>
+        </div>
+        <div class="field">
+          <label>Service fee <span class="opt">Default 2.5%</span></label>
+          <div class="input-suffix"><input class="input" type="number" step="0.1" data-field="serviceRate" value="2.5" /><span class="sfx">%</span></div>
+          <div class="helper">Charged on cheque amount.</div>
+        </div>
+        <div class="field">
+          <label>Admin fee <span class="opt">Default $1.99</span></label>
+          <div class="input-icon"><span class="ico">$</span><input class="input" type="number" step="0.01" data-field="adminFee" value="1.99" /></div>
+          <div class="helper">Per-cheque administrative fee.</div>
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Cheque image <span class="opt">Front &amp; back</span></label>
+          <div class="upload-grid">
+            <label class="upload-zone">
+              <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <span class="lbl">Front of cheque</span>
+              <span class="sub">PDF, JPG, PNG · drop or click</span>
+              <input type="file" accept="image/*,application/pdf" data-field="upload-front" />
+            </label>
+            <label class="upload-zone">
+              <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <span class="lbl">Back of cheque</span>
+              <span class="sub">Endorsement signature</span>
+              <input type="file" accept="image/*,application/pdf" data-field="upload-back" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Per-cheque mini summary -->
+        <div class="field" style="grid-column: 1 / -1; padding-top: 10px; border-top: 1px dashed var(--border); margin-top: 6px;">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-size:12.5px;">
+            <div><div style="color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:0.05em;">Face</div><div style="font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;" data-out="face">$0.00</div></div>
+            <div><div style="color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:0.05em;">Service</div><div style="font-weight:700;color:var(--danger);font-variant-numeric:tabular-nums;" data-out="service">−$0.00</div></div>
+            <div><div style="color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:0.05em;">Admin</div><div style="font-weight:700;color:var(--danger);font-variant-numeric:tabular-nums;" data-out="admin">−$0.00</div></div>
+            <div><div style="color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:0.05em;">Net</div><div style="font-weight:800;color:var(--c-bank);font-variant-numeric:tabular-nums;" data-out="net">$0.00</div></div>
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+    wireChequeCard(card);
+    renumberCards();
+    recalc();
+    return card;
+  }
+
+  function renumberCards() {
+    const cards = container.querySelectorAll('.cheque-card');
+    cards.forEach((c, i) => {
+      c.querySelector('.num').textContent = i + 1;
+      c.querySelector('.lbl').textContent = 'Cheque ' + (i + 1);
+      c.querySelector('.remove').style.visibility = (cards.length === 1) ? 'hidden' : 'visible';
+    });
+  }
+
+  function wireChequeCard(card) {
+    // Remove
+    card.querySelector('.remove').addEventListener('click', () => { card.remove(); renumberCards(); recalc(); });
+
+    // Type chip toggle
+    card.querySelectorAll('[data-field="type-chips"] .type-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        card.querySelectorAll('[data-field="type-chips"] .type-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      });
+    });
+
+    // Issuer search + dropdown
+    const issuerInput = card.querySelector('[data-field="issuer"]');
+    const dd = card.querySelector('.issuer-dd');
+    const ci = card.querySelector('[data-field="company-info"]');
+    const tagIssuer = card.querySelector('[data-tag-issuer]');
+
+    function renderDD(query) {
+      const q = query.trim().toLowerCase();
+      const matches = COMPANIES.filter(c => c.name.toLowerCase().includes(q));
+      let html = '';
+      matches.slice(0, 6).forEach(c => {
+        html += `
+          <div class="issuer-item" data-id="${c.id}">
+            <div class="ava" style="background:${c.color};">${initials(c.name)}</div>
+            <div class="meta">
+              <div class="nm">${c.name}</div>
+              <div class="sub">${c.count} cheques · ${fmt(c.cleared)} cleared · ★ ${c.rating.toFixed(1)}</div>
+            </div>
+            <span class="stat-pill stat-${c.status}">${statusLabel(c.status)}</span>
+          </div>`;
+      });
+      if (q && matches.length === 0) {
+        html = `<div class="issuer-item add-new"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add "${query}" as new company</div>`;
+      } else {
+        html += `<div class="issuer-item add-new" data-id="__new"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add a new company…</div>`;
+      }
+      dd.innerHTML = html;
+      dd.classList.add('open');
+
+      dd.querySelectorAll('.issuer-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const id = item.dataset.id;
+          if (id === '__new' || !id) {
+            issuerInput.value = query || '';
+            ci.classList.remove('show');
+            tagIssuer.style.display = 'none';
+          } else {
+            const c = COMPANIES.find(x => x.id === id);
+            if (c) selectCompany(c);
+          }
+          dd.classList.remove('open');
+        });
+      });
+    }
+
+    function selectCompany(c) {
+      issuerInput.value = c.name;
+      tagIssuer.style.display = '';
+      tagIssuer.textContent = c.name;
+      tagIssuer.style.background = c.color + '22';
+      tagIssuer.style.color = c.color;
+      tagIssuer.style.borderColor = c.color + '55';
+
+      // Auto-set type if known
+      const typeBtn = card.querySelector(`[data-type="${c.type}"]`);
+      if (typeBtn) {
+        card.querySelectorAll('[data-field="type-chips"] .type-chip').forEach(ch => ch.classList.remove('active'));
+        typeBtn.classList.add('active');
+      }
+
+      // Render company info
+      let warn = '';
+      if (c.status === 'blocked') warn = `<div class="ci-warn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg><span><strong>This company is BLOCKED.</strong> Cheques from this issuer cannot be cashed without manager override. Last activity: ${c.lastDate}.</span></div>`;
+      else if (c.status === 'watch') warn = `<div class="ci-warn warn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span><strong>Watchlist.</strong> Verify endorsement carefully and confirm payee identity. Service fee may be increased.</span></div>`;
+
+      ci.className = 'company-info show s-' + c.status;
+      ci.innerHTML = `
+        <div class="ci-head">
+          <div class="ava" style="background:${c.color};">${initials(c.name)}</div>
+          <div class="nm">${c.name}</div>
+          <span class="stat-pill stat-${c.status}">${statusLabel(c.status)}</span>
+          <span class="ci-stars">${stars(c.rating)} <span class="num">${c.rating.toFixed(1)}</span></span>
+        </div>
+        <div class="ci-stats">
+          <div class="ci-stat"><div class="k">Cheques cleared</div><div class="v">${c.count}</div></div>
+          <div class="ci-stat"><div class="k">Total amount</div><div class="v">${fmt(c.cleared)}</div></div>
+          <div class="ci-stat"><div class="k">Last 90 days</div><div class="v">${c.last90}</div></div>
+        </div>
+        <div class="ci-actions">
+          <button type="button" data-act="img"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> View last cheque image</button>
+          <button type="button" data-act="hist"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> Full cheque history</button>
+        </div>
+        ${warn}
+      `;
+      ci.querySelector('[data-act="img"]').addEventListener('click', () => openChequeImage(c));
+      ci.querySelector('[data-act="hist"]').addEventListener('click', () => showToast('Opening cheque history…'));
+    }
+
+    issuerInput.addEventListener('input', () => renderDD(issuerInput.value));
+    issuerInput.addEventListener('focus', () => renderDD(issuerInput.value));
+    document.addEventListener('click', (e) => { if (!card.contains(e.target)) dd.classList.remove('open'); });
+
+    // Inputs trigger recalc
+    card.querySelectorAll('input[data-field="amount"], input[data-field="serviceRate"], input[data-field="adminFee"]').forEach(el => {
+      el.addEventListener('input', recalc);
+    });
+
+    // Upload tile state
+    card.querySelectorAll('input[type="file"]').forEach(input => {
+      input.addEventListener('change', () => {
+        if (input.files && input.files[0]) {
+          input.parentNode.classList.add('uploaded');
+          input.parentNode.querySelector('.lbl').textContent = input.files[0].name.length > 20 ? input.files[0].name.slice(0,20) + '…' : input.files[0].name;
+          input.parentNode.querySelector('.sub').textContent = (input.files[0].size/1024).toFixed(0) + ' KB · ' + input.files[0].type.split('/')[1].toUpperCase();
+        }
+      });
+    });
+  }
+
+  // ===== Recalc summary =====
+  function recalc() {
+    let face = 0, service = 0, admin = 0;
+    let cards = container.querySelectorAll('.cheque-card');
+    cards.forEach(card => {
+      const amt = parseFloat(card.querySelector('[data-field="amount"]').value) || 0;
+      const rate = parseFloat(card.querySelector('[data-field="serviceRate"]').value) || 0;
+      const adm = parseFloat(card.querySelector('[data-field="adminFee"]').value) || 0;
+      const svc = amt * (rate/100);
+      const net = amt - svc - adm;
+      face += amt; service += svc; admin += adm;
+      card.querySelector('[data-out="face"]').textContent = fmt(amt);
+      card.querySelector('[data-out="service"]').textContent = '−' + fmt(svc);
+      card.querySelector('[data-out="admin"]').textContent = '−' + fmt(adm);
+      card.querySelector('[data-out="net"]').textContent = fmt(net);
+    });
+    const net = face - service - admin;
+    document.getElementById('sumFace').textContent = fmt(face);
+    document.getElementById('sumService').textContent = fmt(service);
+    document.getElementById('sumAdmin').textContent = fmt(admin);
+    document.getElementById('sumNet').textContent = fmt(net);
+    document.getElementById('sumNet2').textContent = fmt(net);
+    document.getElementById('sumCount').textContent = cards.length + ' cheque' + (cards.length === 1 ? '' : 's') + ' in this transaction';
+    document.getElementById('payoutAmount').value = net.toFixed(2);
+    document.getElementById('footNet').textContent = fmt(net);
+  }
+
+  // ===== Payout method tiles =====
+  const payDestField = document.getElementById('payoutDestField');
+  document.querySelectorAll('#payoutGrid .payout-tile').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('#payoutGrid .payout-tile').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      const m = t.dataset.method;
+      document.getElementById('footMethod').textContent = ({cash:'Cash', etransfer:'E-transfer', bank:'Bank Transfer'})[m] || 'Cash';
+      // Update destination field by method
+      if (m === 'etransfer') {
+        payDestField.innerHTML = `<label>Send to email</label><input class="input" value="aman@example.com" /><div class="helper">Auto-deposit if enabled with the client's bank.</div>`;
+      } else if (m === 'bank') {
+        payDestField.innerHTML = `<label>Deposit account</label><select class="select"><option>RBC Royal Bank · ••••4567 (Primary)</option><option>＋ Add new bank account…</option></select><div class="helper">Funds typically arrive next business day.</div>`;
+      } else {
+        payDestField.innerHTML = `<label>Cash given by</label><select class="select"><option>Aman Singh (you)</option><option>Sarah Kapoor</option><option>Sandeep Rao</option></select><div class="helper">Logged on the receipt and audit trail.</div>`;
+      }
+    });
+  });
+
+  // ===== Cheque image modal =====
+  const chequeModal = document.getElementById('chequeModal');
+  function openChequeImage(c) {
+    document.getElementById('cmTitle').textContent = 'Last cheque from ' + c.name;
+    document.getElementById('cmName').textContent = c.name;
+    document.getElementById('cmChequeNum').textContent = '#' + c.lastChequeNum;
+    document.getElementById('cmDate').textContent = c.lastDate;
+    document.getElementById('cmAmt').textContent = c.lastAmount.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    chequeModal.classList.add('show');
+  }
+  document.getElementById('cmClose').addEventListener('click', () => chequeModal.classList.remove('show'));
+  chequeModal.addEventListener('click', (e) => { if (e.target === chequeModal) chequeModal.classList.remove('show'); });
+
+  // ===== Submit modal =====
+  const submitModal = document.getElementById('submitModal');
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toastMsg');
+  function showToast(msg) {
+    toastMsg.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 3200);
+  }
+  function showSubmitModal() {
+    document.getElementById('modalRef').textContent = '#CC-' + (50000 + Math.floor(Math.random() * 5000));
+    const cards = container.querySelectorAll('.cheque-card');
+    document.getElementById('modalCount').textContent = cards.length + ' cheque' + (cards.length === 1 ? '' : 's');
+    document.getElementById('modalNet').textContent = document.getElementById('sumNet').textContent;
+    submitModal.classList.add('show');
+  }
+  document.getElementById('submitBtn').addEventListener('click', showSubmitModal);
+  document.getElementById('footSubmitBtn').addEventListener('click', showSubmitModal);
+  document.getElementById('modalCloseBtn').addEventListener('click', () => submitModal.classList.remove('show'));
+  submitModal.addEventListener('click', (e) => { if (e.target === submitModal) submitModal.classList.remove('show'); });
+  submitModal.querySelectorAll('.ma').forEach(b => b.addEventListener('click', () => {
+    const a = b.dataset.action;
+    submitModal.classList.remove('show');
+    if (a === 'print') showToast('Opening print preview…');
+    else if (a === 'print-email') showToast('Printing and emailing receipt to aman@example.com');
+    else if (a === 'email') showToast('Receipt emailed to aman@example.com');
+  }));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { submitModal.classList.remove('show'); chequeModal.classList.remove('show'); }
+  });
+
+  // ===== Add another cheque =====
+  document.getElementById('addChequeBtn').addEventListener('click', () => {
+    const c = buildChequeCard();
+    c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  // Bootstrap with one cheque
+  buildChequeCard();
+  recalc();
+</script>
+
+</body>
+</html>

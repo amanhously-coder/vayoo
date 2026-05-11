@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vayoo.ai — Gold &amp; Silver Buy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  @view-transition { navigation: auto; }
+  @keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .main-area > * { animation: pageFadeIn 0.22s ease-out; }
+  :root {
+    --bg:#f4f6fb;--surface:#fff;--surface-2:#f6f8fd;--border:#dde2ed;--border-strong:#c2c9da;
+    --ink:#18213d;--ink-soft:#233055;--text:#18213d;--text-muted:#54607a;--text-soft:#7d869f;
+    --primary:#3b5cff;--primary-600:#2945e3;--primary-700:#1d34b8;--primary-50:#ecf0ff;--primary-100:#d6deff;
+    --success:#0e8f3e;--success-50:#e1f8ed;--warn:#c2660e;--warn-50:#fff5e0;--danger:#d11f3a;--danger-50:#fde2e6;
+    --c-identity:#6366f1;--c-contact:#0d9488;--c-id:#8b5cf6;--c-bank:#059669;--c-income:#d97706;--c-tags:#e11d48;
+    --gold-400:#fbbf24;--gold-500:#f59e0b;--gold-600:#d97706;--gold-700:#b45309;
+    --silver-400:#94a3b8;--silver-500:#64748b;--silver-600:#475569;
+    --radius:14px;--radius-sm:10px;--radius-lg:20px;
+  }
+  *{box-sizing:border-box;}html,body{margin:0;padding:0;}
+  body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:16px;font-weight:500;line-height:1.5;letter-spacing:-0.005em;-webkit-font-smoothing:antialiased;}
+
+  /* ===== Shell ===== */
+  .app-shell{display:flex;min-height:100vh;}
+  .sidebar{width:256px;flex-shrink:0;background:linear-gradient(180deg,#1a2342 0%,#221d3e 50%,#2d1f3b 100%);border-right:1px solid rgba(255,255,255,0.06);position:sticky;top:0;height:100vh;display:flex;flex-direction:column;z-index:30;transition:width 0.22s ease;}
+  .sidebar-brand{padding:20px 22px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.06);}
+  .sidebar-brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--c-id));color:#fff;display:grid;place-items:center;font-weight:900;font-size:16px;box-shadow:0 4px 12px rgba(59,92,255,0.30);}
+  .sidebar-brand .name{font-size:17px;font-weight:800;letter-spacing:-0.015em;color:#fff;}
+  .sidebar-brand .name span{color:var(--primary);}
+  .sidebar-nav{flex:1;overflow-y:auto;padding:10px 0;}
+  .nav-section{font-size:11px;font-weight:800;color:rgba(255,255,255,0.40);text-transform:uppercase;letter-spacing:0.08em;padding:14px 22px 6px;}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px 22px;text-decoration:none;color:rgba(255,255,255,0.72);font-weight:600;font-size:14.5px;border-left:3px solid transparent;cursor:pointer;}
+  .nav-item:hover{background:rgba(255,255,255,0.06);color:#fff;}
+  .nav-item.active{background:linear-gradient(90deg,rgba(59,92,255,0.30),rgba(59,92,255,0.05));color:#fff;border-left-color:var(--primary);font-weight:700;}
+  .nav-item .ico{width:22px;height:22px;display:grid;place-items:center;flex-shrink:0;}
+  .nav-item .badge{margin-left:auto;background:var(--c-tags);color:#fff;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;}
+  .nav-sub{padding-left:32px;display:none;}
+  .nav-item.has-sub.expanded + .nav-sub{display:block;}
+  .nav-sub .nav-item{padding:7px 22px 7px 32px;font-size:13.5px;}
+  .nav-item.has-sub .chev{margin-left:auto;transition:transform 0.18s;}
+  .nav-item.has-sub.expanded .chev{transform:rotate(90deg);}
+  .sidebar-profile{border-top:1px solid rgba(255,255,255,0.06);padding:14px 18px;display:flex;align-items:center;gap:12px;background:rgba(0,0,0,0.18);}
+  .sidebar-profile .pf-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1a3dff,#7a2cff);color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center;}
+  .sidebar-profile .pf-name{font-weight:700;font-size:13.5px;color:#fff;}
+  .sidebar-profile .pf-role{font-size:12px;color:rgba(255,255,255,0.55);margin-top:2px;font-weight:600;}
+  .sidebar-profile .pf-menu{margin-left:auto;color:rgba(255,255,255,0.50);cursor:pointer;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;}
+  .sidebar-profile .pf-menu:hover{background:rgba(255,255,255,0.08);color:#fff;}
+  .main-area{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .sb-collapse{position:absolute;top:26px;right:-13px;width:26px;height:26px;border-radius:50%;background:var(--surface);border:1px solid var(--border-strong);color:var(--text-muted);display:grid;place-items:center;cursor:pointer;z-index:32;transition:transform 0.18s,color 0.18s,border-color 0.18s;box-shadow:0 2px 6px rgba(24,33,61,0.12);}
+  .sb-collapse:hover{color:var(--primary);border-color:var(--primary);}
+  .sidebar.collapsed .sb-collapse svg{transform:rotate(180deg);}
+  .sidebar.collapsed{width:68px;}
+  .sidebar.collapsed .sidebar-brand{padding:20px 0 18px;justify-content:center;}
+  .sidebar.collapsed .sidebar-brand .name{display:none;}
+  .sidebar.collapsed .nav-section{display:none;}
+  .sidebar.collapsed .nav-item{justify-content:center;padding:10px 0;border-left:0;position:relative;font-size:0;line-height:0;gap:0;}
+  .sidebar.collapsed .nav-item.active{background:rgba(59,92,255,0.20);}
+  .sidebar.collapsed .nav-item.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;background:var(--primary);border-radius:0 3px 3px 0;}
+  .sidebar.collapsed .nav-item > *:not(.ico){display:none;}
+  .sidebar.collapsed .nav-item .ico{font-size:initial;line-height:1;}
+  .sidebar.collapsed .nav-sub{display:none !important;}
+  .sidebar.collapsed .sidebar-profile{padding:14px 0;justify-content:center;}
+  .sidebar.collapsed .sidebar-profile > div:not(.pf-avatar):not(.pf-menu){display:none;}
+  .sidebar.collapsed .sidebar-profile .pf-menu{display:none;}
+  .sidebar.collapsed .nav-item:hover::after{content:attr(data-label);position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);background:var(--ink);color:#fff;font-size:12px;font-weight:700;padding:6px 10px;border-radius:6px;white-space:nowrap;z-index:100;pointer-events:none;}
+  .menu-toggle{display:none;}
+  @media (max-width:1100px){
+    .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform 0.22s ease;box-shadow:8px 0 24px rgba(24,33,61,0.10);}
+    .sidebar.open{transform:translateX(0);}
+    .menu-toggle{display:grid;place-items:center;width:42px;height:42px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--text);margin-right:12px;}
+    .sidebar-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.4);z-index:25;display:none;}
+    .sidebar-overlay.show{display:block;}
+  }
+
+  /* ===== Topbar ===== */
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;align-items:center;gap:20px;}
+  .crumbs{color:var(--text-soft);font-size:15px;font-weight:600;display:flex;align-items:center;flex-shrink:0;}
+  .crumbs a{color:var(--text-soft);text-decoration:none;}
+  .crumbs a:hover{color:var(--text);}
+  .crumbs .current{color:var(--text);font-weight:700;}
+  .crumbs .sep{margin:0 10px;}
+  .gsearch{flex:1;max-width:560px;margin:0 auto;position:relative;}
+  .gsearch input{width:100%;padding:9px 14px 9px 38px;border:1px solid var(--border-strong);background:var(--surface-2);border-radius:999px;font-size:13.5px;font-weight:500;font-family:inherit;color:var(--text);}
+  .gsearch input:focus{outline:0;border-color:var(--primary);background:var(--surface);box-shadow:0 0 0 4px rgba(59,92,255,0.12);}
+  .gsearch .gs-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;}
+  .gsearch .gs-kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:inline-flex;gap:3px;pointer-events:none;}
+  .gsearch .gs-kbd kbd{font-family:inherit;font-size:10.5px;font-weight:700;padding:2px 6px;background:var(--surface);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);line-height:1;}
+  .topbar .right{display:flex;align-items:center;gap:18px;flex-shrink:0;}
+  .icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--text-muted);}
+  .icon-btn:hover{border-color:var(--border-strong);color:var(--ink);}
+  .topbar .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1a3dff,#7a2cff);color:#fff;font-weight:800;font-size:15px;display:grid;place-items:center;box-shadow:0 4px 12px rgba(26,61,255,0.35);}
+  @media (max-width:600px){.gsearch{display:none;}}
+
+  /* ===== Page header + buttons ===== */
+  .page{max-width:1400px;margin:24px auto 64px;padding:0 32px;width:100%;}
+  .page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;margin-bottom:24px;flex-wrap:wrap;}
+  .page-title{margin:0 0 4px;font-size:24px;font-weight:700;letter-spacing:-0.018em;line-height:1.15;color:var(--ink);}
+  .page-subtitle{color:var(--text-muted);font-size:14px;font-weight:500;margin:0;}
+  .header-actions{display:flex;gap:10px;align-items:center;}
+  .btn{border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);padding:9px 16px;border-radius:var(--radius-sm);font-weight:600;font-size:14px;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:8px;text-decoration:none;letter-spacing:-0.005em;font-family:inherit;}
+  .btn:hover{background:var(--surface-2);border-color:var(--ink);color:var(--ink);}
+  .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 4px 12px rgba(59,92,255,0.25);}
+  .btn.primary:hover{background:var(--primary-600);border-color:var(--primary-600);}
+  .btn.ghost{border-color:transparent;background:transparent;color:var(--text-muted);}
+
+  /* Client strip */
+  .client-strip{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;box-shadow:0 1px 3px rgba(24,33,61,0.04);}
+  .client-strip .ava{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#3b5cff,#8b5cf6);color:#fff;font-weight:800;font-size:14px;display:grid;place-items:center;flex-shrink:0;box-shadow:0 4px 10px rgba(139,92,246,0.25);}
+  .client-strip .info .nm{font-weight:700;font-size:15px;color:var(--ink);}
+  .client-strip .info .meta{font-size:12.5px;color:var(--text-muted);margin-top:2px;font-weight:500;}
+  .client-strip .change{margin-left:auto;font-size:13px;color:var(--primary-600);font-weight:600;cursor:pointer;text-decoration:none;}
+  .client-strip .change:hover{text-decoration:underline;}
+
+  /* ===== Market price panel ===== */
+  .market-panel{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+  .market-card{
+    border-radius:var(--radius);padding:18px 22px;
+    color:#fff;position:relative;overflow:hidden;
+    box-shadow:0 1px 3px rgba(24,33,61,0.04),0 8px 24px rgba(24,33,61,0.08);
+  }
+  .market-card.m-gold{background:linear-gradient(135deg,#b45309 0%,#d97706 50%,#fbbf24 100%);}
+  .market-card.m-silver{background:linear-gradient(135deg,#475569 0%,#64748b 50%,#94a3b8 100%);}
+  .market-card::before{
+    content:"";position:absolute;top:-30px;right:-20px;
+    width:140px;height:140px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,0.22),transparent 70%);
+    pointer-events:none;
+  }
+  .mc-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .mc-head .ico{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);display:grid;place-items:center;border:1px solid rgba(255,255,255,0.20);}
+  .mc-head .lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.85);}
+  .mc-head .nm{font-size:16px;font-weight:800;letter-spacing:-0.01em;line-height:1.1;}
+  .mc-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .mc-price .big{font-size:32px;font-weight:900;letter-spacing:-0.025em;font-variant-numeric:tabular-nums;line-height:1;}
+  .mc-price .unit{font-size:13px;font-weight:600;color:rgba(255,255,255,0.78);}
+  .mc-trend{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,0.22);border:1px solid rgba(255,255,255,0.20);}
+  .mc-trend.down{background:rgba(0,0,0,0.18);}
+  .mc-trend svg{width:11px;height:11px;}
+  .mc-sub{display:flex;gap:14px;margin-top:12px;font-size:12px;color:rgba(255,255,255,0.82);font-weight:600;flex-wrap:wrap;}
+  .mc-sub span{display:inline-flex;align-items:center;gap:5px;}
+  .mc-sub .v{color:#fff;font-weight:800;font-variant-numeric:tabular-nums;}
+  .mc-foot{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:rgba(255,255,255,0.72);font-weight:600;}
+  .mc-foot .live{display:inline-flex;align-items:center;gap:5px;}
+  .mc-foot .live::before{content:"";width:7px;height:7px;border-radius:50%;background:#5dffaa;box-shadow:0 0 8px rgba(93,255,170,0.8);animation:livepulse 1.6s ease-in-out infinite;}
+  @keyframes livepulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+  /* ===== Layout ===== */
+  .layout{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:flex-start;}
+
+  /* Card / section */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:0 1px 3px rgba(24,33,61,0.04),0 8px 24px rgba(24,33,61,0.06);overflow:hidden;}
+  .section{padding:22px 24px;border-bottom:1px solid var(--border);}
+  .section:last-child{border-bottom:0;}
+  .section.acc-items{border-left:4px solid var(--gold-500);}
+  .section.acc-items.silver{border-left:4px solid var(--silver-500);}
+  .section.acc-payout{border-left:4px solid var(--c-bank);}
+  .section.acc-notes{border-left:4px solid #64748b;}
+  .section-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+  .section-head h3{margin:0;font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-0.01em;}
+  .section-head p{margin:2px 0 0;font-size:13px;color:var(--text-muted);font-weight:500;}
+  .section-icon{width:36px;height:36px;border-radius:10px;color:#fff;display:grid;place-items:center;flex-shrink:0;}
+  .section.acc-items .section-icon{background:linear-gradient(135deg,var(--gold-600),var(--gold-400));box-shadow:0 4px 12px rgba(217,119,6,0.30);}
+  .section.acc-items.silver .section-icon{background:linear-gradient(135deg,var(--silver-600),var(--silver-400));box-shadow:0 4px 12px rgba(100,116,139,0.30);}
+  .section.acc-payout .section-icon{background:var(--c-bank);box-shadow:0 4px 12px rgba(5,150,105,0.25);}
+  .section.acc-notes .section-icon{background:#64748b;box-shadow:0 4px 12px rgba(100,116,139,0.25);}
+
+  /* Metal toggle pill (Gold / Silver) */
+  .metal-toggle{display:inline-flex;background:var(--surface-2);border:1px solid var(--border-strong);border-radius:999px;padding:4px;gap:4px;}
+  .metal-toggle button{border:0;background:transparent;padding:7px 16px;border-radius:999px;font-size:13px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;letter-spacing:-0.005em;}
+  .metal-toggle button.active{color:#fff;}
+  .metal-toggle button.active[data-metal="gold"]{background:linear-gradient(135deg,var(--gold-600),var(--gold-500));box-shadow:0 3px 10px rgba(217,119,6,0.30);}
+  .metal-toggle button.active[data-metal="silver"]{background:linear-gradient(135deg,var(--silver-600),var(--silver-500));box-shadow:0 3px 10px rgba(100,116,139,0.30);}
+  .metal-toggle .swatch{width:10px;height:10px;border-radius:50%;}
+  .metal-toggle button[data-metal="gold"] .swatch{background:linear-gradient(135deg,var(--gold-600),var(--gold-400));}
+  .metal-toggle button[data-metal="silver"] .swatch{background:linear-gradient(135deg,var(--silver-600),var(--silver-400));}
+
+  /* ===== Item card ===== */
+  .item-card{border:1px solid var(--border-strong);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;background:var(--surface-2);position:relative;}
+  .item-card-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .item-card-head .num{width:26px;height:26px;border-radius:50%;color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center;background:linear-gradient(135deg,var(--gold-600),var(--gold-400));}
+  body[data-metal="silver"] .item-card-head .num{background:linear-gradient(135deg,var(--silver-600),var(--silver-400));}
+  .item-card-head .lbl{font-weight:800;font-size:15px;color:var(--ink);}
+  .item-card-head .meta-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:#fef3c7;color:#92400e;text-transform:uppercase;letter-spacing:0.05em;border:1px solid #fbbf24;}
+  body[data-metal="silver"] .item-card-head .meta-tag{background:#f1f5f9;color:#334155;border-color:#94a3b8;}
+  .item-card-head .remove{margin-left:auto;cursor:pointer;color:var(--text-muted);background:transparent;border:0;font-weight:600;font-size:13px;padding:6px 10px;border-radius:8px;font-family:inherit;}
+  .item-card-head .remove:hover{color:var(--danger);background:var(--danger-50);}
+
+  .grid{display:grid;gap:16px 16px;}
+  .grid.cols-2{grid-template-columns:1fr 1fr;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-size:13px;font-weight:600;color:var(--ink);letter-spacing:-0.005em;}
+  .field label .req{color:var(--danger);margin-left:2px;font-weight:700;}
+  .field label .opt{color:var(--text-soft);font-weight:500;margin-left:6px;font-size:11.5px;text-transform:uppercase;letter-spacing:0.04em;}
+  .input,.select,.textarea{width:100%;border:1px solid var(--border-strong);background:var(--surface);border-radius:var(--radius-sm);padding:10px 12px;font-size:14.5px;font-weight:500;font-family:inherit;color:var(--text);transition:border 0.15s,box-shadow 0.15s;}
+  .input::placeholder,.textarea::placeholder{color:var(--text-soft);font-weight:500;}
+  .input:focus,.select:focus,.textarea:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px rgba(59,92,255,0.14);}
+  .select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2354607a' stroke-width='2.5'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;}
+  .input-suffix{position:relative;}
+  .input-suffix .input{padding-right:42px;}
+  .input-suffix .sfx{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-weight:700;pointer-events:none;font-size:13px;}
+  .input-icon{position:relative;}
+  .input-icon .input{padding-left:36px;}
+  .input-icon .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-weight:700;pointer-events:none;}
+  .helper{font-size:12px;color:var(--text-muted);margin-top:4px;font-weight:500;}
+  input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
+
+  /* Category chips */
+  .cat-chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .cat-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border-strong);background:var(--surface);color:var(--text-muted);font-family:inherit;transition:all 0.12s;}
+  .cat-chip:hover{border-color:var(--ink);color:var(--ink);}
+  .cat-chip.active{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 4px 10px rgba(24,33,61,0.18);}
+  .cat-chip svg{width:14px;height:14px;}
+
+  /* Purity grid with min/max */
+  .purity-label{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px;}
+  .purity-label .pl-note{font-size:11px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.05em;}
+  .purity-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+  .purity-chip{border:1px solid var(--border-strong);background:var(--surface);border-radius:var(--radius-sm);padding:10px 8px;cursor:pointer;text-align:center;font-family:inherit;transition:all 0.12s;display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center;}
+  .purity-chip:hover{border-color:var(--ink);transform:translateY(-1px);}
+  .purity-chip.active{border-color:var(--gold-500);background:linear-gradient(135deg,#fff8e7,#fff);box-shadow:0 4px 12px rgba(217,119,6,0.18);}
+  body[data-metal="silver"] .purity-chip.active{border-color:var(--silver-500);background:linear-gradient(135deg,#f1f5f9,#fff);box-shadow:0 4px 12px rgba(100,116,139,0.18);}
+  .purity-chip .karat{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-0.01em;line-height:1;}
+  .purity-chip .range{font-size:10.5px;font-weight:700;color:var(--gold-700);font-variant-numeric:tabular-nums;}
+  body[data-metal="silver"] .purity-chip .range{color:var(--silver-600);}
+  .purity-chip .desc{font-size:10px;color:var(--text-soft);font-weight:600;line-height:1.2;text-transform:uppercase;letter-spacing:0.04em;}
+  .purity-chip.active .desc{color:var(--text-muted);}
+  .purity-chip:disabled,.purity-chip.disabled{opacity:0.42;cursor:not-allowed;background:var(--surface-2);border-style:dashed;}
+  .purity-chip:disabled:hover,.purity-chip.disabled:hover{transform:none;border-color:var(--border-strong);}
+  .purity-chip:disabled .desc,.purity-chip.disabled .desc{color:var(--text-soft);}
+  @media (max-width:900px){.purity-grid{grid-template-columns:repeat(3,1fr);}}
+
+  /* Upload zone */
+  .upload-zone{border:1.5px dashed var(--border-strong);border-radius:var(--radius-sm);padding:18px 14px;background:var(--surface);text-align:center;cursor:pointer;transition:all 0.12s;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+  .upload-zone:hover{border-color:var(--gold-500);background:#fffbeb;}
+  body[data-metal="silver"] .upload-zone:hover{border-color:var(--silver-500);background:#f8fafc;}
+  .upload-zone .ico{color:var(--text-muted);}
+  .upload-zone:hover .ico{color:var(--gold-600);}
+  body[data-metal="silver"] .upload-zone:hover .ico{color:var(--silver-600);}
+  .upload-zone .lbl{font-size:13px;font-weight:700;color:var(--ink);}
+  .upload-zone .sub{font-size:11px;color:var(--text-muted);font-weight:500;}
+  .upload-zone input[type="file"]{display:none;}
+  .upload-zone.uploaded{border-style:solid;border-color:var(--success);background:var(--success-50);}
+  .upload-zone.uploaded .ico{color:var(--success);}
+
+  /* Offer rate picker (within admin-set range) */
+  .rate-picker{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,#fffaf0,#fff);border:1px solid #fde68a;border-radius:var(--radius-sm);}
+  body[data-metal="silver"] .rate-picker{background:linear-gradient(135deg,#f8fafc,#fff);border-color:#cbd5e1;}
+  .rate-picker-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+  .rate-picker-head .rp-title{font-size:12px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:0.06em;}
+  .rate-picker-head .rp-band{font-size:11px;font-weight:700;color:var(--text-muted);font-variant-numeric:tabular-nums;}
+  .rate-picker-head .rp-band b{color:var(--ink);}
+  .rate-picker-head .rp-flag{display:none;align-items:center;gap:4px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;padding:3px 8px;border-radius:999px;background:#fef3c7;color:#92400e;border:1px solid #fbbf24;}
+  .rate-picker-head .rp-flag.show{display:inline-flex;}
+  .rate-picker-head .rp-flag.over{background:var(--danger-50);color:var(--danger);border-color:#fca5a5;}
+  .rate-picker.below-band{border-color:#fbbf24;background:linear-gradient(135deg,#fffbeb,#fff);}
+  body[data-metal="silver"] .rate-picker.below-band{border-color:#94a3b8;background:linear-gradient(135deg,#f8fafc,#fff);}
+  .rate-picker.above-band{border-color:#fca5a5;background:linear-gradient(135deg,#fff1f2,#fff);}
+  .rate-picker.above-band .rate-slider::-webkit-slider-thumb{background:var(--danger);box-shadow:0 2px 6px rgba(209,31,58,0.35);}
+  .rate-picker.above-band .rate-slider::-moz-range-thumb{background:var(--danger);box-shadow:0 2px 6px rgba(209,31,58,0.35);}
+  .rate-picker-row{display:flex;align-items:center;gap:14px;}
+  .rate-slider{flex:1;-webkit-appearance:none;appearance:none;height:8px;border-radius:999px;outline:none;
+    /* 3-zone track: below band (grey) · admin band (amber) · above band (rose) */
+    background:linear-gradient(90deg,
+      #e2e8f0 0%, #e2e8f0 var(--band-start,30%),
+      #fde68a var(--band-start,30%), #f59e0b var(--band-end,70%),
+      #fecaca var(--band-end,70%), #fecaca 100%);
+  }
+  body[data-metal="silver"] .rate-slider{
+    background:linear-gradient(90deg,
+      #e2e8f0 0%, #e2e8f0 var(--band-start,30%),
+      #cbd5e1 var(--band-start,30%), #64748b var(--band-end,70%),
+      #fecaca var(--band-end,70%), #fecaca 100%);
+  }
+  .rate-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--gold-600);border:3px solid #fff;box-shadow:0 2px 6px rgba(217,119,6,0.35);cursor:pointer;}
+  body[data-metal="silver"] .rate-slider::-webkit-slider-thumb{background:var(--silver-600);box-shadow:0 2px 6px rgba(100,116,139,0.35);}
+  .rate-slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--gold-600);border:3px solid #fff;box-shadow:0 2px 6px rgba(217,119,6,0.35);cursor:pointer;}
+  .rate-input{width:78px;display:flex;align-items:center;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;padding:5px 8px;font-variant-numeric:tabular-nums;}
+  .rate-input input{width:100%;border:0;outline:0;font-family:inherit;font-size:14px;font-weight:800;color:var(--ink);background:transparent;text-align:right;-moz-appearance:textfield;}
+  .rate-input input::-webkit-outer-spin-button,.rate-input input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .rate-input .pct{color:var(--text-muted);font-size:13px;font-weight:700;margin-left:3px;}
+
+  /* Per-item value calc box */
+  .item-calc{margin-top:14px;padding:12px 14px;background:linear-gradient(135deg,#fffaf0,#fff);border:1px solid #fde68a;border-radius:var(--radius-sm);display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  body[data-metal="silver"] .item-calc{background:linear-gradient(135deg,#f8fafc,#fff);border-color:#cbd5e1;}
+  .item-calc .ic-cell{padding:0 4px;}
+  .item-calc .ic-lbl{font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;}
+  .item-calc .ic-val{font-size:14px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:3px;}
+  .item-calc .ic-val.amount{color:var(--gold-700);font-size:16px;}
+  body[data-metal="silver"] .item-calc .ic-val.amount{color:var(--silver-600);}
+  .item-calc .ic-val .ceiling{display:block;font-size:10px;font-weight:600;color:var(--text-soft);margin-top:2px;letter-spacing:0;}
+
+  /* Add another */
+  .add-row{border:1.5px dashed var(--border-strong);background:var(--surface);color:var(--text-muted);font-weight:600;font-size:13.5px;padding:12px;width:100%;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;}
+  .add-row:hover{border-color:var(--ink);color:var(--ink);background:var(--surface-2);}
+
+  /* Payout */
+  .payout-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .payout-tile{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 12px;border:1px solid var(--border-strong);background:var(--surface);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.12s;text-align:center;}
+  .payout-tile:hover{border-color:var(--ink);}
+  .payout-tile.active{border-color:var(--c-bank);background:var(--success-50);}
+  .payout-tile .ico{width:32px;height:32px;border-radius:8px;background:var(--surface-2);color:var(--text-muted);display:grid;place-items:center;}
+  .payout-tile.active .ico{background:var(--c-bank);color:#fff;}
+  .payout-tile .lbl{font-size:13px;font-weight:700;color:var(--ink);}
+  .payout-tile .sub{font-size:11px;color:var(--text-muted);font-weight:500;}
+
+  /* Summary */
+  .summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 1px 3px rgba(24,33,61,0.04),0 8px 24px rgba(24,33,61,0.06);overflow:hidden;position:sticky;top:88px;}
+  .summary-head{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;justify-content:space-between;}
+  .summary-head h4{margin:0;font-size:13px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:0.06em;}
+  .summary-head .pill{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:#fef3c7;color:#92400e;border:1px solid #fbbf24;}
+  body[data-metal="silver"] .summary-head .pill{background:#f1f5f9;color:#334155;border-color:#94a3b8;}
+  .summary-body{padding:18px;}
+  .summary-amt{text-align:center;padding:8px 0 18px;}
+  .summary-amt .lbl{font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;}
+  .summary-amt .num{font-size:36px;font-weight:800;letter-spacing:-0.025em;color:var(--ink);margin-top:4px;line-height:1;font-variant-numeric:tabular-nums;}
+  .summary-amt .sub{font-size:12px;color:var(--text-muted);font-weight:600;margin-top:6px;}
+  .summary-list{border-top:1px dashed var(--border);padding-top:14px;}
+  .summary-row{display:flex;justify-content:space-between;padding:7px 0;font-size:13.5px;}
+  .summary-row .k{color:var(--text-muted);font-weight:500;}
+  .summary-row .v{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;}
+  .summary-row.subtract .v{color:var(--danger);}
+  .summary-row.subtract .v::before{content:"− ";}
+  .summary-row.total{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;}
+  .summary-row.total .k{color:var(--ink);font-weight:700;}
+  .summary-row.total .v{font-size:15px;font-weight:800;color:var(--c-bank);}
+  .summary-row .k .hint{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:6px;margin-left:6px;}
+  body[data-metal="silver"] .summary-row .k .hint{background:#f1f5f9;color:#334155;}
+  .summary-note{display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:10px 12px;background:var(--surface-2);border:1px dashed var(--border-strong);border-radius:8px;font-size:11.5px;color:var(--text-muted);font-weight:500;line-height:1.4;}
+  .summary-note svg{flex-shrink:0;margin-top:1px;color:var(--text-muted);}
+  .summary-actions{padding:14px 18px;border-top:1px solid var(--border);background:var(--surface-2);}
+
+  /* Footer */
+  .footer-bar{position:sticky;bottom:20px;margin-top:24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 22px;box-shadow:0 4px 14px rgba(24,33,61,0.08);display:flex;align-items:center;justify-content:space-between;z-index:5;flex-wrap:wrap;gap:16px;}
+  .footer-bar .info{font-size:13px;color:var(--text-muted);font-weight:500;}
+  .footer-bar .info strong{color:var(--ink);font-weight:700;}
+
+  /* Submit modal (shared pattern) */
+  .modal-bd{position:fixed;inset:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
+  .modal-bd.show{display:flex;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:100%;max-width:520px;box-shadow:0 24px 60px rgba(15,23,42,0.30);overflow:hidden;}
+  .modal-head{text-align:center;padding:28px 28px 20px;background:linear-gradient(180deg,#fffbeb 0%,var(--surface) 100%);border-bottom:1px solid var(--border);}
+  body[data-metal="silver"] .modal-head{background:linear-gradient(180deg,#f8fafc 0%,var(--surface) 100%);}
+  .modal-head .check{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--gold-600),var(--gold-400));color:#fff;display:grid;place-items:center;margin:0 auto 14px;box-shadow:0 8px 22px rgba(217,119,6,0.30);}
+  body[data-metal="silver"] .modal-head .check{background:linear-gradient(135deg,var(--silver-600),var(--silver-400));box-shadow:0 8px 22px rgba(100,116,139,0.30);}
+  .modal-head h2{margin:0;font-size:20px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);}
+  .modal-head .ref{margin-top:4px;font-size:13px;color:var(--text-muted);font-weight:500;}
+  .modal-head .ref strong{color:var(--ink);font-weight:700;}
+  .modal-body{padding:22px 24px;}
+  .modal-body .question{font-size:13.5px;font-weight:600;color:var(--ink);margin:0 0 14px;}
+  .modal-actions{display:flex;flex-direction:column;gap:10px;}
+  .ma{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;text-align:left;transition:all 0.15s;font-family:inherit;width:100%;}
+  .ma:hover{border-color:var(--ink);background:var(--surface-2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(24,33,61,0.06);}
+  .ma .ico-wrap{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;color:#fff;flex-shrink:0;}
+  .ma.ma-print .ico-wrap{background:linear-gradient(135deg,#475569,#1e293b);}
+  .ma.ma-print-email .ico-wrap{background:linear-gradient(135deg,var(--c-contact),#0f766e);}
+  .ma.ma-payout .ico-wrap{background:linear-gradient(135deg,var(--primary),var(--c-id));}
+  .ma .meta{flex:1;}
+  .ma .meta .t{font-size:14.5px;font-weight:700;color:var(--ink);letter-spacing:-0.01em;}
+  .ma .meta .s{font-size:12.5px;color:var(--text-muted);font-weight:500;margin-top:2px;}
+  .ma .chev{color:var(--text-soft);flex-shrink:0;}
+  .ma:hover .chev{color:var(--ink);}
+  .ma.ma-recommended{border-color:var(--primary);background:linear-gradient(135deg,var(--primary-50),var(--surface));}
+  .ma .badge-rec{background:var(--primary);color:#fff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:999px;text-transform:uppercase;letter-spacing:0.05em;margin-left:8px;}
+  .modal-foot{padding:14px 22px;border-top:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:12.5px;color:var(--text-muted);font-weight:500;}
+  .modal-close{background:transparent;border:0;cursor:pointer;color:var(--text-muted);font-weight:700;font-size:13px;padding:6px 12px;border-radius:8px;font-family:inherit;}
+  .modal-close:hover{background:var(--surface);color:var(--ink);}
+
+  /* Toast */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:var(--radius);box-shadow:0 12px 32px rgba(15,23,42,0.30);font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;z-index:250;opacity:0;pointer-events:none;transition:opacity 0.2s,transform 0.2s;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+  .toast .ico{width:22px;height:22px;border-radius:50%;background:var(--success);display:grid;place-items:center;flex-shrink:0;}
+
+  @media (max-width:1100px){
+    .market-panel,.layout{grid-template-columns:1fr;}
+    .summary-card{position:relative;top:0;}
+    .grid.cols-2,.payout-grid,.item-calc{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:600px){
+    .grid.cols-2,.payout-grid,.item-calc{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body data-metal="gold">
+
+<div class="app-shell">
+
+<aside class="sidebar" id="sidebar">
+  <button class="sb-collapse" id="sbCollapse"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <div class="sidebar-brand"><div class="logo">V</div><div class="name">Vayoo<span>.ai</span></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Workspace</div>
+    <a class="nav-item" href="index.html" data-label="Dashboard"><span class="ico" style="color:var(--c-id);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Dashboard</a>
+    <a class="nav-item" href="client-list.html" data-label="Clients"><span class="ico" style="color:var(--primary);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Clients <span class="badge">12</span></a>
+    <a class="nav-item" href="companies-list.html" data-label="Companies"><span class="ico" style="color:var(--c-income);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></span>Companies</a>
+    <div class="nav-section">Operations</div>
+    <a class="nav-item has-sub expanded" data-label="Transactions"><span class="ico" style="color:var(--c-bank);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>Transactions <span class="chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></a>
+    <div class="nav-sub">
+      <a class="nav-item" href="loan-new.html" data-label="Loans"><span class="ico" style="color:var(--primary);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Loans</a>
+      <a class="nav-item" href="cheque-cashing-new.html" data-label="Cheque cashing"><span class="ico" style="color:#0d9488;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Cheque cashing</a>
+      <a class="nav-item active" href="gold-buy-new.html" data-label="Gold buy"><span class="ico" style="color:#d97706;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></span>Gold &amp; Silver buy</a>
+      <a class="nav-item" href="#" data-label="Currency exchange"><span class="ico" style="color:#ec4899;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/></svg></span>Currency exchange</a>
+    </div>
+    <a class="nav-item" href="#" data-label="Approvals"><span class="ico" style="color:var(--warn);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Approvals <span class="badge">5</span></a>
+    <div class="nav-section">Insights</div>
+    <a class="nav-item" href="#" data-label="Reports"><span class="ico" style="color:var(--c-identity);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Reports</a>
+    <a class="nav-item" href="#" data-label="Analytics"><span class="ico" style="color:var(--c-tags);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Analytics</a>
+    <div class="nav-section">System</div>
+    <a class="nav-item has-sub" data-label="Settings"><span class="ico" style="color:rgba(255,255,255,0.5);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/></svg></span>Settings <span class="chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></a>
+    <div class="nav-sub">
+      <a class="nav-item" href="#"><span class="ico" style="color:rgba(255,255,255,0.55);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>General</a>
+      <a class="nav-item" href="#"><span class="ico" style="color:rgba(255,255,255,0.55);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>Team &amp; Users</a>
+      <a class="nav-item" href="#"><span class="ico" style="color:rgba(255,255,255,0.55);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>Roles &amp; Permissions</a>
+    </div>
+  </nav>
+  <div class="sidebar-profile">
+    <div class="pf-avatar">A</div>
+    <div><div class="pf-name">Aman Singh</div><div class="pf-role">Admin · Toronto</div></div>
+    <div class="pf-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></div>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sbOverlay"></div>
+
+<div class="main-area">
+
+<header class="topbar">
+  <div class="crumbs">
+    <button class="menu-toggle" id="menuToggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <a href="index.html">Dashboard</a><span class="sep">/</span>
+    <a href="client-list.html">Clients</a><span class="sep">/</span>
+    <a href="client-view.html">Aman Singh</a><span class="sep">/</span>
+    <span class="current">Gold &amp; Silver Buy</span>
+  </div>
+  <div class="gsearch">
+    <span class="gs-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+    <input type="text" placeholder="Search clients, companies, loans, cheques, transactions…" />
+    <span class="gs-kbd"><kbd>⌘</kbd><kbd>K</kbd></span>
+  </div>
+  <div class="right">
+    <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+    <div class="avatar">A</div>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Gold &amp; Silver Buy</h1>
+      <p class="page-subtitle">Client is selling bars, coins or jewellery. Pricing pulls live spot · purity drives the calculation.</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn ghost" href="client-list.html">Cancel</a>
+      <button class="btn">Save draft</button>
+    </div>
+  </div>
+
+  <!-- Client strip -->
+  <div class="client-strip">
+    <div class="ava">AS</div>
+    <div class="info">
+      <div class="nm">Aman Singh <span style="font-size:11px;color:var(--success);background:#e1f8ed;padding:2px 8px;border-radius:999px;font-weight:700;margin-left:6px;border:1px solid #bbe9c9;">● Active</span></div>
+      <div class="meta">#VC-10284 · KYC verified · 3 prior gold sells · Last: 2 months ago</div>
+    </div>
+    <a class="change" href="client-list.html">Change client →</a>
+  </div>
+
+  <!-- ===== Market price panel ===== -->
+  <div class="market-panel">
+    <div class="market-card m-gold">
+      <div class="mc-head">
+        <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></div>
+        <div>
+          <div class="lbl">Today's spot price</div>
+          <div class="nm">Gold</div>
+        </div>
+      </div>
+      <div class="mc-price">
+        <span class="big">$108.50</span>
+        <span class="unit">CAD / gram (24K)</span>
+        <span class="mc-trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 9 12 3 6 9"/><line x1="12" y1="3" x2="12" y2="21"/></svg>+0.8%</span>
+      </div>
+      <div class="mc-sub">
+        <span>Per oz: <span class="v">$3,374.00</span></span>
+        <span>Per 10g: <span class="v">$1,085.00</span></span>
+        <span>Yesterday: <span class="v">$107.65</span></span>
+      </div>
+      <div class="mc-foot">
+        <span class="live">Live · refreshes every 60s</span>
+        <span>Last update 11:42 AM EDT · May 10</span>
+      </div>
+    </div>
+
+    <div class="market-card m-silver">
+      <div class="mc-head">
+        <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg></div>
+        <div>
+          <div class="lbl">Today's spot price</div>
+          <div class="nm">Silver</div>
+        </div>
+      </div>
+      <div class="mc-price">
+        <span class="big">$1.62</span>
+        <span class="unit">CAD / gram (.999 fine)</span>
+        <span class="mc-trend down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 15 12 21 18 15"/><line x1="12" y1="3" x2="12" y2="21"/></svg>−0.4%</span>
+      </div>
+      <div class="mc-sub">
+        <span>Per oz: <span class="v">$50.40</span></span>
+        <span>Per kg: <span class="v">$1,620.00</span></span>
+        <span>Yesterday: <span class="v">$1.627</span></span>
+      </div>
+      <div class="mc-foot">
+        <span class="live">Live · refreshes every 60s</span>
+        <span>Last update 11:42 AM EDT · May 10</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div>
+
+      <!-- ===== Items section ===== -->
+      <div class="card">
+        <div class="section acc-items" id="itemsSection">
+          <div class="section-head">
+            <div class="section-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg>
+            </div>
+            <div>
+              <h3>Items to buy</h3>
+              <p>Add each piece separately. Bars, coins and jewellery can mix in one transaction.</p>
+            </div>
+            <div style="margin-left:auto;">
+              <div class="metal-toggle" id="metalToggle">
+                <button type="button" class="active" data-metal="gold"><span class="swatch"></span>Gold</button>
+                <button type="button" data-metal="silver"><span class="swatch"></span>Silver</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="itemsContainer"></div>
+
+          <button class="add-row" type="button" id="addItemBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add another item
+          </button>
+        </div>
+
+        <!-- Payout -->
+        <div class="section acc-payout">
+          <div class="section-head">
+            <div class="section-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94"/><path d="M9.69 8h11.48"/></svg></div>
+            <div><h3>Payout to client</h3><p>How to pay the client for the items.</p></div>
+          </div>
+
+          <div class="field" style="margin-bottom:14px;">
+            <label>Method <span class="req">*</span></label>
+            <div class="payout-grid" id="payoutGrid">
+              <label class="payout-tile active" data-method="cash">
+                <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94"/><path d="M9.69 8h11.48"/></svg></span>
+                <span class="lbl">Cash</span><span class="sub">In-person at branch</span>
+              </label>
+              <label class="payout-tile" data-method="etransfer">
+                <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+                <span class="lbl">E-transfer</span><span class="sub">Email transfer</span>
+              </label>
+              <label class="payout-tile" data-method="bank">
+                <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
+                <span class="lbl">Bank Transfer</span><span class="sub">Direct deposit</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="grid cols-2">
+            <div class="field"><label>Cash given by</label><select class="select"><option>Aman Singh (you)</option><option>Sarah Kapoor</option><option>Sandeep Rao</option></select></div>
+            <div class="field"><label>Payout amount</label><div class="input-icon"><span class="ico">$</span><input class="input" id="payoutAmount" value="0.00" /></div><div class="helper">Auto-filled from net below — override only if releasing partial.</div></div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="section acc-notes">
+          <div class="section-head">
+            <div class="section-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg></div>
+            <div><h3>Internal notes</h3><p>Anything reviewers or auditors should know.</p></div>
+          </div>
+          <textarea class="textarea" rows="3" placeholder="Hallmarks observed, melt verification notes, ID checks, special handling…"></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Summary -->
+    <aside>
+      <div class="summary-card">
+        <div class="summary-head">
+          <h4>Transaction summary</h4>
+          <span class="pill" id="sumPill">Gold buy</span>
+        </div>
+        <div class="summary-body">
+          <div class="summary-amt">
+            <div class="lbl">Net payout to client</div>
+            <div class="num" id="sumNet">$0.00</div>
+            <div class="sub" id="sumCount">0 items · 0.00 g total</div>
+          </div>
+          <div class="summary-list">
+            <div class="summary-row"><span class="k">Spot value @ max rate <span class="hint">our ceiling</span></span><span class="v" id="sumCeiling">$0.00</span></div>
+            <div class="summary-row subtract"><span class="k">Offer adjustment</span><span class="v" id="sumDiscount">−$0.00</span></div>
+            <div class="summary-row total"><span class="k">Net payout</span><span class="v" id="sumNet2">$0.00</span></div>
+          </div>
+          <div class="summary-note">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16.5" r="1" fill="currentColor" stroke="none"/></svg>
+            <span>Front desk can flex up to ±15pp outside the admin band. Out-of-band offers are flagged on each item. No assay or melt fees deducted.</span>
+          </div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn primary" id="submitBtn" style="width:100%;justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Submit
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-bar">
+    <div class="info">
+      <strong id="footMetal">Gold buy</strong> — <span id="footMethod">Cash</span> · Net <strong id="footNet">$0.00</strong>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <a class="btn ghost" href="client-list.html">Cancel</a>
+      <button class="btn">Save draft</button>
+      <button class="btn primary" id="footSubmitBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Submit
+      </button>
+    </div>
+  </div>
+
+</main>
+
+</div>
+</div>
+
+<!-- Submit modal -->
+<div class="modal-bd" id="submitModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <h2 id="modalTitle">Purchase recorded</h2>
+      <div class="ref">Reference <strong id="modalRef">#GB-94182</strong> · Aman Singh · <span id="modalSummary">— items</span> · Net <strong id="modalNet">$0.00</strong></div>
+    </div>
+    <div class="modal-body">
+      <p class="question">How would you like to finalize this transaction?</p>
+      <div class="modal-actions">
+        <button type="button" class="ma ma-print" data-action="print"><span class="ico-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span><span class="meta"><span class="t">Print receipt</span><span class="s">Print at the branch with item breakdown.</span></span><span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></button>
+        <button type="button" class="ma ma-print-email ma-recommended" data-action="print-email"><span class="ico-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><span class="meta"><span class="t">Print and email receipt <span class="badge-rec">Recommended</span></span><span class="s">Print here and email PDF to <strong>aman@example.com</strong>.</span></span><span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></button>
+        <button type="button" class="ma ma-payout" data-action="payout"><span class="ico-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span class="meta"><span class="t">Release payout now</span><span class="s">Skip print · client gets payout immediately.</span></span><span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span>Items will be tagged and stored in the vault until weekly melt cycle.</span>
+      <button type="button" class="modal-close" id="modalCloseBtn">Skip for now</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+  <span id="toastMsg">Done.</span>
+</div>
+
+<script>
+  // Sidebar
+  (function(){
+    const sidebar=document.getElementById('sidebar');const overlay=document.getElementById('sbOverlay');const menuToggle=document.getElementById('menuToggle');const sbCollapse=document.getElementById('sbCollapse');
+    if(menuToggle){menuToggle.addEventListener('click',(e)=>{e.stopPropagation();sidebar.classList.toggle('open');overlay.classList.toggle('show');});overlay.addEventListener('click',()=>{sidebar.classList.remove('open');overlay.classList.remove('show');});}
+    document.querySelectorAll('.nav-item.has-sub').forEach(nav=>{nav.addEventListener('click',()=>{if(sidebar.classList.contains('collapsed'))return;nav.classList.toggle('expanded');});});
+    try{if(localStorage.getItem('vayoo:sb-collapsed')==='1')sidebar.classList.add('collapsed');}catch(e){}
+    if(sbCollapse){sbCollapse.addEventListener('click',(e)=>{e.stopPropagation();sidebar.classList.toggle('collapsed');try{localStorage.setItem('vayoo:sb-collapsed',sidebar.classList.contains('collapsed')?'1':'0');}catch(e){}});}
+  })();
+
+  // ===== Pricing config =====
+  const PRICES = { gold: 108.50, silver: 1.62 }; // CAD per gram (our selling-price reference)
+
+  // Admin-configurable BUY-RATE ranges by karat / fineness.
+  // min = floor offer · max = ceiling (our selling price — offer must always be ≤ max).
+  // Front desk picks an offer rate within this band; system never quotes above max.
+  const PURITY = {
+    gold: [
+      { key:'24k', label:'24K', min:91, max:96, desc:'Pure' },
+      { key:'22k', label:'22K', min:85, max:90, desc:'Jewelry' },
+      { key:'18k', label:'18K', min:70, max:75, desc:'Common' },
+      { key:'14k', label:'14K', min:54, max:58, desc:'Lower' },
+      { key:'10k', label:'10K', min:38, max:42, desc:'Minimum' },
+    ],
+    silver: [
+      { key:'999', label:'.999', min:92, max:96, desc:'Fine' },
+      { key:'925', label:'.925', min:85, max:90, desc:'Sterling' },
+      { key:'900', label:'.900', min:82, max:87, desc:'Coin' },
+      { key:'800', label:'.800', min:72, max:78, desc:'Continental' },
+      { key:'500', label:'.500', min:45, max:50, desc:'Junk silver' },
+    ],
+  };
+
+  function fmt(n){return '$'+(n||0).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+  // Active metal
+  let currentMetal = 'gold';
+
+  // ===== Item card factory =====
+  let itemCount = 0;
+  const container = document.getElementById('itemsContainer');
+
+  function buildItemCard() {
+    itemCount++;
+    const idx = itemCount;
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.dataset.idx = idx;
+    card.innerHTML = `
+      <div class="item-card-head">
+        <span class="num">${idx}</span>
+        <span class="lbl">Item ${idx}</span>
+        <span class="meta-tag" data-out="tag">Gold · 24K · Bar</span>
+        <button type="button" class="remove" ${idx===1?'style="visibility:hidden;"':''}>Remove</button>
+      </div>
+
+      <div class="field" style="margin-bottom:14px;">
+        <label>Category <span class="req">*</span></label>
+        <div class="cat-chips" data-field="cat-chips">
+          <button type="button" class="cat-chip active" data-cat="bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="9" width="18" height="6" rx="1"/></svg>Bar</button>
+          <button type="button" class="cat-chip" data-cat="coin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>Coin</button>
+          <button type="button" class="cat-chip" data-cat="jewellery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="14" r="6"/><polyline points="8 4 12 8 16 4"/></svg>Jewellery</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:14px;">
+        <div class="purity-label">
+          <span>Karat / fineness <span class="req">*</span></span>
+          <span class="pl-note">Admin-set offer band · max = our selling price</span>
+        </div>
+        <div class="purity-grid" data-field="purity-grid"></div>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="field">
+          <label>Weight <span class="req">*</span></label>
+          <div class="input-suffix"><input class="input" type="number" step="0.01" data-field="weight" placeholder="0.00" value="0" /><span class="sfx">grams</span></div>
+          <div class="helper">Hallmark or stamped weight if available.</div>
+        </div>
+        <div class="field">
+          <label>Description <span class="opt">Optional</span></label>
+          <input class="input" type="text" data-field="desc" placeholder="e.g. 1 oz Maple Leaf, 22k chain (broken clasp)" />
+        </div>
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Photos <span class="opt">Front &amp; reverse — recommended</span></label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <label class="upload-zone">
+              <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <span class="lbl">Front photo</span>
+              <span class="sub">JPG, PNG or HEIC</span>
+              <input type="file" accept="image/*" />
+            </label>
+            <label class="upload-zone">
+              <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <span class="lbl">Reverse / hallmark</span>
+              <span class="sub">Show hallmark stamp</span>
+              <input type="file" accept="image/*" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="rate-picker" data-field="rate-picker">
+        <div class="rate-picker-head">
+          <span class="rp-title">Offer rate</span>
+          <span class="rp-band">Admin band <b data-out="band">91% – 96%</b> · max = ceiling</span>
+          <span class="rp-flag" data-out="flag">Below band</span>
+        </div>
+        <div class="rate-picker-row">
+          <input type="range" class="rate-slider" data-field="rate" min="0" max="96" step="1" value="91" />
+          <div class="rate-input">
+            <input type="number" data-field="rate-num" min="0" max="96" step="1" value="91" />
+            <span class="pct">%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="item-calc">
+        <div class="ic-cell"><div class="ic-lbl">Spot price</div><div class="ic-val" data-out="spot">$0.00 /g</div></div>
+        <div class="ic-cell"><div class="ic-lbl">Offer rate</div><div class="ic-val" data-out="rate">91%</div></div>
+        <div class="ic-cell"><div class="ic-lbl">Max ceiling</div><div class="ic-val" data-out="ceiling">$0.00<span class="ceiling">at max rate</span></div></div>
+        <div class="ic-cell"><div class="ic-lbl">Item value</div><div class="ic-val amount" data-out="value">$0.00</div></div>
+      </div>
+    `;
+    container.appendChild(card);
+    wireItemCard(card);
+    renumberCards();
+    renderPurityForCard(card);
+    recalc();
+    return card;
+  }
+
+  function renumberCards() {
+    const cards = container.querySelectorAll('.item-card');
+    cards.forEach((c, i) => {
+      c.querySelector('.num').textContent = i + 1;
+      c.querySelector('.lbl').textContent = 'Item ' + (i + 1);
+      c.querySelector('.remove').style.visibility = cards.length === 1 ? 'hidden' : 'visible';
+    });
+  }
+
+  function renderPurityForCard(card) {
+    const grid = card.querySelector('[data-field="purity-grid"]');
+    const list = PURITY[currentMetal];
+    grid.innerHTML = list.map((p, i) => `
+      <button type="button" class="purity-chip ${i === 0 ? 'active' : ''}" data-purity="${p.key}" data-min="${p.min}" data-max="${p.max}">
+        <span class="karat">${p.label}</span>
+        <span class="range">${p.min}% – ${p.max}%</span>
+        <span class="desc">${p.desc}</span>
+      </button>
+    `).join('');
+    grid.querySelectorAll('.purity-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        if (chip.disabled) return;
+        grid.querySelectorAll('.purity-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        syncRateBand(card);
+        updateTag(card);
+        recalc();
+      });
+    });
+    // Honour current category constraints (Bar/Coin → only top purity)
+    applyCategoryConstraints(card);
+    // Initial sync to the first chip
+    syncRateBand(card);
+  }
+
+  // Bar & Coin only ship in the highest purity (24K gold / .999 silver).
+  // Disable lower purities and force-select the top chip when category is bar/coin.
+  function applyCategoryConstraints(card) {
+    const cat = card.querySelector('[data-field="cat-chips"] .cat-chip.active')?.dataset.cat || 'bar';
+    const chips = card.querySelectorAll('[data-field="purity-grid"] .purity-chip');
+    const restrict = (cat === 'bar' || cat === 'coin');
+    chips.forEach((chip, i) => {
+      const lock = restrict && i !== 0;
+      chip.disabled = lock;
+      chip.classList.toggle('disabled', lock);
+      const noteEl = chip.querySelector('.desc');
+      if (noteEl && lock) noteEl.textContent = 'N/A';
+    });
+    if (restrict) {
+      // If the active chip is no longer allowed, snap to the top one.
+      const active = card.querySelector('[data-field="purity-grid"] .purity-chip.active');
+      if (!active || active.disabled) {
+        chips.forEach(c => c.classList.remove('active'));
+        chips[0].classList.add('active');
+      }
+    } else {
+      // Restore descriptions when constraint is lifted
+      const list = PURITY[currentMetal];
+      chips.forEach((chip, i) => {
+        const noteEl = chip.querySelector('.desc');
+        if (noteEl && list[i]) noteEl.textContent = list[i].desc;
+      });
+    }
+  }
+
+  // Sync slider + numeric input to the selected karat's admin-set band.
+  // Front desk gets ±15pp flex around the band on both sides:
+  //   floor = max(0,  band.min - 15)   ceiling = min(100, band.max + 15)
+  // Default starts at band.min. Values above band.max are flagged "above band".
+  const FLEX = 15;
+  function syncRateBand(card) {
+    const chip = card.querySelector('[data-field="purity-grid"] .purity-chip.active');
+    if (!chip) return;
+    const min = parseFloat(chip.dataset.min);
+    const max = parseFloat(chip.dataset.max);
+    const lo  = Math.max(0,   min - FLEX);
+    const hi  = Math.min(100, max + FLEX);
+    const slider = card.querySelector('[data-field="rate"]');
+    const num = card.querySelector('[data-field="rate-num"]');
+    const band = card.querySelector('[data-out="band"]');
+    slider.min = lo; slider.max = hi; slider.step = 1;
+    num.min = lo; num.max = hi; num.step = 1;
+    // Default starts at the band's lower bound; if a value was already set
+    // (e.g. user is switching metal/karat), keep it but clamp to new bounds.
+    const cur = parseFloat(slider.value);
+    const rounded = isNaN(cur) ? min : Math.round(Math.min(hi, Math.max(lo, cur)));
+    slider.value = isNaN(cur) ? min : rounded;
+    num.value = slider.value;
+    if (band) band.textContent = `${min}% – ${max}%`;
+    // Paint band-start and band-end onto the track via CSS variables.
+    const span = (hi - lo) || 1;
+    slider.style.setProperty('--band-start', (((min - lo) / span) * 100).toFixed(2) + '%');
+    slider.style.setProperty('--band-end',   (((max - lo) / span) * 100).toFixed(2) + '%');
+    // Stash band bounds on the card for recalc() to read
+    card.dataset.bandMin = min;
+    card.dataset.bandMax = max;
+  }
+
+  function wireItemCard(card) {
+    card.querySelector('.remove').addEventListener('click', () => { card.remove(); renumberCards(); recalc(); });
+
+    card.querySelectorAll('[data-field="cat-chips"] .cat-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        card.querySelectorAll('[data-field="cat-chips"] .cat-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        applyCategoryConstraints(card);
+        syncRateBand(card);
+        updateTag(card);
+        recalc();
+      });
+    });
+
+    card.querySelector('[data-field="weight"]').addEventListener('input', recalc);
+
+    // Rate slider ↔ numeric input.
+    // Both ends are bounded by band ±15pp (set in syncRateBand).
+    const slider = card.querySelector('[data-field="rate"]');
+    const num = card.querySelector('[data-field="rate-num"]');
+    const clamp = (v) => {
+      const lo = parseFloat(slider.min);
+      const hi = parseFloat(slider.max);
+      if (isNaN(v)) return lo;
+      return Math.round(Math.min(hi, Math.max(lo, v)));
+    };
+    slider.addEventListener('input', () => { num.value = slider.value; recalc(); });
+    num.addEventListener('input', () => {
+      const v = clamp(parseFloat(num.value));
+      // Don't fight typing — only push slider, not the input itself
+      slider.value = v;
+      recalc();
+    });
+    num.addEventListener('blur', () => {
+      num.value = clamp(parseFloat(num.value));
+      slider.value = num.value;
+      recalc();
+    });
+
+    card.querySelectorAll('input[type="file"]').forEach(input => {
+      input.addEventListener('change', () => {
+        if (input.files && input.files[0]) {
+          input.parentNode.classList.add('uploaded');
+          input.parentNode.querySelector('.lbl').textContent = '✓ ' + (input.files[0].name.length > 18 ? input.files[0].name.slice(0,18) + '…' : input.files[0].name);
+          input.parentNode.querySelector('.sub').textContent = (input.files[0].size/1024).toFixed(0) + ' KB';
+        }
+      });
+    });
+  }
+
+  function updateTag(card) {
+    const cat = card.querySelector('[data-field="cat-chips"] .cat-chip.active')?.dataset.cat || 'bar';
+    const purity = card.querySelector('[data-field="purity-grid"] .purity-chip.active');
+    const purityLabel = purity?.querySelector('.karat').textContent || '';
+    const metalLabel = currentMetal === 'gold' ? 'Gold' : 'Silver';
+    card.querySelector('[data-out="tag"]').textContent = `${metalLabel} · ${purityLabel} · ${cat.charAt(0).toUpperCase()+cat.slice(1)}`;
+  }
+
+  // ===== Recalc =====
+  // Value = weight × spot × (offer_rate / 100)
+  // offer_rate is chosen by front desk within admin-set [min, max] band.
+  // max = our selling price ceiling — offer never exceeds it.
+  function recalc() {
+    let ceilingTotal = 0, net = 0, totalWeight = 0;
+    let cards = container.querySelectorAll('.item-card');
+    cards.forEach(card => {
+      const purityEl = card.querySelector('[data-field="purity-grid"] .purity-chip.active');
+      const minRate = parseFloat(purityEl?.dataset.min || '0');
+      const maxRate = parseFloat(purityEl?.dataset.max || '0');
+      const weight = parseFloat(card.querySelector('[data-field="weight"]').value) || 0;
+      const spot = PRICES[currentMetal];
+
+      let offerRate = parseFloat(card.querySelector('[data-field="rate"]').value) || 0;
+      // Safety clamp: respect the ±15pp flex bounds set on the slider
+      const slider = card.querySelector('[data-field="rate"]');
+      const lo = parseFloat(slider.min), hi = parseFloat(slider.max);
+      if (offerRate > hi) offerRate = hi;
+      if (offerRate < lo) offerRate = lo;
+
+      const ceilingValue = weight * spot * (maxRate / 100);   // our selling price for this item
+      const itemValue    = weight * spot * (offerRate / 100); // what we offer the client
+
+      ceilingTotal += ceilingValue;
+      net += itemValue;
+      totalWeight += weight;
+
+      card.querySelector('[data-out="spot"]').textContent = fmt(spot) + ' /g';
+      card.querySelector('[data-out="rate"]').textContent = Math.round(offerRate) + '%';
+      card.querySelector('[data-out="ceiling"]').innerHTML = fmt(ceilingValue) + '<span class="ceiling">at max rate</span>';
+      card.querySelector('[data-out="value"]').textContent = fmt(itemValue);
+
+      // Out-of-band indicators (below min OR above max)
+      const picker = card.querySelector('[data-field="rate-picker"]');
+      const flag = card.querySelector('[data-out="flag"]');
+      const belowBand = offerRate < minRate;
+      const aboveBand = offerRate > maxRate;
+      picker.classList.toggle('below-band', belowBand);
+      picker.classList.toggle('above-band', aboveBand);
+      if (flag) {
+        flag.classList.toggle('show', belowBand || aboveBand);
+        flag.classList.toggle('over', aboveBand);
+        if (belowBand)      flag.textContent = `Below band · ${Math.round(minRate - offerRate)}pp under min`;
+        else if (aboveBand) flag.textContent = `Above ceiling · ${Math.round(offerRate - maxRate)}pp over max`;
+      }
+    });
+
+    const discount = Math.max(0, ceilingTotal - net);
+
+    document.getElementById('sumCeiling').textContent = fmt(ceilingTotal);
+    document.getElementById('sumDiscount').textContent = fmt(discount);
+    document.getElementById('sumNet').textContent = fmt(net);
+    document.getElementById('sumNet2').textContent = fmt(net);
+    document.getElementById('sumCount').textContent = `${cards.length} item${cards.length === 1 ? '' : 's'} · ${totalWeight.toFixed(2)} g total`;
+    const payEl = document.getElementById('payoutAmount');
+    if (payEl) payEl.value = net.toFixed(2);
+    document.getElementById('footNet').textContent = fmt(net);
+  }
+
+  // ===== Metal toggle =====
+  document.getElementById('metalToggle').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-metal]');
+    if (!btn) return;
+    currentMetal = btn.dataset.metal;
+    document.querySelectorAll('#metalToggle button').forEach(b => b.classList.toggle('active', b === btn));
+    document.body.dataset.metal = currentMetal;
+    // Update section accent class
+    const itemsSection = document.getElementById('itemsSection');
+    itemsSection.classList.toggle('silver', currentMetal === 'silver');
+    // Re-render purity chips on each card
+    container.querySelectorAll('.item-card').forEach(card => { renderPurityForCard(card); updateTag(card); });
+    // Update labels
+    document.getElementById('sumPill').textContent = currentMetal === 'gold' ? 'Gold buy' : 'Silver buy';
+    document.getElementById('footMetal').textContent = currentMetal === 'gold' ? 'Gold buy' : 'Silver buy';
+    recalc();
+  });
+
+  // ===== Payout method =====
+  document.querySelectorAll('#payoutGrid .payout-tile').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('#payoutGrid .payout-tile').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      const m = t.dataset.method;
+      document.getElementById('footMethod').textContent = ({cash:'Cash', etransfer:'E-transfer', bank:'Bank Transfer'})[m] || 'Cash';
+    });
+  });
+
+  // ===== Submit modal =====
+  const modal = document.getElementById('submitModal');
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toastMsg');
+  function showToast(msg){ toastMsg.textContent = msg; toast.classList.add('show'); clearTimeout(showToast._t); showToast._t = setTimeout(()=>toast.classList.remove('show'), 3200); }
+  function showSubmit() {
+    const cards = container.querySelectorAll('.item-card');
+    let totalWeight = 0;
+    cards.forEach(c => { totalWeight += parseFloat(c.querySelector('[data-field="weight"]').value) || 0; });
+    document.getElementById('modalRef').textContent = '#' + (currentMetal === 'gold' ? 'GB-' : 'SB-') + (90000 + Math.floor(Math.random() * 5000));
+    document.getElementById('modalTitle').textContent = currentMetal === 'gold' ? 'Gold purchase recorded' : 'Silver purchase recorded';
+    document.getElementById('modalSummary').textContent = `${cards.length} item${cards.length === 1 ? '' : 's'} · ${totalWeight.toFixed(2)} g`;
+    document.getElementById('modalNet').textContent = document.getElementById('sumNet').textContent;
+    modal.classList.add('show');
+  }
+  document.getElementById('submitBtn').addEventListener('click', showSubmit);
+  document.getElementById('footSubmitBtn').addEventListener('click', showSubmit);
+  document.getElementById('modalCloseBtn').addEventListener('click', () => modal.classList.remove('show'));
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+  modal.querySelectorAll('.ma').forEach(b => b.addEventListener('click', () => {
+    const a = b.dataset.action;
+    modal.classList.remove('show');
+    if (a === 'print') showToast('Opening print preview…');
+    else if (a === 'print-email') showToast('Printing and emailing receipt to aman@example.com');
+    else if (a === 'payout') showToast('Payout released · client receives funds now');
+  }));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.classList.remove('show'); });
+
+  // ===== Add another item =====
+  document.getElementById('addItemBtn').addEventListener('click', () => {
+    const c = buildItemCard();
+    c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  // Bootstrap with one item
+  buildItemCard();
+  recalc();
+</script>
+
+</body>
+</html>

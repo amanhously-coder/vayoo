@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vayoo.ai — New Loan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  @view-transition { navigation: auto; }
+  @keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .main-area > * { animation: pageFadeIn 0.22s ease-out; }
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --surface-2: #f6f8fd;
+    --border: #dde2ed;
+    --border-strong: #c2c9da;
+    --ink: #18213d;
+    --ink-soft: #233055;
+    --text: #18213d;
+    --text-muted: #54607a;
+    --text-soft: #7d869f;
+    --primary: #3b5cff;
+    --primary-600: #2945e3;
+    --primary-700: #1d34b8;
+    --primary-50: #ecf0ff;
+    --primary-100: #d6deff;
+    --success: #0e8f3e;
+    --success-50: #e1f8ed;
+    --warn: #c2660e;
+    --warn-50: #fff5e0;
+    --danger: #d11f3a;
+    --danger-50: #fde2e6;
+    --c-identity: #6366f1;
+    --c-contact: #0d9488;
+    --c-id: #8b5cf6;
+    --c-bank: #059669;
+    --c-income: #d97706;
+    --c-tags: #e11d48;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --radius-lg: 20px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    font-size: 16px; font-weight: 500; line-height: 1.5;
+    letter-spacing: -0.005em; -webkit-font-smoothing: antialiased;
+  }
+
+  /* App shell + sidebar (shared) */
+  .app-shell { display: flex; min-height: 100vh; }
+  .sidebar { width: 256px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; z-index: 30; transition: width 0.22s ease; }
+  .sidebar-brand { padding: 20px 22px 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+  .sidebar-brand .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--c-id)); color: #fff; display: grid; place-items: center; font-weight: 900; font-size: 16px; box-shadow: 0 4px 12px rgba(59,92,255,0.30); }
+  .sidebar-brand .name { font-size: 17px; font-weight: 800; letter-spacing: -0.015em; color: var(--ink); }
+  .sidebar-brand .name span { color: var(--primary); }
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 10px 0; }
+  .nav-section { font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em; padding: 14px 22px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 22px; text-decoration: none; color: var(--text-muted); font-weight: 600; font-size: 14.5px; border-left: 3px solid transparent; cursor: pointer; }
+  .nav-item:hover { background: var(--surface-2); color: var(--ink); }
+  .nav-item.active { background: linear-gradient(90deg, rgba(59,92,255,0.08), rgba(59,92,255,0)); color: var(--primary-600); border-left-color: var(--primary); font-weight: 700; }
+  .nav-item .ico { width: 22px; height: 22px; display: grid; place-items: center; flex-shrink: 0; }
+  .nav-item.active .ico { color: var(--primary); }
+  .nav-item .badge { margin-left: auto; background: var(--c-tags); color: #fff; font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 999px; }
+  .nav-sub { padding-left: 32px; display: none; }
+  .nav-item.has-sub.expanded + .nav-sub { display: block; }
+  .nav-sub .nav-item { padding: 7px 22px 7px 32px; font-size: 13.5px; }
+  .nav-item.has-sub .chev { margin-left: auto; transition: transform 0.18s; }
+  .nav-item.has-sub.expanded .chev { transform: rotate(90deg); }
+  .sidebar-profile { border-top: 1px solid var(--border); padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
+  .sidebar-profile .pf-avatar { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #1a3dff, #7a2cff); color: #fff; font-weight: 800; font-size: 13px; display: grid; place-items: center; }
+  .sidebar-profile .pf-name { font-weight: 700; font-size: 13.5px; color: var(--ink); }
+  .sidebar-profile .pf-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
+  .sidebar-profile .pf-menu { margin-left: auto; color: var(--text-muted); cursor: pointer; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; }
+  .sidebar-profile .pf-menu:hover { background: var(--surface-2); color: var(--ink); }
+  .main-area { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .sb-collapse { position: absolute; top: 26px; right: -13px; width: 26px; height: 26px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border-strong); color: var(--text-muted); display: grid; place-items: center; cursor: pointer; z-index: 32; transition: transform 0.18s, color 0.18s, border-color 0.18s; box-shadow: 0 2px 6px rgba(24, 33, 61, 0.08); }
+  .sb-collapse:hover { color: var(--primary); border-color: var(--primary); }
+  .sidebar.collapsed .sb-collapse svg { transform: rotate(180deg); }
+  .sidebar.collapsed { width: 68px; }
+  .sidebar.collapsed .sidebar-brand { padding: 20px 0 18px; justify-content: center; }
+  .sidebar.collapsed .sidebar-brand .name { display: none; }
+  .sidebar.collapsed .nav-section { display: none; }
+  .sidebar.collapsed .nav-item { justify-content: center; padding: 10px 0; border-left: 0; position: relative; font-size: 0; line-height: 0; gap: 0; }
+  .sidebar.collapsed .nav-item.active { background: var(--primary-50); }
+  .sidebar.collapsed .nav-item.active::before { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; background: var(--primary); border-radius: 0 3px 3px 0; }
+  .sidebar.collapsed .nav-item > *:not(.ico) { display: none; }
+  .sidebar.collapsed .nav-item .ico { font-size: initial; line-height: 1; }
+  .sidebar.collapsed .nav-sub { display: none !important; }
+  .sidebar.collapsed .sidebar-profile { padding: 14px 0; justify-content: center; }
+  .sidebar.collapsed .sidebar-profile > div:not(.pf-avatar):not(.pf-menu) { display: none; }
+  .sidebar.collapsed .sidebar-profile .pf-menu { display: none; }
+  .sidebar.collapsed .nav-item:hover::after { content: attr(data-label); position: absolute; left: calc(100% + 14px); top: 50%; transform: translateY(-50%); background: var(--ink); color: #fff; font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 6px; white-space: nowrap; z-index: 100; pointer-events: none; }
+  .menu-toggle { display: none; }
+  @media (max-width: 1100px) {
+    .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); transition: transform 0.22s ease; box-shadow: 8px 0 24px rgba(24, 33, 61, 0.10); }
+    .sidebar.open { transform: translateX(0); }
+    .menu-toggle { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; color: var(--text); margin-right: 12px; }
+    .sidebar-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 25; display: none; }
+    .sidebar-overlay.show { display: block; }
+  }
+
+  /* Topbar (shared) */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .crumbs { color: var(--text-soft); font-size: 15px; font-weight: 600; display:flex; align-items:center; }
+  .crumbs a { color: var(--text-soft); text-decoration: none; }
+  .crumbs a:hover { color: var(--text); }
+  .crumbs .current { color: var(--text); font-weight: 700; }
+  .crumbs .sep { margin: 0 10px; }
+  .topbar .right { display: flex; align-items: center; gap: 18px; }
+  .icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; cursor: pointer; color: var(--text-muted); }
+  .icon-btn:hover { border-color: var(--border-strong); color: var(--ink); }
+  .topbar .avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #1a3dff, #7a2cff); color: #fff; font-weight: 800; font-size: 15px; display: grid; place-items: center; box-shadow: 0 4px 12px rgba(26, 61, 255, 0.35); }
+
+  .page { max-width: 1400px; margin: 24px auto 64px; padding: 0 32px; width: 100%; }
+
+  /* Page header */
+  .page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin-bottom: 24px; flex-wrap: wrap; }
+  .page-title { margin: 0 0 4px; font-size: 24px; font-weight: 700; letter-spacing: -0.018em; line-height: 1.15; color: var(--ink); }
+  .page-subtitle { color: var(--text-muted); font-size: 14px; font-weight: 500; margin: 0; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn { border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink); padding: 9px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; letter-spacing: -0.005em; }
+  .btn:hover { background: var(--surface-2); border-color: var(--ink); color: var(--ink); }
+  .btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(59, 92, 255, 0.25); }
+  .btn.primary:hover { background: var(--primary-600); border-color: var(--primary-600); }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--text-muted); }
+  .btn.ghost:hover { background: var(--surface-2); color: var(--ink); }
+
+  /* Client context strip */
+  .client-strip {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04);
+  }
+  .client-strip .ava { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #3b5cff, #8b5cf6); color: #fff; font-weight: 800; font-size: 14px; display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(139,92,246,0.25); }
+  .client-strip .info .nm { font-weight: 700; font-size: 15px; color: var(--ink); }
+  .client-strip .info .meta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
+  .client-strip .change { margin-left: auto; font-size: 13px; color: var(--primary-600); font-weight: 600; cursor: pointer; text-decoration: none; }
+  .client-strip .change:hover { text-decoration: underline; }
+
+  /* Type selector cards */
+  .type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .type-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; gap: 16px; align-items: flex-start;
+    position: relative;
+  }
+  .type-card:hover { border-color: var(--primary); box-shadow: 0 6px 20px rgba(59, 92, 255, 0.08); }
+  .type-card.active {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--surface) 100%);
+    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 8px 24px rgba(59, 92, 255, 0.12);
+  }
+  .type-card .ico-wrap {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: grid; place-items: center; flex-shrink: 0;
+    color: #fff;
+  }
+  .type-card.t-short  .ico-wrap { background: linear-gradient(135deg, var(--primary), #6366f1); }
+  .type-card.t-loc    .ico-wrap { background: linear-gradient(135deg, var(--c-bank), #0d9488); }
+  .type-card.t-payday .ico-wrap { background: linear-gradient(135deg, var(--c-income), #e11d48); }
+  .type-card .meta { flex: 1; }
+  .type-card .meta h3 { margin: 0 0 4px; font-size: 17px; font-weight: 700; letter-spacing: -0.015em; color: var(--ink); }
+  .type-card .meta p { margin: 0; font-size: 13px; color: var(--text-muted); font-weight: 500; line-height: 1.4; }
+  .type-card .meta .specs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .type-card .spec {
+    background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+    padding: 3px 9px; border-radius: 999px;
+    font-size: 11px; font-weight: 600;
+  }
+  .type-card.active .spec { background: rgba(255,255,255,0.7); border-color: var(--primary-100); color: var(--primary-700); }
+  .type-card .check {
+    position: absolute; top: 16px; right: 16px;
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    display: grid; place-items: center;
+    color: transparent;
+    transition: all 0.15s;
+  }
+  .type-card.active .check { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+  /* Layout for form + summary */
+  .layout { display: grid; grid-template-columns: 1fr 360px; gap: 20px; align-items: flex-start; }
+
+  /* Card */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 8px 24px rgba(24, 33, 61, 0.06);
+    overflow: hidden;
+  }
+  .section { padding: 24px 28px; border-bottom: 1px solid var(--border); }
+  .section:last-child { border-bottom: 0; }
+  .section.acc-loan   { border-left: 4px solid var(--primary); }
+  .section.acc-loc    { border-left: 4px solid var(--c-bank); }
+  .section.acc-payday { border-left: 4px solid var(--c-income); }
+  .section.acc-disburse { border-left: 4px solid var(--c-income); }
+  .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .section-head > div { min-width: 0; }
+  .section-head .history-pill { margin-left: auto; flex-shrink: 0; }
+  .section-head h3 { margin: 0; font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .section-head p { margin: 2px 0 0; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .section-icon { width: 36px; height: 36px; border-radius: 10px; color: #fff; display: grid; place-items: center; flex-shrink: 0; }
+  .section.acc-loan   .section-icon { background: var(--primary); box-shadow: 0 4px 12px rgba(59, 92, 255, 0.25); }
+  .section.acc-loc    .section-icon { background: var(--c-bank); box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25); }
+  .section.acc-payday .section-icon { background: linear-gradient(135deg, var(--c-income), #e11d48); box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25); }
+  .section.acc-disburse .section-icon { background: var(--c-income); box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25); }
+
+  .grid { display: grid; gap: 16px 16px; }
+  .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 13px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em; }
+  .field label .req { color: var(--danger); margin-left: 3px; font-weight: 700; }
+  .field label .opt { color: var(--text-soft); font-weight: 500; margin-left: 6px; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .input, .select, .textarea {
+    width: 100%; border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+    font-size: 14.5px; font-weight: 500; font-family: inherit; color: var(--text);
+    transition: border 0.15s, box-shadow 0.15s;
+  }
+  .input::placeholder, .textarea::placeholder { color: var(--text-soft); font-weight: 500; }
+  .input:focus, .select:focus, .textarea:focus { outline: 0; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 92, 255, 0.14); }
+  .select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2354607a' stroke-width='2.5'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+  .input-icon { position: relative; }
+  .input-icon .input { padding-left: 36px; }
+  .input-icon .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-weight: 700; pointer-events: none; }
+  .helper { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+
+  /* Term selector chips */
+  .term-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .term-chip {
+    background: var(--surface); border: 1px solid var(--border-strong);
+    color: var(--text); padding: 8px 14px;
+    border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.12s;
+    font-family: inherit;
+  }
+  .term-chip:hover { border-color: var(--ink); }
+  .term-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* Disbursement options */
+  .radio-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .radio-tile {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 14px 12px;
+    border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: var(--radius-sm);
+    cursor: pointer; transition: all 0.12s;
+    text-align: center;
+  }
+  .radio-tile .ico { width: 32px; height: 32px; border-radius: 8px; background: var(--surface-2); color: var(--text-muted); display: grid; place-items: center; }
+  .radio-tile .lbl { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .radio-tile .sub { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+  .radio-tile:hover { border-color: var(--ink); }
+  .radio-tile.active { border-color: var(--primary); background: var(--primary-50); }
+  .radio-tile.active .ico { background: var(--primary); color: #fff; }
+
+  /* Summary card (right rail) */
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(24, 33, 61, 0.04), 0 8px 24px rgba(24, 33, 61, 0.06);
+    overflow: hidden;
+    position: sticky; top: 88px;
+  }
+  .summary-head { padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--surface-2); display: flex; align-items: center; justify-content: space-between; }
+  .summary-head h4 { margin: 0; font-size: 13px; font-weight: 800; color: var(--ink); text-transform: uppercase; letter-spacing: 0.06em; }
+  .summary-head .pill {
+    font-size: 10.5px; font-weight: 700;
+    padding: 3px 8px; border-radius: 999px;
+    background: var(--primary-50); color: var(--primary-600);
+    border: 1px solid var(--primary-100);
+  }
+  .summary-body { padding: 18px; }
+  .summary-amt { text-align: center; padding: 12px 0 18px; }
+  .summary-amt .lbl { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .summary-amt .num { font-size: 36px; font-weight: 800; letter-spacing: -0.025em; color: var(--ink); margin-top: 4px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .summary-amt .sub { font-size: 12.5px; color: var(--text-muted); font-weight: 600; margin-top: 6px; }
+  .summary-list { border-top: 1px dashed var(--border); padding-top: 14px; }
+  .summary-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13.5px; }
+  .summary-row .k { color: var(--text-muted); font-weight: 500; }
+  .summary-row .v { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .summary-row.total { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; }
+  .summary-row.total .k { color: var(--ink); font-weight: 700; }
+  .summary-row.total .v { font-size: 15px; font-weight: 800; }
+  .summary-actions { padding: 14px 18px; border-top: 1px solid var(--border); background: var(--surface-2); }
+
+  /* Schedule preview */
+  .schedule-card { padding: 24px 28px; }
+  .schedule-card h4 { margin: 0 0 14px; font-size: 14px; font-weight: 700; color: var(--ink); display: flex; align-items: center; justify-content: space-between; }
+  .schedule-card h4 a { font-size: 12.5px; font-weight: 600; color: var(--primary-600); text-decoration: none; }
+  .schedule-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .schedule-table th { text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
+  .schedule-table td { padding: 10px 10px; border-bottom: 1px dashed var(--border); }
+  .schedule-table .right { text-align: right; font-variant-numeric: tabular-nums; }
+  .schedule-table tr:last-child td { border-bottom: 0; }
+
+  /* Loan-type-specific show/hide */
+  .show-short, .show-loc, .show-payday { display: none; }
+  body.type-short  .show-short  { display: block; }
+  body.type-loc    .show-loc    { display: block; }
+  body.type-payday .show-payday { display: block; }
+  /* When no type chosen, hide form area */
+  .type-empty {
+    background: var(--surface);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius);
+    padding: 60px 30px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .type-empty svg { color: var(--border-strong); margin-bottom: 8px; }
+  .type-empty .t { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .type-empty .s { font-size: 13px; margin-top: 4px; font-weight: 500; }
+  body.type-short .type-empty, body.type-loc .type-empty, body.type-payday .type-empty { display: none; }
+
+  /* Employment / income editable card */
+  .employment-card {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: grid; gap: 10px;
+  }
+  .emp-row {
+    display: grid; grid-template-columns: 160px 1fr auto;
+    align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px dashed var(--border);
+  }
+  .emp-row:last-child { border-bottom: 0; }
+  .emp-row .k { font-size: 12.5px; color: var(--text-muted); font-weight: 600; }
+  .emp-row .v { font-size: 14px; color: var(--ink); font-weight: 700; }
+  .emp-row .v input.input, .emp-row .v select.select {
+    padding: 5px 8px; font-size: 13.5px; font-weight: 600;
+    width: auto; min-width: 110px;
+    background: var(--surface);
+  }
+  .emp-row .v .grp { display: flex; align-items: center; gap: 6px; }
+  .emp-row .edit-btn {
+    background: transparent; border: 0; cursor: pointer;
+    color: var(--text-soft); font-size: 12px; font-weight: 600;
+    padding: 4px 8px; border-radius: 6px;
+  }
+  .emp-row .edit-btn:hover { background: var(--surface); color: var(--primary-600); }
+
+  /* Net pay calculation panel */
+  .calc-panel {
+    background: linear-gradient(135deg, #ecf0ff 0%, #f3edff 100%);
+    border: 1px solid var(--primary-100);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+  .calc-panel .calc-head {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; font-weight: 800; color: var(--primary-700);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+  .calc-panel .calc-head .reg {
+    font-weight: 600; font-size: 10.5px; color: var(--text-muted); text-transform: none; letter-spacing: 0;
+  }
+  .formula {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 8px 6px;
+    font-size: 14.5px; font-weight: 600; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    background: var(--surface);
+    border: 1px solid var(--primary-100);
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .formula .v { font-weight: 800; color: var(--primary-700); padding: 2px 6px; background: var(--primary-50); border-radius: 6px; }
+  .formula .v.lbl-tag { color: var(--text-muted); background: transparent; font-weight: 600; font-size: 11px; }
+  .formula .op { color: var(--text-muted); font-weight: 700; }
+  .formula .equals { color: var(--text-muted); margin: 0 2px; font-weight: 700; }
+  .formula .result { font-size: 16px; font-weight: 900; color: var(--ink); margin-left: auto; padding: 4px 10px; background: var(--primary-100); border-radius: 8px; }
+
+  .cap-stack { margin-top: 12px; background: var(--surface); border: 1px solid var(--primary-100); border-radius: 10px; padding: 12px 14px; }
+  .cap-row {
+    display: grid; grid-template-columns: 1fr auto auto;
+    align-items: center; gap: 10px;
+    padding: 6px 0;
+    font-size: 13.5px; color: var(--ink); font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .cap-row .k { color: var(--text-muted); font-weight: 600; }
+  .cap-row .v { font-weight: 800; }
+  .cap-row .tag {
+    font-size: 10.5px; font-weight: 700;
+    padding: 2px 7px; border-radius: 999px;
+    background: var(--surface-2); color: var(--text-soft);
+    border: 1px solid var(--border);
+  }
+  .cap-row.bind .tag { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .cap-row.bind { color: var(--primary-700); }
+  .cap-row.final {
+    border-top: 1px dashed var(--primary-100);
+    margin-top: 4px; padding-top: 10px;
+  }
+  .cap-row.final .k { color: var(--ink); font-weight: 800; }
+  .cap-row.final .v { font-size: 18px; color: var(--primary-700); font-weight: 900; }
+
+  /* Compliance badges row */
+  .comply-row {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+    font-size: 11.5px;
+  }
+  .comply-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 9px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--primary-100);
+    color: var(--text-muted); font-weight: 600;
+  }
+  .comply-tag svg { color: var(--success); }
+
+  /* Loan history pill in section head */
+  .history-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 700;
+    margin-left: auto;
+    border: 1px solid currentColor;
+  }
+  .history-pill::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+  }
+  .history-pill.qualifies { color: var(--success); background: var(--success-50); }
+  .history-pill.not-qualifies { color: var(--text-muted); background: var(--surface-2); }
+
+  /* Plan toggle (radio cards) */
+  .plan-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .plan-option { cursor: pointer; }
+  .plan-option input { position: absolute; opacity: 0; pointer-events: none; }
+  .plan-card {
+    border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: var(--radius-sm); padding: 14px;
+    transition: all 0.12s;
+    position: relative;
+  }
+  .plan-option:hover .plan-card { border-color: var(--ink); }
+  .plan-option input:checked + .plan-card {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary-50), var(--surface));
+    box-shadow: 0 4px 14px rgba(59, 92, 255, 0.10);
+  }
+  .plan-card h4 { margin: 0 0 4px; font-size: 14px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+  .plan-card .qmark {
+    background: var(--success); color: #fff; font-size: 10px; font-weight: 800;
+    padding: 2px 7px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .plan-card p { margin: 0; font-size: 13px; color: var(--text-muted); font-weight: 500; line-height: 1.4; }
+
+  /* 3-payment schedule (editable) */
+  .plan-schedule {
+    margin-top: 14px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .plan-schedule-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 11.5px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .ps-rebalance {
+    background: transparent; border: 0;
+    color: var(--primary-600); font-weight: 700; font-size: 11.5px;
+    cursor: pointer; font-family: inherit;
+    text-transform: none; letter-spacing: 0;
+  }
+  .ps-rebalance:hover { text-decoration: underline; }
+  .ps-row {
+    display: grid; grid-template-columns: 28px 100px 200px 1fr;
+    padding: 10px 16px;
+    border-bottom: 1px dashed var(--border);
+    align-items: center;
+    gap: 12px;
+    font-size: 13.5px;
+  }
+  .ps-row:last-child { border-bottom: 0; }
+  .ps-row .num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--primary); color: #fff;
+    font-size: 11px; font-weight: 800;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .ps-row .label { font-weight: 700; color: var(--ink); }
+  .ps-row .ps-date {
+    width: 100%;
+    padding: 7px 10px; border: 1px solid var(--border-strong);
+    border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--ink);
+    background: var(--surface); font-family: inherit;
+  }
+  .ps-row .ps-amt {
+    width: 100%;
+    padding: 7px 10px 7px 22px; border: 1px solid var(--border-strong);
+    border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--ink);
+    background: var(--surface); font-family: inherit;
+    text-align: right; font-variant-numeric: tabular-nums;
+  }
+  /* Hide number-input spinner arrows in this form */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+  }
+  input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+  .ps-row .ps-amt-wrap { position: relative; }
+  .ps-row .ps-amt-wrap::before {
+    content: "$"; position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-weight: 700; font-size: 13px;
+  }
+  .ps-row .ps-date:focus, .ps-row .ps-amt:focus {
+    outline: 0; border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 92, 255, 0.14);
+  }
+  .ps-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    font-size: 12.5px; font-weight: 600;
+  }
+  .ps-foot .ps-total-lbl { color: var(--text-muted); }
+  .ps-foot .ps-total-val { color: var(--ink); font-weight: 800; font-variant-numeric: tabular-nums; }
+  .ps-foot.warn .ps-total-val { color: var(--danger); }
+  .ps-foot .ps-warn-tag {
+    margin-left: 8px;
+    background: var(--danger-50); color: var(--danger); border: 1px solid #f5b3bd;
+    padding: 2px 8px; border-radius: 999px;
+    font-size: 11px; font-weight: 700;
+    display: none;
+  }
+  .ps-foot.warn .ps-warn-tag { display: inline-block; }
+
+  /* Override row */
+  .override-row {
+    margin-top: 14px; padding: 12px 14px;
+    background: var(--surface-2); border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--text-muted); font-weight: 500;
+    flex-wrap: wrap;
+  }
+  .override-row .grant {
+    margin-left: auto;
+    background: var(--surface); border: 1px solid var(--ink);
+    color: var(--ink); padding: 6px 12px;
+    border-radius: 999px; font-size: 12.5px; font-weight: 700;
+    cursor: pointer;
+  }
+  .override-row .grant:hover { background: var(--ink); color: #fff; }
+  body.override-on .override-row { background: var(--warn-50); border-color: var(--warn); }
+
+  /* Max loan warning */
+  .max-warn {
+    display: none;
+    align-items: center; gap: 8px;
+    background: var(--danger-50); color: var(--danger);
+    border: 1px solid #f5b3bd;
+    padding: 8px 12px; border-radius: var(--radius-sm);
+    margin-top: 6px;
+    font-size: 12.5px; font-weight: 600;
+  }
+  body.exceeds-max .max-warn { display: flex; }
+
+  /* Demo pill (toggle loan history state) */
+  .demo-toggle {
+    display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    flex-wrap: wrap;
+    font-size: 11px; color: var(--text-soft); font-weight: 600;
+    padding: 8px 0;
+    border-top: 1px dashed var(--border);
+    border-bottom: 1px dashed var(--border);
+    margin-bottom: 14px;
+  }
+  .demo-toggle .demo-label { margin-right: auto; text-transform: uppercase; letter-spacing: 0.05em; }
+  .demo-toggle button {
+    background: var(--surface); border: 1px solid var(--border-strong);
+    color: var(--text); padding: 5px 11px;
+    border-radius: 999px; font-size: 11.5px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+  }
+  .demo-toggle button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* Payday loan callouts */
+  .payday-callout {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #fff5e0, #fde2e6);
+    border: 1px solid #f5d394;
+    border-radius: var(--radius-sm);
+    margin-top: 6px;
+  }
+  .payday-callout .ico { width: 28px; height: 28px; border-radius: 8px; background: var(--c-income); color: #fff; display: grid; place-items: center; flex-shrink: 0; }
+  .payday-callout .txt { font-size: 13px; color: var(--ink); font-weight: 500; }
+  .payday-callout .txt strong { font-weight: 700; }
+  .locked-input { background: var(--surface-2) !important; color: var(--text-muted) !important; cursor: not-allowed; }
+  .locked-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--warn-50); color: var(--warn);
+    font-size: 10.5px; font-weight: 700;
+    padding: 2px 7px; border-radius: 999px;
+    margin-left: 6px;
+  }
+  .locked-pill::before { content: ""; width: 9px; height: 9px; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c2660e' stroke-width='3'><rect x='3' y='11' width='18' height='11' rx='2'/><path d='M7 11V7a5 5 0 0 1 10 0v4'/></svg>") center/contain no-repeat; }
+
+  /* Submit success modal */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 200;
+    padding: 20px;
+    animation: backdropIn 0.18s ease-out;
+  }
+  .modal-backdrop.show { display: flex; }
+  @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.30);
+    overflow: hidden;
+    animation: modalIn 0.22s ease-out;
+  }
+  .modal-head {
+    text-align: center;
+    padding: 28px 28px 20px;
+    background: linear-gradient(180deg, var(--success-50) 0%, var(--surface) 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-head .check {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--success); color: #fff;
+    display: grid; place-items: center;
+    margin: 0 auto 14px;
+    box-shadow: 0 8px 22px rgba(14, 143, 62, 0.28);
+  }
+  .modal-head h2 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+  .modal-head .ref { margin-top: 4px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .modal-head .ref strong { color: var(--ink); font-weight: 700; }
+
+  .modal-body { padding: 22px 24px; }
+  .modal-body .question {
+    font-size: 13.5px; font-weight: 600; color: var(--ink);
+    margin: 0 0 14px;
+  }
+  .modal-actions { display: flex; flex-direction: column; gap: 10px; }
+  .ma {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    background: var(--surface);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    font-family: inherit;
+    width: 100%;
+  }
+  .ma:hover { border-color: var(--ink); background: var(--surface-2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,33,61,0.06); }
+  .ma .ico-wrap {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: grid; place-items: center;
+    color: #fff; flex-shrink: 0;
+  }
+  .ma.ma-print  .ico-wrap { background: linear-gradient(135deg, #475569, #1e293b); }
+  .ma.ma-print-send .ico-wrap { background: linear-gradient(135deg, var(--c-contact), #0f766e); }
+  .ma.ma-esign  .ico-wrap { background: linear-gradient(135deg, var(--primary), var(--c-id)); }
+  .ma .meta { flex: 1; }
+  .ma .meta .t { font-size: 14.5px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .ma .meta .s { font-size: 12.5px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+  .ma .chev { color: var(--text-soft); flex-shrink: 0; transition: transform 0.15s, color 0.15s; }
+  .ma:hover .chev { transform: translateX(2px); color: var(--ink); }
+  .ma.ma-recommended { border-color: var(--primary); background: linear-gradient(135deg, var(--primary-50), var(--surface)); position: relative; }
+  .ma .badge-rec {
+    background: var(--primary); color: #fff;
+    font-size: 9.5px; font-weight: 800;
+    padding: 2px 7px; border-radius: 999px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-left: 8px;
+  }
+
+  .modal-foot {
+    padding: 14px 22px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+    font-size: 12.5px; color: var(--text-muted); font-weight: 500;
+  }
+  .modal-foot a { color: var(--primary-600); font-weight: 600; text-decoration: none; cursor: pointer; }
+  .modal-foot a:hover { text-decoration: underline; }
+  .modal-close {
+    background: transparent; border: 0; cursor: pointer;
+    color: var(--text-muted); font-weight: 700; font-size: 13px;
+    padding: 6px 12px; border-radius: 8px;
+    font-family: inherit;
+  }
+  .modal-close:hover { background: var(--surface); color: var(--ink); }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: #fff;
+    padding: 12px 20px; border-radius: var(--radius);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.30);
+    font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 10px;
+    z-index: 250;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  .toast .ico { width: 22px; height: 22px; border-radius: 50%; background: var(--success); display: grid; place-items: center; flex-shrink: 0; }
+
+  /* Footer bar */
+  .footer-bar {
+    position: sticky;
+    bottom: 20px;
+    margin-top: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 22px;
+    box-shadow: 0 4px 14px rgba(24, 33, 61, 0.08);
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 5; flex-wrap: wrap; gap: 16px;
+  }
+  .footer-bar .info { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .footer-bar .info strong { color: var(--ink); font-weight: 700; }
+
+  @media (max-width: 1300px) {
+    .type-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; }
+    .summary-card { position: relative; top: 0; }
+    .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; }
+    .radio-group { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+<aside class="sidebar" id="sidebar">
+  <button class="sb-collapse" id="sbCollapse" aria-label="Collapse sidebar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <div class="sidebar-brand">
+    <div class="logo">V</div>
+    <div class="name">Vayoo<span>.ai</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Workspace</div>
+    <a class="nav-item" href="index.html" data-label="Dashboard"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Dashboard</a>
+    <a class="nav-item" href="client-list.html" data-label="Clients"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Clients <span class="badge">12</span></a>
+    <a class="nav-item" href="companies-list.html" data-label="Companies"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></span>Companies</a>
+    <div class="nav-section">Operations</div>
+    <a class="nav-item has-sub expanded" data-label="Transactions"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>Transactions <span class="chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></a>
+    <div class="nav-sub">
+      <a class="nav-item active" href="loan-new.html" data-label="Loans"><span class="ico" style="color:var(--primary);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Loans</a>
+      <a class="nav-item" href="#" data-label="Cheque cashing"><span class="ico" style="color:#0d9488;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Cheque cashing</a>
+      <a class="nav-item" href="#" data-label="Gold buy"><span class="ico" style="color:#d97706;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg></span>Gold buy</a>
+      <a class="nav-item" href="#" data-label="Currency exchange"><span class="ico" style="color:#ec4899;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/></svg></span>Currency exchange</a>
+    </div>
+    <a class="nav-item" href="#" data-label="Approvals"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Approvals <span class="badge">5</span></a>
+    <div class="nav-section">Insights</div>
+    <a class="nav-item" href="#" data-label="Reports"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Reports</a>
+    <a class="nav-item" href="#" data-label="Analytics"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Analytics</a>
+    <div class="nav-section">System</div>
+    <a class="nav-item has-sub" data-label="Settings"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/></svg></span>Settings <span class="chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></a>
+    <div class="nav-sub">
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>General</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>Team &amp; Users</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>Roles &amp; Permissions</a>
+      <a class="nav-item" href="#"><span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg></span>Branches</a>
+    </div>
+  </nav>
+  <div class="sidebar-profile">
+    <div class="pf-avatar">A</div>
+    <div>
+      <div class="pf-name">Aman Singh</div>
+      <div class="pf-role">Admin · Toronto</div>
+    </div>
+    <div class="pf-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></div>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sbOverlay"></div>
+
+<div class="main-area">
+
+<header class="topbar">
+  <div class="crumbs">
+    <button class="menu-toggle" id="menuToggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <a href="index.html">Dashboard</a><span class="sep">/</span>
+    <a href="client-list.html">Clients</a><span class="sep">/</span>
+    <a href="client-view.html">Aman Singh</a><span class="sep">/</span>
+    <span class="current">New Loan</span>
+  </div>
+  <div class="right">
+    <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+    <div class="avatar">A</div>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">New Loan</h1>
+      <p class="page-subtitle">Choose a loan type to get started — fields and calculations adapt to your selection.</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn ghost" href="client-list.html">Cancel</a>
+      <button class="btn">Save draft</button>
+    </div>
+  </div>
+
+  <!-- Client context strip -->
+  <div class="client-strip">
+    <div class="ava">AS</div>
+    <div class="info">
+      <div class="nm">Aman Singh <span style="font-size:11px;color:var(--success);background:#e1f8ed;padding:2px 8px;border-radius:999px;font-weight:700;margin-left:6px;border:1px solid #bbe9c9;">● Active</span></div>
+      <div class="meta">#VC-10284 · Driver's License · KYC verified · Risk: Low (92)</div>
+    </div>
+    <a class="change" href="client-list.html">Change client →</a>
+  </div>
+
+  <!-- Loan type selector -->
+  <div class="type-grid" id="typeGrid">
+    <div class="type-card t-payday" data-type="payday">
+      <div class="ico-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="meta">
+        <h3>Payday Loan <span style="font-size:11px;font-weight:700;color:#fff;background:var(--c-income);padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:middle;">Short term</span></h3>
+        <p>Single lump-sum advance, repaid in full on the client's next payday. Auto-debited from their linked account.</p>
+        <div class="specs">
+          <span class="spec">Due on next payday</span>
+          <span class="spec">14% flat charge</span>
+          <span class="spec">Single repayment</span>
+        </div>
+      </div>
+      <div class="check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+    </div>
+
+    <div class="type-card t-short" data-type="short">
+      <div class="ico-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div class="meta">
+        <h3>Short Term Loan</h3>
+        <p>One-time advance with a fixed term and equal scheduled payments. Best for predictable, short-duration cash needs.</p>
+        <div class="specs">
+          <span class="spec">Fixed term · 3–24 months</span>
+          <span class="spec">Equal payments</span>
+          <span class="spec">Single disbursement</span>
+        </div>
+      </div>
+      <div class="check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+    </div>
+
+    <div class="type-card t-loc" data-type="loc">
+      <div class="ico-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 14h4"/></svg>
+      </div>
+      <div class="meta">
+        <h3>Line of Credit</h3>
+        <p>Revolving credit limit. Client draws as needed and pays interest only on the outstanding balance, with a minimum monthly payment.</p>
+        <div class="specs">
+          <span class="spec">Revolving limit</span>
+          <span class="spec">Interest on used balance</span>
+          <span class="spec">Min monthly payment</span>
+        </div>
+      </div>
+      <div class="check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+    </div>
+  </div>
+
+  <!-- Empty state when no type selected -->
+  <div class="type-empty" id="typeEmpty">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <div class="t">Choose a loan type above to begin</div>
+    <div class="s">Form fields, payment schedule, and required disclosures will adapt to your selection.</div>
+  </div>
+
+  <!-- Form + summary layout -->
+  <div class="layout">
+    <div>
+
+      <!-- ===== SHORT TERM LOAN form ===== -->
+      <div class="card show-short">
+        <div class="section acc-loan">
+          <div class="section-head">
+            <div class="section-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div>
+              <h3>Loan terms</h3>
+              <p>Principal, term and rate. Payment schedule auto-calculates.</p>
+            </div>
+          </div>
+          <div class="grid cols-2">
+            <div class="field">
+              <label>Loan amount <span class="req">*</span></label>
+              <div class="input-icon"><span class="ico">$</span><input class="input" id="stAmount" placeholder="5,000.00" value="5000" /></div>
+              <div class="helper">Available limit for this client: <strong style="color:var(--ink);">$15,000</strong></div>
+            </div>
+            <div class="field">
+              <label>Annual interest rate (APR) <span class="req">*</span></label>
+              <div class="input-icon" style="position:relative;"><input class="input" id="stApr" placeholder="18.99" value="18.99" style="padding-right:32px;" /><span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-weight:600;font-size:14px;">%</span></div>
+            </div>
+            <div class="field" style="grid-column: 1 / -1;">
+              <label>Term length <span class="req">*</span></label>
+              <div class="term-chips" id="stTermChips">
+                <button class="term-chip" type="button" data-months="3">3 mo</button>
+                <button class="term-chip" type="button" data-months="6">6 mo</button>
+                <button class="term-chip" type="button" data-months="9">9 mo</button>
+                <button class="term-chip active" type="button" data-months="12">12 mo</button>
+                <button class="term-chip" type="button" data-months="18">18 mo</button>
+                <button class="term-chip" type="button" data-months="24">24 mo</button>
+                <button class="term-chip" type="button" data-months="36">36 mo</button>
+              </div>
+            </div>
+            <div class="field">
+              <label>Payment frequency <span class="req">*</span></label>
+              <select class="select" id="stFreq">
+                <option value="12">Monthly</option>
+                <option value="24">Semi-monthly</option>
+                <option value="26">Bi-weekly</option>
+                <option value="52">Weekly</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>First payment date</label>
+              <input class="input" type="text" placeholder="YYYY-MM-DD" value="2026-06-10" />
+            </div>
+            <div class="field">
+              <label>Loan purpose <span class="opt">Optional</span></label>
+              <select class="select"><option>—</option><option>Debt consolidation</option><option>Home repair</option><option>Medical</option><option>Vehicle</option><option>Other</option></select>
+            </div>
+            <div class="field">
+              <label>Booking fee <span class="opt">Optional</span></label>
+              <div class="input-icon"><span class="ico">$</span><input class="input" placeholder="0.00" /></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section acc-disburse">
+          <div class="section-head">
+            <div class="section-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+            </div>
+            <div>
+              <h3>Disbursement</h3>
+              <p>How funds get to the client.</p>
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:14px;">
+            <label>Disburse via <span class="req">*</span></label>
+            <div class="radio-group">
+              <label class="radio-tile active">
+                <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
+                <span class="lbl">Bank deposit</span>
+                <span class="sub">1–2 business days</span>
+              </label>
+              <label class="radio-tile">
+                <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+                <span class="lbl">Cheque</span>
+                <span class="sub">Pick up at branch</span>
+              </label>
+              <label class="radio-tile">
+                <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94"/><path d="M9.69 8h11.48"/></svg></span>
+                <span class="lbl">Cash</span>
+                <span class="sub">In-person, today</span>
+              </label>
+            </div>
+          </div>
+          <div class="grid cols-2">
+            <div class="field">
+              <label>Deposit account</label>
+              <select class="select">
+                <option>RBC Royal Bank · ••••4567 (Primary)</option>
+                <option>＋ Add new bank account…</option>
+              </select>
+              <div class="helper" style="display:flex;align-items:center;gap:6px;color:var(--success);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Account on file</div>
+            </div>
+            <div class="field">
+              <label>Auto-debit repayments?</label>
+              <select class="select"><option>Yes — debit RBC ••4567 on each due date</option><option>No — client will pay manually</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="schedule-card">
+            <h4>Repayment schedule preview <a href="#">View all 12 →</a></h4>
+            <table class="schedule-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Due date</th><th class="right">Principal</th><th class="right">Interest</th><th class="right">Payment</th><th class="right">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>Jun 10, 2026</td><td class="right">$382.04</td><td class="right">$77.04</td><td class="right"><strong>$459.08</strong></td><td class="right">$4,617.96</td></tr>
+                <tr><td>2</td><td>Jul 10, 2026</td><td class="right">$388.13</td><td class="right">$70.95</td><td class="right"><strong>$459.08</strong></td><td class="right">$4,229.83</td></tr>
+                <tr><td>3</td><td>Aug 10, 2026</td><td class="right">$394.31</td><td class="right">$64.77</td><td class="right"><strong>$459.08</strong></td><td class="right">$3,835.52</td></tr>
+                <tr><td>4</td><td>Sep 10, 2026</td><td class="right">$400.59</td><td class="right">$58.49</td><td class="right"><strong>$459.08</strong></td><td class="right">$3,434.93</td></tr>
+                <tr><td>…</td><td>…</td><td class="right">…</td><td class="right">…</td><td class="right">…</td><td class="right">…</td></tr>
+                <tr><td>12</td><td>May 10, 2027</td><td class="right">$451.93</td><td class="right">$7.15</td><td class="right"><strong>$459.08</strong></td><td class="right">$0.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== LINE OF CREDIT form ===== -->
+      <div class="card show-loc">
+        <div class="section acc-loc">
+          <div class="section-head">
+            <div class="section-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+            </div>
+            <div>
+              <h3>Credit line terms</h3>
+              <p>Set the limit, interest rate, and repayment rules.</p>
+            </div>
+          </div>
+          <div class="grid cols-2">
+            <div class="field">
+              <label>Credit limit <span class="req">*</span></label>
+              <div class="input-icon"><span class="ico">$</span><input class="input" id="locLimit" placeholder="10,000.00" value="10000" /></div>
+              <div class="helper">Approved limit ceiling for this client: <strong style="color:var(--ink);">$15,000</strong></div>
+            </div>
+            <div class="field">
+              <label>Annual interest rate (APR) <span class="req">*</span></label>
+              <div class="input-icon" style="position:relative;"><input class="input" id="locApr" placeholder="22.99" value="22.99" style="padding-right:32px;" /><span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-weight:600;font-size:14px;">%</span></div>
+              <div class="helper">Charged on outstanding balance only.</div>
+            </div>
+            <div class="field">
+              <label>Minimum monthly payment <span class="req">*</span></label>
+              <div style="display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center;">
+                <select class="select" style="width:auto;padding:10px 30px 10px 12px;"><option>3% of balance</option><option>5% of balance</option><option>Fixed amount</option></select>
+                <div style="font-size:12.5px;color:var(--text-muted);font-weight:500;">whichever is greater than <strong style="color:var(--ink);">$25.00</strong></div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Statement cycle</label>
+              <select class="select"><option>Monthly</option><option>Bi-weekly</option></select>
+            </div>
+            <div class="field">
+              <label>Draw method <span class="opt">How can client access funds</span></label>
+              <select class="select"><option>Bank transfer + Cheque + Cash</option><option>Bank transfer only</option><option>Cheque only</option></select>
+            </div>
+            <div class="field">
+              <label>Annual fee <span class="opt">Optional</span></label>
+              <div class="input-icon"><span class="ico">$</span><input class="input" placeholder="0.00" value="0" /></div>
+            </div>
+            <div class="field" style="grid-column: 1 / -1;">
+              <label>Initial draw amount <span class="opt">Optional · take some now</span></label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="input-icon"><span class="ico">$</span><input class="input" id="locInitial" placeholder="0.00" value="2500" /></div>
+                <div style="display:flex;align-items:center;font-size:13px;color:var(--text-muted);font-weight:500;">Available after this draw: <strong style="color:var(--ink);margin-left:6px;" id="locAvailable">$7,500.00</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section acc-disburse">
+          <div class="section-head">
+            <div class="section-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+            </div>
+            <div>
+              <h3>Linked accounts</h3>
+              <p>Where draws go and where minimum payments are debited from.</p>
+            </div>
+          </div>
+          <div class="grid cols-2">
+            <div class="field">
+              <label>Linked deposit account <span class="req">*</span></label>
+              <select class="select">
+                <option>RBC Royal Bank · ••••4567 (Primary)</option>
+                <option>＋ Add new bank account…</option>
+              </select>
+              <div class="helper" style="display:flex;align-items:center;gap:6px;color:var(--success);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Draws and repayments share the same account on file.</div>
+            </div>
+            <div class="field">
+              <label>Auto-payment of minimum?</label>
+              <select class="select"><option>Yes — auto-debit on statement due date</option><option>No — client will pay manually</option></select>
+            </div>
+            <div class="field" style="grid-column: 1 / -1;">
+              <label>Internal note <span class="opt">Optional</span></label>
+              <textarea class="textarea" rows="2" placeholder="Anything underwriters or future officers should know…"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAYDAY LOAN form ===== -->
+      <div class="card show-payday">
+
+        <!-- Employment & Net Pay -->
+        <div class="section" style="border-left: 4px solid var(--c-bank);">
+          <div class="section-head">
+            <div class="section-icon" style="background: var(--c-bank); box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div>
+              <h3>Employment &amp; net pay</h3>
+              <p>Pulled from client profile. Editable here; max payday loan is <strong style="color:var(--ink);">50% of net pay</strong>.</p>
+            </div>
+          </div>
+
+          <div class="employment-card" id="employmentCard">
+            <div class="emp-row">
+              <span class="k">Employer</span>
+              <span class="v" id="empName">Vayoo Tech Inc.</span>
+              <button class="edit-btn" onclick="this.parentNode.querySelector('.v').contentEditable='true';this.parentNode.querySelector('.v').focus();">Edit</button>
+            </div>
+            <div class="emp-row">
+              <span class="k">Job title</span>
+              <span class="v" id="jobTitle">Senior Engineer</span>
+              <button class="edit-btn" onclick="this.parentNode.querySelector('.v').contentEditable='true';this.parentNode.querySelector('.v').focus();">Edit</button>
+            </div>
+            <div class="emp-row">
+              <span class="k">Last month's net income</span>
+              <span class="v">
+                <div class="grp">
+                  <span style="color:var(--text-soft);font-weight:600;">$</span>
+                  <input class="input" type="number" id="monthlyNet" value="5600" step="100" />
+                  <span style="color:var(--text-muted);font-size:12px;font-weight:600;">take-home, prev. calendar month</span>
+                </div>
+              </span>
+              <span class="edit-btn" style="cursor:default;">✓ live</span>
+            </div>
+            <div class="emp-row">
+              <span class="k">Pay frequency</span>
+              <span class="v">
+                <select class="select" id="payFreq">
+                  <option value="52">Weekly · 52 / yr</option>
+                  <option value="26" selected>Bi-weekly · 26 / yr</option>
+                  <option value="24">Semi-monthly · 24 / yr</option>
+                  <option value="12">Monthly · 12 / yr</option>
+                </select>
+              </span>
+              <span class="edit-btn" style="cursor:default;">✓ live</span>
+            </div>
+            <div class="emp-row">
+              <span class="k">Next payday</span>
+              <span class="v" id="nextPayday">Fri, May 22, 2026 <span style="color:var(--text-muted);font-weight:500;font-size:12px;margin-left:4px;">· in 12 days</span></span>
+              <button class="edit-btn" onclick="this.parentNode.querySelector('.v').contentEditable='true';this.parentNode.querySelector('.v').focus();">Edit</button>
+            </div>
+          </div>
+
+          <!-- Ontario formula calculation -->
+          <div class="calc-panel">
+            <div class="calc-head">
+              <span>Net Pay Calculation</span>
+              <span class="reg">Per Ontario O.&nbsp;Reg. 489/17</span>
+            </div>
+
+            <div class="formula">
+              <span class="v">$<span id="aValue">5,600.00</span></span>
+              <span class="op">×</span>
+              <span class="v">12</span>
+              <span class="op">÷</span>
+              <span class="v"><span id="bValue">26</span></span>
+              <span class="op" style="color:var(--text-soft);font-weight:600;font-size:12px;">(<span id="bLabelText">bi-weekly</span>)</span>
+              <span class="equals">=</span>
+              <span class="result" id="perPeriodOut">$2,584.62</span>
+              <span style="font-size:11px; color: var(--text-muted); font-weight:600; flex-basis:100%; margin-top:4px;">last month's net income × 12 ÷ pay periods per year = per-period net pay</span>
+            </div>
+
+            <div class="cap-stack">
+              <div class="cap-row" id="capHalf">
+                <span class="k">50% of per-period net pay</span>
+                <span class="tag">Borrowing limit</span>
+                <span class="v" id="halfOut">$1,292.31</span>
+              </div>
+              <div class="cap-row" id="capMax">
+                <span class="k">Ontario maximum loan size</span>
+                <span class="tag">Hard cap</span>
+                <span class="v">$1,500.00</span>
+              </div>
+              <div class="cap-row final">
+                <span class="k">⚖️ Maximum payday loan</span>
+                <span class="tag" id="bindingTag" style="background:var(--primary);color:#fff;border-color:var(--primary);">50% rule binds</span>
+                <span class="v" id="maxLoanOut">$1,292.31</span>
+              </div>
+            </div>
+
+            <div class="comply-row">
+              <span class="comply-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> 50% of per-period net</span>
+              <span class="comply-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> ≤ $1,500 cap</span>
+              <span class="comply-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> $14 per $100 (max cost)</span>
+              <span class="comply-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> ≤ 62-day term</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" type="button" style="padding: 7px 12px; font-size: 13px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add another income source
+            </button>
+            <button class="btn" type="button" style="padding: 7px 12px; font-size: 13px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload pay stub
+            </button>
+            <span style="margin-left:auto;font-size:12px;color:var(--text-muted);font-weight:500;align-self:center;">Changes here also update the client's profile.</span>
+          </div>
+        </div>
+
+        <!-- Loan terms -->
+        <div class="section acc-payday">
+          <div class="section-head">
+            <div class="section-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <h3>Payday loan terms</h3>
+              <p>Single advance repaid on the client's next payday. Rate locked at <strong style="color:var(--ink);">14% flat charge</strong>.</p>
+            </div>
+          </div>
+
+          <div class="payday-callout">
+            <div class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="txt">
+              Client's next payday is <strong>Friday, May 22, 2026</strong> (in 12 days) — pulled from their <strong>Bi-weekly</strong> income at <strong>Vayoo Tech Inc.</strong>
+              <span style="color:var(--text-muted);"> · This loan is due in full on that date (or split into 3 payments — see below).</span>
+            </div>
+          </div>
+
+          <div class="grid cols-2" style="margin-top: 16px;">
+            <div class="field">
+              <label>Loan amount <span class="req">*</span></label>
+              <div class="input-icon"><span class="ico">$</span><input class="input" id="pdAmount" placeholder="500.00" value="500" min="100" max="1500" /></div>
+              <div class="helper">Allowed range: <strong style="color:var(--ink);">$100 – <span id="pdMaxHint">$1,292.31</span></strong> (lower of <em>50% per-period net</em> or <em>$1,500 Ontario cap</em>)</div>
+              <div class="max-warn" id="pdMaxWarn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Amount exceeds the Ontario maximum. Reduce, or update employment to raise the calculated cap.
+              </div>
+            </div>
+            <div class="field">
+              <label>Charge rate <span class="locked-pill">Locked</span></label>
+              <div class="input-icon" style="position:relative;">
+                <input class="input locked-input" value="14.00" readonly style="padding-right:32px;" />
+                <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-weight:600;font-size:14px;">%</span>
+              </div>
+              <div class="helper">Flat fee on principal. Equivalent APR shown in summary →</div>
+            </div>
+            <div class="field">
+              <label>Due date <span class="opt">Pre-filled from next payday — editable</span></label>
+              <input type="date" class="input" id="pdDueDate" value="2026-05-22" />
+              <div class="helper">Defaults to client's next payday (Fri, May 22, 2026). Adjust if needed within the <strong style="color:var(--ink);">62-day</strong> term cap.</div>
+            </div>
+            <div class="field">
+              <label>Repayment method <span class="req">*</span></label>
+              <select class="select"><option>Auto-debit on payday — RBC ••4567</option><option>Manual payment by client</option></select>
+              <div class="helper" style="display:flex;align-items:center;gap:6px;color:var(--success);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Same account as income deposit — single tap to confirm.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Repayment plan: single vs 3-payment -->
+        <div class="section" style="border-left: 4px solid var(--c-id);">
+          <div class="section-head">
+            <div class="section-icon" style="background: var(--c-id); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div>
+              <h3>Repayment plan</h3>
+              <p>Pay in full on payday, or split across the next 3 paydays.</p>
+            </div>
+            <span class="history-pill qualifies" id="historyPill">Loan #3 in 63 days · Qualifies for 3-payment plan</span>
+          </div>
+
+          <!-- Demo control -->
+          <div class="demo-toggle">
+            <span class="demo-label">Demo loan history</span>
+            <button type="button" class="hist-btn" data-hist="not-qualifies">Loan #2 (not qualified)</button>
+            <button type="button" class="hist-btn active" data-hist="qualifies">Loan #3 (qualifies)</button>
+          </div>
+
+          <div class="plan-toggle">
+            <label class="plan-option">
+              <input type="radio" name="payPlan" value="single" id="planSingle" checked />
+              <div class="plan-card">
+                <h4>Lump sum on payday</h4>
+                <p>Single repayment on Fri, May 22 — auto-debited from RBC ••4567.</p>
+              </div>
+            </label>
+            <label class="plan-option" id="planThreeOpt">
+              <input type="radio" name="payPlan" value="three" id="planThree" />
+              <div class="plan-card">
+                <h4>3-payment plan <span class="qmark" id="qualifyMark">Qualifies</span></h4>
+                <p>3 equal installments on the next 3 paydays. No extra fee.</p>
+              </div>
+            </label>
+          </div>
+
+          <!-- 62-day term warning (Ontario max term) -->
+          <div class="max-warn" id="term62Warn" style="display: none; margin-top: 12px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            For a monthly pay schedule the 3-payment plan would span 90+ days, exceeding the Ontario 62-day maximum loan term. Use lump-sum or shorten to 2 payments.
+          </div>
+
+          <!-- Schedule, only visible when 3-payment chosen — editable dates & amounts -->
+          <div class="plan-schedule" id="planSchedule" style="display: none;">
+            <div class="plan-schedule-head">
+              <span>Payment schedule · edit amounts or dates</span>
+              <button type="button" class="ps-rebalance" id="psRebalance">Split evenly</button>
+            </div>
+            <div class="ps-row" style="padding-top:6px;padding-bottom:6px;font-size:10.5px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);">
+              <span></span>
+              <span></span>
+              <span style="text-align:right;padding-right:8px;">Amount</span>
+              <span>Due date</span>
+            </div>
+            <div class="ps-row">
+              <span class="num">1</span>
+              <span class="label">Payment 1</span>
+              <span class="ps-amt-wrap"><input type="number" class="ps-amt" id="psAmt1" value="190.00" step="0.01" /></span>
+              <input type="date" class="ps-date" id="psDate1" value="2026-05-22" />
+            </div>
+            <div class="ps-row">
+              <span class="num">2</span>
+              <span class="label">Payment 2</span>
+              <span class="ps-amt-wrap"><input type="number" class="ps-amt" id="psAmt2" value="190.00" step="0.01" /></span>
+              <input type="date" class="ps-date" id="psDate2" value="2026-06-05" />
+            </div>
+            <div class="ps-row">
+              <span class="num">3</span>
+              <span class="label">Payment 3</span>
+              <span class="ps-amt-wrap"><input type="number" class="ps-amt" id="psAmt3" value="190.00" step="0.01" /></span>
+              <input type="date" class="ps-date" id="psDate3" value="2026-06-19" />
+            </div>
+            <div class="ps-foot" id="psFoot">
+              <div>
+                <span class="ps-total-lbl">Sum of payments</span>
+                <span class="ps-total-val" id="psSum">$570.00</span>
+                <span class="ps-warn-tag" id="psWarn">does not match $570.00 owed</span>
+              </div>
+              <div style="color:var(--text-muted);font-weight:500;">
+                Last payment must be on or before <strong style="color:var(--ink);" id="psMaxDate">Jul 23, 2026</strong> (62-day cap)
+              </div>
+            </div>
+          </div>
+
+          <!-- Override row -->
+          <div class="override-row" id="overrideRow" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color: var(--warn);"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span><strong style="color:var(--ink);">Not qualified</strong> — client must complete 3 loans within 63 days. You can still grant a payment plan as an override (requires approval).</span>
+            <button class="grant" id="overrideBtn" type="button">Grant payment plan anyway</button>
+          </div>
+
+          <!-- Override reason field, hidden until override-on -->
+          <div class="field" id="overrideReasonField" style="margin-top: 12px; display: none;">
+            <label>Override reason <span class="req">*</span></label>
+            <textarea class="textarea" rows="2" placeholder="Why is this client being granted a 3-payment plan despite not qualifying? (logged for compliance)"></textarea>
+          </div>
+        </div>
+
+        <div class="section acc-disburse">
+          <div class="section-head">
+            <div class="section-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+            </div>
+            <div>
+              <h3>Disbursement</h3>
+              <p>How the client receives funds today.</p>
+            </div>
+          </div>
+          <div class="field">
+            <label>Disburse via <span class="req">*</span></label>
+            <div class="radio-group">
+              <label class="radio-tile active">
+                <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94"/><path d="M9.69 8h11.48"/></svg></span>
+                <span class="lbl">Cash</span>
+                <span class="sub">In-person, today</span>
+              </label>
+              <label class="radio-tile">
+                <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
+                <span class="lbl">Bank deposit</span>
+                <span class="sub">Same day if before 2pm</span>
+              </label>
+              <label class="radio-tile">
+                <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+                <span class="lbl">Cheque</span>
+                <span class="sub">Pick up at branch</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div style="padding: 4px 0; display:flex; align-items:flex-start; gap:12px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color: var(--warn); flex-shrink:0; margin-top:2px;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div style="font-size: 13px; color: var(--text-muted); line-height: 1.55;">
+              <strong style="color: var(--ink);">Ontario disclosure:</strong> This payday loan complies with O.&nbsp;Reg. 489/17 — borrowing limit is the lower of 50% of per-period net pay or <strong style="color:var(--ink);">$1,500</strong>; cost of borrowing is capped at <strong style="color:var(--ink);">$14 per $100</strong> (14%); maximum loan term is <strong style="color:var(--ink);">62 days</strong>. The 14% flat charge for a 12-day term is equivalent to <strong style="color: var(--ink);">~426% APR</strong>. The full balance of <strong style="color: var(--ink);">$570.00</strong> will be auto-debited on May 22, 2026 (or split across the elected payment plan). If the debit fails, NSF fees may apply.
+              <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-weight:600;color:var(--ink);cursor:pointer;">
+                <input type="checkbox" /> I have explained the terms to the client per Ontario regulations and obtained their consent.
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Summary card -->
+    <aside>
+      <!-- Short-term summary -->
+      <div class="summary-card show-short">
+        <div class="summary-head">
+          <h4>Loan summary</h4>
+          <span class="pill">Short term</span>
+        </div>
+        <div class="summary-body">
+          <div class="summary-amt">
+            <div class="lbl">Periodic payment</div>
+            <div class="num" id="stPayment">$459.08</div>
+            <div class="sub">12 monthly payments</div>
+          </div>
+          <div class="summary-list">
+            <div class="summary-row"><span class="k">Loan amount</span><span class="v" id="stPrincipal">$5,000.00</span></div>
+            <div class="summary-row"><span class="k">Interest rate</span><span class="v" id="stRate">18.99% APR</span></div>
+            <div class="summary-row"><span class="k">Term</span><span class="v" id="stTerm">12 months</span></div>
+            <div class="summary-row"><span class="k">Total interest</span><span class="v" id="stInterest">$508.96</span></div>
+            <div class="summary-row total"><span class="k">Total to repay</span><span class="v" id="stTotal">$5,508.96</span></div>
+            <div class="summary-row"><span class="k">First payment</span><span class="v">Jun 10, 2026</span></div>
+            <div class="summary-row"><span class="k">Last payment</span><span class="v">May 10, 2027</span></div>
+          </div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn primary" style="width:100%;justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Submit
+          </button>
+        </div>
+      </div>
+
+      <!-- LoC summary -->
+      <div class="summary-card show-loc">
+        <div class="summary-head">
+          <h4>Credit line summary</h4>
+          <span class="pill" style="background:#e1f8ed;color:#047857;border-color:#bbe9c9;">Line of credit</span>
+        </div>
+        <div class="summary-body">
+          <div class="summary-amt">
+            <div class="lbl">Approved limit</div>
+            <div class="num" id="locLimitOut">$10,000</div>
+            <div class="sub">22.99% APR · interest on used balance</div>
+          </div>
+          <div class="summary-list">
+            <div class="summary-row"><span class="k">Initial draw</span><span class="v" id="locInitialOut">$2,500.00</span></div>
+            <div class="summary-row"><span class="k">Available after draw</span><span class="v" id="locAvailOut">$7,500.00</span></div>
+            <div class="summary-row"><span class="k">Min monthly payment</span><span class="v">$75.00</span></div>
+            <div class="summary-row"><span class="k">Daily interest (per $1k)</span><span class="v">$0.63</span></div>
+            <div class="summary-row"><span class="k">First statement</span><span class="v">Jun 1, 2026</span></div>
+            <div class="summary-row total"><span class="k">First minimum due</span><span class="v">$75.00 on Jun 25</span></div>
+          </div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn primary" style="width:100%;justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Submit
+          </button>
+        </div>
+      </div>
+
+      <!-- Payday summary -->
+      <div class="summary-card show-payday">
+        <div class="summary-head">
+          <h4>Payday loan summary</h4>
+          <span class="pill" style="background:#fff5e0;color:#b45309;border-color:#f5d394;">Payday</span>
+        </div>
+        <div class="summary-body">
+          <div class="summary-amt">
+            <div class="lbl">Due on payday (May 22)</div>
+            <div class="num" id="pdTotal">$570.00</div>
+            <div class="sub">Single repayment · auto-debit</div>
+          </div>
+          <div class="summary-list">
+            <div class="summary-row"><span class="k">Loan amount</span><span class="v" id="pdPrincipal">$500.00</span></div>
+            <div class="summary-row"><span class="k">Charge (14% flat)</span><span class="v" id="pdFee">$70.00</span></div>
+            <div class="summary-row"><span class="k">Term</span><span class="v">12 days</span></div>
+            <div class="summary-row"><span class="k">Cost per $100</span><span class="v">$14.00</span></div>
+            <div class="summary-row"><span class="k">Equivalent APR</span><span class="v" style="color:var(--warn);" id="pdApr">~426%</span></div>
+            <div class="summary-row total"><span class="k">Repayment date</span><span class="v">Fri, May 22, 2026</span></div>
+          </div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn primary" style="width:100%;justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Submit
+          </button>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Sticky footer status -->
+  <div class="footer-bar">
+    <div class="info">
+      <strong id="footType">Choose a loan type</strong>
+      <span id="footHint"> — pick one of the cards above to start filling in details.</span>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <a class="btn ghost" href="client-list.html">Cancel</a>
+      <button class="btn">Save draft</button>
+      <button class="btn primary" id="footSubmit" disabled style="opacity:0.5;cursor:not-allowed;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Submit
+      </button>
+    </div>
+  </div>
+
+</main>
+
+</div><!-- /.main-area -->
+</div><!-- /.app-shell -->
+
+<!-- ===== Submit success modal ===== -->
+<div class="modal-backdrop" id="submitModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="check">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>Loan submitted</h2>
+      <div class="ref">Reference <strong id="modalRef">#LN-4429</strong> · Aman Singh · <span id="modalKind">Payday loan</span></div>
+    </div>
+    <div class="modal-body">
+      <p class="question">How would you like to share the loan agreement with the client?</p>
+      <div class="modal-actions">
+        <button type="button" class="ma ma-print" data-action="print">
+          <span class="ico-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          </span>
+          <span class="meta">
+            <span class="t">Print</span>
+            <span class="s">Open the agreement in your browser's print preview to print at the branch.</span>
+          </span>
+          <span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </button>
+
+        <button type="button" class="ma ma-print-send" data-action="print-send">
+          <span class="ico-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </span>
+          <span class="meta">
+            <span class="t">Print and send a copy</span>
+            <span class="s">Print the agreement here and email a PDF copy to <strong>aman@example.com</strong>.</span>
+          </span>
+          <span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </button>
+
+        <button type="button" class="ma ma-esign ma-recommended" data-action="esign">
+          <span class="ico-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 17l4-4 4 4 6-6 4 4"/><path d="M3 21h18"/></svg>
+          </span>
+          <span class="meta">
+            <span class="t">Send for E-Sign <span class="badge-rec">Recommended</span></span>
+            <span class="s">Email a secure signing link to <strong>aman@example.com</strong> + SMS to +1 (416) 555-2841. Funds release on signature.</span>
+          </span>
+          <span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span>You can re-send or re-print from the loan record any time.</span>
+      <button type="button" class="modal-close" id="modalClose">Skip for now</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+  <span id="toastMsg">Done.</span>
+</div>
+
+<script>
+  // Sidebar collapse + sub-nav
+  (function(){
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sbOverlay');
+    const menuToggle = document.getElementById('menuToggle');
+    const sbCollapse = document.getElementById('sbCollapse');
+    if (menuToggle) {
+      menuToggle.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+      overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+    }
+    document.querySelectorAll('.nav-item.has-sub').forEach(nav => {
+      nav.addEventListener('click', () => { if (sidebar.classList.contains('collapsed')) return; nav.classList.toggle('expanded'); });
+    });
+    try { if (localStorage.getItem('vayoo:sb-collapsed') === '1') sidebar.classList.add('collapsed'); } catch(e){}
+    if (sbCollapse) {
+      sbCollapse.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle('collapsed');
+        try { localStorage.setItem('vayoo:sb-collapsed', sidebar.classList.contains('collapsed') ? '1' : '0'); } catch(e){}
+      });
+    }
+  })();
+
+  // Loan type selector + dynamic summary
+  (function(){
+    const grid = document.getElementById('typeGrid');
+    const footType = document.getElementById('footType');
+    const footHint = document.getElementById('footHint');
+    const footSubmit = document.getElementById('footSubmit');
+
+    function setType(type) {
+      document.body.classList.remove('type-short', 'type-loc', 'type-payday');
+      document.body.classList.add('type-' + type);
+      grid.querySelectorAll('.type-card').forEach(c => c.classList.toggle('active', c.dataset.type === type));
+      if (type === 'short') {
+        footType.textContent = 'Short Term Loan';
+        footHint.textContent = ' — equal monthly payments, fixed term.';
+      } else if (type === 'loc') {
+        footType.textContent = 'Line of Credit';
+        footHint.textContent = ' — revolving limit, pay interest only on used balance.';
+      } else if (type === 'payday') {
+        footType.textContent = 'Payday Loan';
+        footHint.textContent = ' — single lump-sum repayment on next payday at 14% flat charge.';
+      }
+      footSubmit.disabled = false;
+      footSubmit.style.opacity = '1';
+      footSubmit.style.cursor = 'pointer';
+    }
+
+    grid.addEventListener('click', (e) => {
+      const card = e.target.closest('.type-card');
+      if (card) setType(card.dataset.type);
+    });
+
+    // Default selection: Payday Loan (first card in the new sequence)
+    setType('payday');
+  })();
+
+  // Term chips
+  (function(){
+    const chips = document.querySelectorAll('#stTermChips .term-chip');
+    chips.forEach(c => c.addEventListener('click', () => {
+      chips.forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      recalcShortTerm();
+    }));
+  })();
+
+  // Live recalc for Short Term
+  function recalcShortTerm() {
+    const principal = parseFloat(document.getElementById('stAmount').value) || 0;
+    const apr = parseFloat(document.getElementById('stApr').value) || 0;
+    const term = parseInt(document.querySelector('#stTermChips .term-chip.active')?.dataset.months || '12', 10);
+    const freq = parseInt(document.getElementById('stFreq').value, 10);
+    const periods = Math.round((term / 12) * freq);
+    const periodicRate = (apr / 100) / freq;
+    let payment = 0;
+    if (periodicRate > 0 && periods > 0) {
+      payment = principal * periodicRate / (1 - Math.pow(1 + periodicRate, -periods));
+    } else if (periods > 0) {
+      payment = principal / periods;
+    }
+    const total = payment * periods;
+    const interest = total - principal;
+    const fmt = (n) => '$' + n.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('stPayment').textContent = fmt(payment);
+    document.getElementById('stPrincipal').textContent = fmt(principal);
+    document.getElementById('stTerm').textContent = term + ' months';
+    document.getElementById('stRate').textContent = apr.toFixed(2) + '% APR';
+    document.getElementById('stInterest').textContent = fmt(interest);
+    document.getElementById('stTotal').textContent = fmt(total);
+    const subText = document.querySelector('#stPayment + .sub') || document.querySelector('.summary-amt .sub');
+    if (subText) subText.textContent = periods + ' ' + (freq === 12 ? 'monthly' : freq === 26 ? 'bi-weekly' : freq === 52 ? 'weekly' : 'semi-monthly') + ' payments';
+  }
+
+  function recalcLoC() {
+    const limit = parseFloat(document.getElementById('locLimit').value) || 0;
+    const initial = parseFloat(document.getElementById('locInitial').value) || 0;
+    const avail = Math.max(0, limit - initial);
+    const fmt = (n) => '$' + n.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('locLimitOut').textContent = '$' + limit.toLocaleString('en-CA', { maximumFractionDigits: 0 });
+    document.getElementById('locInitialOut').textContent = fmt(initial);
+    document.getElementById('locAvailOut').textContent = fmt(avail);
+    document.getElementById('locAvailable').textContent = fmt(avail);
+  }
+
+  // ===== Ontario payday rules: shared helpers =====
+  const ONTARIO_MAX_LOAN = 1500;        // O.Reg 489/17 absolute cap
+  const ONTARIO_RATE = 0.14;            // $14 per $100
+  const ONTARIO_MAX_TERM = 62;          // days
+
+  function fmt(n) { return '$' + n.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+  function ontarioMaxLoan() {
+    const A = parseFloat(document.getElementById('monthlyNet').value) || 0;
+    const B = parseInt(document.getElementById('payFreq').value, 10) || 26;
+    const perPeriod = (A * 12) / B;
+    const half = perPeriod * 0.5;
+    const max = Math.min(half, ONTARIO_MAX_LOAN);
+    return { A, B, perPeriod, half, max, halfBinds: half < ONTARIO_MAX_LOAN };
+  }
+
+  function recalcPayday() {
+    const principal = parseFloat(document.getElementById('pdAmount').value) || 0;
+    const termDays = 12;          // days until next payday (mock — would come from client.nextPayDate - today)
+    const fee = principal * ONTARIO_RATE;
+    const total = principal + fee;
+    const apr = (ONTARIO_RATE * (365 / termDays)) * 100;
+    document.getElementById('pdPrincipal').textContent = fmt(principal);
+    document.getElementById('pdFee').textContent = fmt(fee);
+    document.getElementById('pdTotal').textContent = fmt(total);
+    document.getElementById('pdApr').textContent = '~' + Math.round(apr) + '%';
+    // 3-payment plan amounts (only if user hasn't manually edited)
+    if (!plan3Edited) {
+      const each = +(total / 3).toFixed(2);
+      document.getElementById('psAmt1').value = each.toFixed(2);
+      document.getElementById('psAmt2').value = each.toFixed(2);
+      // Last payment absorbs rounding so the sum matches total exactly
+      document.getElementById('psAmt3').value = (total - 2 * each).toFixed(2);
+      validateSchedule();
+    } else {
+      validateSchedule();
+    }
+    // Validate against Ontario max
+    const ont = ontarioMaxLoan();
+    document.body.classList.toggle('exceeds-max', principal > ont.max);
+  }
+
+  function recalcNetPay() {
+    const ont = ontarioMaxLoan();
+    const freqLabel = ({'52':'weekly','26':'bi-weekly','24':'semi-monthly','12':'monthly'})[document.getElementById('payFreq').value] || '';
+    document.getElementById('aValue').textContent = ont.A.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('bValue').textContent = ont.B;
+    document.getElementById('bLabelText').textContent = freqLabel;
+    document.getElementById('perPeriodOut').textContent = fmt(ont.perPeriod);
+    document.getElementById('halfOut').textContent = fmt(ont.half);
+    document.getElementById('maxLoanOut').textContent = fmt(ont.max);
+    document.getElementById('pdMaxHint').textContent = fmt(ont.max);
+    // Highlight the binding cap
+    document.getElementById('capHalf').classList.toggle('bind', ont.halfBinds);
+    document.getElementById('capMax').classList.toggle('bind', !ont.halfBinds);
+    document.getElementById('bindingTag').textContent = ont.halfBinds ? '50% rule binds' : '$1,500 cap binds';
+    recalcPayday();
+    checkTerm62();
+  }
+
+  // 3-payment plan term check (must stay within 62-day Ontario cap)
+  function checkTerm62() {
+    const B = parseInt(document.getElementById('payFreq').value, 10) || 26;
+    const periodDays = Math.round(365 / B);   // ~7, 14, 15, 30
+    const threePayDays = periodDays * 3;       // total span if 3 paydays out
+    const planThreeOpt = document.getElementById('planThreeOpt');
+    const planThree = document.getElementById('planThree');
+    const warn = document.getElementById('term62Warn');
+    const exceeds = threePayDays > ONTARIO_MAX_TERM;
+    if (warn) warn.style.display = exceeds ? 'flex' : 'none';
+    // Disable the 3-payment option if it would push past 62 days
+    if (planThreeOpt && planThree) {
+      planThreeOpt.style.opacity = exceeds ? '0.45' : '';
+      planThreeOpt.style.pointerEvents = exceeds ? 'none' : '';
+      planThree.disabled = exceeds || planThree.disabled;
+      if (exceeds && planThree.checked) {
+        document.getElementById('planSingle').checked = true;
+        document.getElementById('planSchedule').style.display = 'none';
+      }
+    }
+  }
+
+  ['stAmount','stApr','stFreq'].forEach(id => document.getElementById(id).addEventListener('input', recalcShortTerm));
+  ['locLimit','locInitial'].forEach(id => document.getElementById(id).addEventListener('input', recalcLoC));
+  document.getElementById('pdAmount').addEventListener('input', recalcPayday);
+  document.getElementById('monthlyNet').addEventListener('input', recalcNetPay);
+  document.getElementById('payFreq').addEventListener('change', recalcNetPay);
+
+  // ===== Repayment plan: single vs 3-payment =====
+  (function(){
+    const planSchedule = document.getElementById('planSchedule');
+    const planSingle = document.getElementById('planSingle');
+    const planThree  = document.getElementById('planThree');
+    const planThreeOpt = document.getElementById('planThreeOpt');
+    const overrideRow = document.getElementById('overrideRow');
+    const overrideBtn = document.getElementById('overrideBtn');
+    const overrideReason = document.getElementById('overrideReasonField');
+    const historyPill = document.getElementById('historyPill');
+    const qualifyMark = document.getElementById('qualifyMark');
+    const histBtns = document.querySelectorAll('.hist-btn');
+
+    let qualifies = true;
+    let overrideOn = false;
+
+    function syncSchedule() {
+      planSchedule.style.display = planThree.checked ? 'block' : 'none';
+    }
+    [planSingle, planThree].forEach(r => r.addEventListener('change', syncSchedule));
+
+    function applyState() {
+      // Update history pill
+      historyPill.classList.toggle('qualifies', qualifies);
+      historyPill.classList.toggle('not-qualifies', !qualifies);
+      historyPill.textContent = qualifies
+        ? 'Loan #3 in 63 days · Qualifies for 3-payment plan'
+        : 'Loan #2 in 63 days · 1 more loan to qualify';
+      // Qualify badge inside plan card
+      if (qualifies) {
+        qualifyMark.textContent = 'Qualifies'; qualifyMark.style.background = 'var(--success)';
+      } else if (overrideOn) {
+        qualifyMark.textContent = 'Override'; qualifyMark.style.background = 'var(--warn)';
+      } else {
+        qualifyMark.textContent = 'Locked'; qualifyMark.style.background = 'var(--text-soft)';
+      }
+      // Plan-three card enabled/disabled
+      const enable3 = qualifies || overrideOn;
+      planThree.disabled = !enable3;
+      planThreeOpt.style.opacity = enable3 ? '1' : '0.55';
+      planThreeOpt.style.pointerEvents = enable3 ? '' : 'none';
+      if (!enable3 && planThree.checked) { planSingle.checked = true; syncSchedule(); }
+      // Override row visibility
+      overrideRow.style.display = qualifies ? 'none' : 'flex';
+      overrideReason.style.display = (overrideOn && !qualifies) ? '' : 'none';
+      document.body.classList.toggle('override-on', overrideOn && !qualifies);
+    }
+
+    overrideBtn.addEventListener('click', () => {
+      overrideOn = !overrideOn;
+      overrideBtn.textContent = overrideOn ? 'Cancel override' : 'Grant payment plan anyway';
+      applyState();
+    });
+
+    histBtns.forEach(b => {
+      b.addEventListener('click', () => {
+        histBtns.forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        qualifies = b.dataset.hist === 'qualifies';
+        if (qualifies) overrideOn = false; // reset override when newly qualified
+        applyState();
+      });
+    });
+
+    applyState();
+    syncSchedule();
+  })();
+
+  // Disbursement radio tiles
+  document.querySelectorAll('.radio-group').forEach(g => {
+    const tiles = g.querySelectorAll('.radio-tile');
+    tiles.forEach(t => t.addEventListener('click', () => {
+      tiles.forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+    }));
+  });
+
+  // ===== Submit → success modal =====
+  (function(){
+    const modal = document.getElementById('submitModal');
+    const close = document.getElementById('modalClose');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    const modalKind = document.getElementById('modalKind');
+    const modalRef = document.getElementById('modalRef');
+
+    function kindLabel() {
+      if (document.body.classList.contains('type-payday')) return 'Payday loan';
+      if (document.body.classList.contains('type-loc')) return 'Line of credit';
+      if (document.body.classList.contains('type-short')) return 'Short term loan';
+      return 'Loan';
+    }
+    function genRef() {
+      return '#LN-' + (4400 + Math.floor(Math.random() * 200));
+    }
+    function showModal() {
+      modalKind.textContent = kindLabel();
+      modalRef.textContent = genRef();
+      modal.classList.add('show');
+    }
+    function hideModal() { modal.classList.remove('show'); }
+    function showToast(msg) {
+      toastMsg.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+
+    // Wire all Submit buttons (in summaries + footer-bar)
+    document.querySelectorAll('.btn.primary').forEach(btn => {
+      const txt = (btn.textContent || '').trim().toLowerCase();
+      if (txt === 'submit') {
+        btn.addEventListener('click', (e) => { e.preventDefault(); showModal(); });
+      }
+    });
+
+    // Modal action buttons
+    modal.querySelectorAll('.ma').forEach(b => b.addEventListener('click', () => {
+      const a = b.dataset.action;
+      if (a === 'print') {
+        showToast('Opening print preview…');
+        hideModal();
+        // In production: window.print() with a print-friendly stylesheet
+      } else if (a === 'print-send') {
+        showToast('Printing and emailing copy to aman@example.com');
+        hideModal();
+      } else if (a === 'esign') {
+        showToast('E-sign request sent · awaiting client signature');
+        hideModal();
+      }
+    }));
+
+    close.addEventListener('click', hideModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideModal(); });
+  })();
+
+  // ===== Editable 3-payment schedule =====
+  let plan3Edited = false;
+
+  function validateSchedule() {
+    const principal = parseFloat(document.getElementById('pdAmount').value) || 0;
+    const total = principal * (1 + ONTARIO_RATE);
+    const a1 = parseFloat(document.getElementById('psAmt1').value) || 0;
+    const a2 = parseFloat(document.getElementById('psAmt2').value) || 0;
+    const a3 = parseFloat(document.getElementById('psAmt3').value) || 0;
+    const sum = a1 + a2 + a3;
+    document.getElementById('psSum').textContent = fmt(sum);
+    const off = Math.abs(sum - total) > 0.01;
+    const foot = document.getElementById('psFoot');
+    foot.classList.toggle('warn', off);
+    document.getElementById('psWarn').textContent = `does not match ${fmt(total)} owed`;
+
+    // 62-day max date from due date
+    const dueStr = document.getElementById('pdDueDate').value;
+    if (dueStr) {
+      const due = new Date(dueStr);
+      const max = new Date(due);
+      max.setDate(max.getDate() + (ONTARIO_MAX_TERM - 12));  // ~62 days from origination (today is 12 days before due)
+      document.getElementById('psMaxDate').textContent = max.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+  }
+
+  ['psAmt1','psAmt2','psAmt3','psDate1','psDate2','psDate3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => { plan3Edited = true; validateSchedule(); });
+  });
+
+  // "Split evenly" button — reset to even split based on current loan total
+  document.getElementById('psRebalance').addEventListener('click', () => {
+    plan3Edited = false;
+    recalcPayday();
+  });
+
+  // When due date changes, shift the first plan payment to match
+  document.getElementById('pdDueDate').addEventListener('change', () => {
+    const v = document.getElementById('pdDueDate').value;
+    if (v && !plan3Edited) {
+      // Shift the 3 dates forward keeping their original spacing (assume bi-weekly = 14 days)
+      const periodDays = Math.round(365 / (parseInt(document.getElementById('payFreq').value, 10) || 26));
+      const d1 = new Date(v);
+      const d2 = new Date(d1); d2.setDate(d2.getDate() + periodDays);
+      const d3 = new Date(d1); d3.setDate(d3.getDate() + periodDays * 2);
+      document.getElementById('psDate1').value = v;
+      document.getElementById('psDate2').value = d2.toISOString().slice(0,10);
+      document.getElementById('psDate3').value = d3.toISOString().slice(0,10);
+    }
+    validateSchedule();
+  });
+
+  // Initial calc
+  recalcShortTerm();
+  recalcLoC();
+  recalcNetPay();
+  recalcPayday();
+  validateSchedule();
+</script>
+
+</body>
+</html>

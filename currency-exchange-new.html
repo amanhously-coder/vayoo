@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vayoo.ai — Currency Exchange</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  @view-transition { navigation: auto; }
+  @keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .main-area > * { animation: pageFadeIn 0.22s ease-out; }
+  :root {
+    --bg:#f4f6fb;--surface:#fff;--surface-2:#f6f8fd;--border:#dde2ed;--border-strong:#c2c9da;
+    --ink:#18213d;--ink-soft:#233055;--text:#18213d;--text-muted:#54607a;--text-soft:#7d869f;
+    --primary:#3b5cff;--primary-600:#2945e3;--primary-700:#1d34b8;--primary-50:#ecf0ff;--primary-100:#d6deff;
+    --success:#0e8f3e;--success-50:#e1f8ed;--warn:#c2660e;--warn-50:#fff5e0;--danger:#d11f3a;--danger-50:#fde2e6;
+    --c-identity:#6366f1;--c-contact:#0d9488;--c-id:#8b5cf6;--c-bank:#059669;--c-income:#d97706;--c-tags:#e11d48;
+    --fx-buy:#0e8f3e;--fx-buy-50:#e1f8ed;--fx-sell:#1d34b8;--fx-sell-50:#ecf0ff;
+    --radius:14px;--radius-sm:10px;--radius-lg:20px;
+  }
+  *{box-sizing:border-box;}html,body{margin:0;padding:0;}
+  body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:16px;font-weight:500;line-height:1.5;letter-spacing:-0.005em;-webkit-font-smoothing:antialiased;}
+
+  /* ===== Shell ===== */
+  .app-shell{display:flex;min-height:100vh;}
+  .sidebar{width:256px;flex-shrink:0;background:linear-gradient(180deg,#1a2342 0%,#221d3e 50%,#2d1f3b 100%);border-right:1px solid rgba(255,255,255,0.06);position:sticky;top:0;height:100vh;display:flex;flex-direction:column;z-index:30;transition:width 0.22s ease;}
+  .sidebar-brand{padding:20px 22px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.06);}
+  .sidebar-brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--c-id));color:#fff;display:grid;place-items:center;font-weight:900;font-size:16px;box-shadow:0 4px 12px rgba(59,92,255,0.30);}
+  .sidebar-brand .name{font-size:17px;font-weight:800;letter-spacing:-0.015em;color:#fff;}
+  .sidebar-brand .name span{color:var(--primary);}
+  .sidebar-nav{flex:1;overflow-y:auto;padding:10px 0;}
+  .nav-section{font-size:11px;font-weight:800;color:rgba(255,255,255,0.40);text-transform:uppercase;letter-spacing:0.08em;padding:14px 22px 6px;}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px 22px;text-decoration:none;color:rgba(255,255,255,0.72);font-weight:600;font-size:14.5px;border-left:3px solid transparent;cursor:pointer;}
+  .nav-item:hover{background:rgba(255,255,255,0.06);color:#fff;}
+  .nav-item.active{background:linear-gradient(90deg,rgba(59,92,255,0.30),rgba(59,92,255,0.05));color:#fff;border-left-color:var(--primary);font-weight:700;}
+  .nav-item .ico{width:22px;height:22px;display:grid;place-items:center;flex-shrink:0;}
+  .nav-item .badge{margin-left:auto;background:var(--c-tags);color:#fff;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;}
+  .nav-sub{padding-left:32px;display:none;}
+  .nav-item.has-sub.expanded + .nav-sub{display:block;}
+  .nav-sub .nav-item{padding:7px 22px 7px 32px;font-size:13.5px;}
+  .nav-item.has-sub .chev{margin-left:auto;transition:transform 0.18s;}
+  .nav-item.has-sub.expanded .chev{transform:rotate(90deg);}
+  .sidebar-profile{border-top:1px solid rgba(255,255,255,0.06);padding:14px 18px;display:flex;align-items:center;gap:12px;background:rgba(0,0,0,0.18);}
+  .sidebar-profile .pf-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1a3dff,#7a2cff);color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center;}
+  .sidebar-profile .pf-name{font-weight:700;font-size:13.5px;color:#fff;}
+  .sidebar-profile .pf-role{font-size:12px;color:rgba(255,255,255,0.55);margin-top:2px;font-weight:600;}
+  .sidebar-profile .pf-menu{margin-left:auto;color:rgba(255,255,255,0.50);cursor:pointer;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;}
+  .sidebar-profile .pf-menu:hover{background:rgba(255,255,255,0.08);color:#fff;}
+  .main-area{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .sb-collapse{position:absolute;top:26px;right:-13px;width:26px;height:26px;border-radius:50%;background:var(--surface);border:1px solid var(--border-strong);color:var(--text-muted);display:grid;place-items:center;cursor:pointer;z-index:32;transition:transform 0.18s,color 0.18s,border-color 0.18s;box-shadow:0 2px 6px rgba(24,33,61,0.12);}
+  .sb-collapse:hover{color:var(--primary);border-color:var(--primary);}
+  .sidebar.collapsed .sb-collapse svg{transform:rotate(180deg);}
+  .sidebar.collapsed{width:68px;}
+  .sidebar.collapsed .sidebar-brand{padding:20px 0 18px;justify-content:center;}
+  .sidebar.collapsed .sidebar-brand .name{display:none;}
+  .sidebar.collapsed .nav-section{display:none;}
+  .sidebar.collapsed .nav-item{justify-content:center;padding:10px 0;border-left:0;position:relative;font-size:0;line-height:0;gap:0;}
+  .sidebar.collapsed .nav-item.active{background:rgba(59,92,255,0.20);}
+  .sidebar.collapsed .nav-item.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;background:var(--primary);border-radius:0 3px 3px 0;}
+  .sidebar.collapsed .nav-item > *:not(.ico){display:none;}
+  .sidebar.collapsed .nav-item .ico{font-size:initial;line-height:1;}
+  .sidebar.collapsed .nav-sub{display:none !important;}
+  .sidebar.collapsed .sidebar-profile{padding:14px 0;justify-content:center;}
+  .sidebar.collapsed .sidebar-profile > div:not(.pf-avatar):not(.pf-menu){display:none;}
+  .sidebar.collapsed .sidebar-profile .pf-menu{display:none;}
+  .sidebar.collapsed .nav-item:hover::after{content:attr(data-label);position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);background:var(--ink);color:#fff;font-size:12px;font-weight:700;padding:6px 10px;border-radius:6px;white-space:nowrap;z-index:100;pointer-events:none;}
+  .menu-toggle{display:none;}
+  @media (max-width:1100px){
+    .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform 0.22s ease;box-shadow:8px 0 24px rgba(24,33,61,0.10);}
+    .sidebar.open{transform:translateX(0);}
+    .menu-toggle{display:grid;place-items:center;width:42px;height:42px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--text);margin-right:12px;}
+    .sidebar-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.4);z-index:25;display:none;}
+    .sidebar-overlay.show{display:block;}
+  }
+
+  /* ===== Topbar ===== */
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;align-items:center;gap:20px;}
+  .crumbs{color:var(--text-soft);font-size:15px;font-weight:600;display:flex;align-items:center;flex-shrink:0;}
+  .crumbs a{color:var(--text-soft);text-decoration:none;}
+  .crumbs a:hover{color:var(--text);}
+  .crumbs .current{color:var(--text);font-weight:700;}
+  .crumbs .sep{margin:0 10px;}
+  .gsearch{flex:1;max-width:560px;margin:0 auto;position:relative;}
+  .gsearch input{width:100%;padding:9px 14px 9px 38px;border:1px solid var(--border-strong);background:var(--surface-2);border-radius:999px;font-size:13.5px;font-weight:500;font-family:inherit;color:var(--text);}
+  .gsearch input:focus{outline:0;border-color:var(--primary);background:var(--surface);box-shadow:0 0 0 4px rgba(59,92,255,0.12);}
+  .gsearch .gs-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;}
+  .gsearch .gs-kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:inline-flex;gap:3px;pointer-events:none;}
+  .gsearch .gs-kbd kbd{font-family:inherit;font-size:10.5px;font-weight:700;padding:2px 6px;background:var(--surface);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);line-height:1;}
+  .topbar .right{display:flex;align-items:center;gap:18px;flex-shrink:0;}
+  .icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--text-muted);}
+  .icon-btn:hover{border-color:var(--border-strong);color:var(--ink);}
+  .topbar .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1a3dff,#7a2cff);color:#fff;font-weight:800;font-size:15px;display:grid;place-items:center;box-shadow:0 4px 12px rgba(26,61,255,0.35);}
+  @media (max-width:600px){.gsearch{display:none;}}
+
+  /* ===== Page header + buttons ===== */
+  .page{max-width:1400px;margin:24px auto 64px;padding:0 32px;width:100%;}
+  .page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;margin-bottom:24px;flex-wrap:wrap;}
+  .page-header h1{margin:0;font-size:30px;font-weight:800;letter-spacing:-0.025em;color:var(--ink);}
+  .page-header .sub{color:var(--text-muted);font-size:14.5px;margin-top:6px;font-weight:500;}
+  .ph-actions{display:flex;gap:10px;}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);text-decoration:none;}
+  .btn:hover{border-color:var(--ink);background:var(--surface-2);}
+  .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 4px 14px rgba(59,92,255,0.30);}
+  .btn.primary:hover{background:var(--primary-600);border-color:var(--primary-600);}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--text-muted);}
+  .btn.ghost:hover{color:var(--ink);background:var(--surface-2);}
+
+  /* Client strip */
+  .client-strip{background:linear-gradient(135deg,var(--primary-50),#fff);border:1px solid var(--primary-100);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:24px;}
+  .client-strip .av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#1a3dff,#7a2cff);color:#fff;font-weight:800;font-size:14px;display:grid;place-items:center;flex-shrink:0;}
+  .client-strip .who{flex:1;}
+  .client-strip .who .nm{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-0.01em;}
+  .client-strip .who .meta{font-size:12.5px;color:var(--text-muted);font-weight:600;margin-top:2px;}
+  .client-strip .who .meta b{color:var(--ink);font-weight:700;}
+  .client-strip .change{font-size:12.5px;font-weight:700;color:var(--primary);text-decoration:none;padding:6px 12px;border-radius:8px;border:1px solid var(--primary-100);background:#fff;}
+  .client-strip .change:hover{background:var(--primary-50);}
+
+  /* ===== Spot rates panel ===== */
+  .rates-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:20px;box-shadow:0 1px 3px rgba(24,33,61,0.04);}
+  .rates-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+  .rates-head .rh-title{display:flex;align-items:center;gap:10px;}
+  .rates-head .rh-title h3{margin:0;font-size:13px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:0.06em;}
+  .rates-head .live-dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 0 0 rgba(14,143,62,0.6);animation:pulse 2s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(14,143,62,0.6);}70%{box-shadow:0 0 0 8px rgba(14,143,62,0);}100%{box-shadow:0 0 0 0 rgba(14,143,62,0);}}
+  .rates-head .updated{font-size:11.5px;color:var(--text-muted);font-weight:600;}
+  .rates-head .actions{display:flex;gap:8px;}
+  .rates-head .icon-mini{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-strong);background:var(--surface);font-size:12px;font-weight:700;color:var(--text-muted);padding:5px 10px;border-radius:8px;cursor:pointer;font-family:inherit;}
+  .rates-head .icon-mini:hover{border-color:var(--ink);color:var(--ink);}
+
+  .rates-grid{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:10px;align-items:stretch;}
+  @media (max-width:1100px){.rates-grid{grid-template-columns:repeat(2,1fr) auto;}}
+  @media (max-width:560px){.rates-grid{grid-template-columns:1fr;}}
+
+  .rate-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;background:linear-gradient(160deg,var(--surface),var(--surface-2));cursor:pointer;transition:all 0.14s;position:relative;}
+  .rate-card:hover{border-color:var(--ink);transform:translateY(-1px);box-shadow:0 6px 18px rgba(24,33,61,0.08);}
+  .rate-card.active{border-color:var(--primary);background:linear-gradient(160deg,#fff,var(--primary-50));box-shadow:0 4px 14px rgba(59,92,255,0.18);}
+  .rate-card.active::after{content:"In use";position:absolute;top:-8px;right:10px;background:var(--primary);color:#fff;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:999px;letter-spacing:0.04em;text-transform:uppercase;}
+  .rate-card .rc-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .rate-card .flag{font-size:22px;line-height:1;}
+  .rate-card .ccy-code{font-size:14px;font-weight:800;color:var(--ink);letter-spacing:-0.01em;}
+  .rate-card .ccy-name{font-size:11px;color:var(--text-muted);font-weight:600;}
+  .rate-card .trend{margin-left:auto;font-size:10.5px;font-weight:800;padding:2px 6px;border-radius:6px;display:inline-flex;align-items:center;gap:2px;}
+  .rate-card .trend.up{color:var(--success);background:var(--success-50);}
+  .rate-card .trend.dn{color:var(--danger);background:var(--danger-50);}
+  .rate-card .spot-line{font-size:18px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-0.015em;line-height:1.1;}
+  .rate-card .spot-line .unit{font-size:11px;font-weight:700;color:var(--text-muted);margin-left:3px;}
+  .rate-card .bs-row{display:flex;gap:8px;margin-top:8px;}
+  .rate-card .bs{flex:1;padding:5px 7px;border-radius:6px;font-variant-numeric:tabular-nums;}
+  .rate-card .bs.buy{background:var(--fx-buy-50);}
+  .rate-card .bs.sell{background:var(--fx-sell-50);}
+  .rate-card .bs .lbl{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;}
+  .rate-card .bs.buy .lbl{color:var(--fx-buy);}
+  .rate-card .bs.sell .lbl{color:var(--fx-sell);}
+  .rate-card .bs .v{font-size:12.5px;font-weight:800;color:var(--ink);margin-top:1px;}
+
+  .add-rate-card{border:1.5px dashed var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px;cursor:pointer;color:var(--text-muted);font-weight:700;font-size:12.5px;text-align:center;font-family:inherit;width:80px;}
+  .add-rate-card:hover{border-color:var(--ink);color:var(--ink);background:var(--surface-2);}
+  .add-rate-card .plus{width:30px;height:30px;border-radius:50%;border:1.5px dashed var(--border-strong);display:grid;place-items:center;}
+  .add-rate-card:hover .plus{border-color:var(--ink);}
+
+  /* ===== Two-col main layout ===== */
+  .form-grid{display:grid;grid-template-columns:1fr 360px;gap:24px;}
+  @media (max-width:1100px){.form-grid{grid-template-columns:1fr;}}
+
+  /* ===== Card / section ===== */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 1px 3px rgba(24,33,61,0.04);overflow:hidden;margin-bottom:18px;}
+  .card-head{padding:14px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,var(--surface-2),var(--surface));gap:12px;}
+  .card-head h3{margin:0;font-size:13px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:0.06em;}
+  .card-head .stripe{width:4px;align-self:stretch;border-radius:4px;background:var(--primary);margin-right:10px;}
+  .card-body{padding:18px 22px;}
+
+  /* Direction toggle */
+  .dir-toggle{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+  .dir-tile{padding:14px 16px;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;font-family:inherit;text-align:left;transition:all 0.14s;display:flex;align-items:flex-start;gap:12px;}
+  .dir-tile:hover{border-color:var(--ink);}
+  .dir-tile .dt-ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:var(--surface-2);color:var(--text-muted);}
+  .dir-tile .dt-meta .dt-t{font-size:14px;font-weight:800;color:var(--ink);letter-spacing:-0.01em;}
+  .dir-tile .dt-meta .dt-s{font-size:12px;color:var(--text-muted);font-weight:600;margin-top:2px;line-height:1.35;}
+  .dir-tile.active[data-dir="buy"]{border-color:var(--fx-buy);background:linear-gradient(135deg,var(--fx-buy-50),#fff);}
+  .dir-tile.active[data-dir="buy"] .dt-ico{background:var(--fx-buy);color:#fff;}
+  .dir-tile.active[data-dir="sell"]{border-color:var(--fx-sell);background:linear-gradient(135deg,var(--fx-sell-50),#fff);}
+  .dir-tile.active[data-dir="sell"] .dt-ico{background:var(--fx-sell);color:#fff;}
+
+  /* Currency picker row + amount */
+  .ccy-row{display:grid;grid-template-columns:1fr 44px 1fr;gap:12px;align-items:end;margin-bottom:16px;}
+  @media (max-width:760px){.ccy-row{grid-template-columns:1fr;}.swap-btn{justify-self:center;transform:rotate(90deg);}}
+  .field{display:block;}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;}
+  .field .req{color:var(--danger);}
+  .field .opt{font-size:11px;font-weight:600;color:var(--text-soft);text-transform:none;letter-spacing:0;margin-left:5px;}
+  .ccy-select{position:relative;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);padding:12px 42px 12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:62px;}
+  .ccy-select:hover{border-color:var(--ink);}
+  .ccy-select.open{border-color:var(--primary);box-shadow:0 0 0 4px rgba(59,92,255,0.12);}
+  .ccy-select .flag{font-size:26px;line-height:1;}
+  .ccy-select .ccy-meta .code{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-0.01em;}
+  .ccy-select .ccy-meta .name{font-size:12px;color:var(--text-muted);font-weight:600;}
+  .ccy-select .chev{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);}
+  .ccy-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius-sm);box-shadow:0 12px 30px rgba(24,33,61,0.18);z-index:50;max-height:340px;overflow:hidden;display:none;}
+  .ccy-select.open .ccy-dropdown{display:block;}
+  .ccy-search{padding:10px;border-bottom:1px solid var(--border);}
+  .ccy-search input{width:100%;border:1px solid var(--border-strong);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;font-weight:500;color:var(--text);background:var(--surface-2);}
+  .ccy-search input:focus{outline:0;border-color:var(--primary);background:#fff;}
+  .ccy-options{overflow-y:auto;max-height:280px;}
+  .ccy-opt{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;font-size:13.5px;}
+  .ccy-opt:hover{background:var(--surface-2);}
+  .ccy-opt.active{background:var(--primary-50);}
+  .ccy-opt .flag{font-size:18px;}
+  .ccy-opt .code{font-weight:800;color:var(--ink);width:42px;}
+  .ccy-opt .name{color:var(--text-muted);font-weight:600;flex:1;font-size:12.5px;}
+  .ccy-opt .rate{color:var(--text-soft);font-weight:700;font-variant-numeric:tabular-nums;font-size:12px;}
+
+  .swap-btn{align-self:end;width:44px;height:44px;border-radius:50%;border:1px solid var(--border-strong);background:var(--surface);color:var(--text-muted);display:grid;place-items:center;cursor:pointer;margin-bottom:9px;transition:all 0.14s;}
+  .swap-btn:hover{color:var(--primary);border-color:var(--primary);transform:rotate(180deg);}
+
+  .input{width:100%;padding:11px 14px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:inherit;font-size:14.5px;font-weight:600;color:var(--text);background:var(--surface);}
+  .input:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 4px rgba(59,92,255,0.12);}
+  .amount-input{position:relative;}
+  .amount-input input{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-0.015em;padding:14px 90px 14px 18px;height:62px;border:1.5px solid var(--border-strong);}
+  .amount-input input::-webkit-outer-spin-button,.amount-input input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .amount-input input{-moz-appearance:textfield;}
+  .amount-input .ai-suffix{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:14px;font-weight:800;color:var(--text-muted);background:var(--surface-2);padding:5px 10px;border-radius:8px;letter-spacing:0.02em;}
+  .amount-helper{font-size:11.5px;color:var(--text-muted);margin-top:5px;font-weight:500;}
+
+  /* Rate breakdown card */
+  .rate-breakdown{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:linear-gradient(140deg,var(--surface-2),var(--surface));padding:14px 16px;}
+  .rb-line{display:flex;align-items:center;justify-content:space-between;font-size:13px;padding:6px 0;}
+  .rb-line.spot{font-size:14px;border-bottom:1px dashed var(--border);padding-bottom:10px;margin-bottom:6px;}
+  .rb-line .k{color:var(--text-muted);font-weight:600;display:flex;align-items:center;gap:8px;}
+  .rb-line .pill{font-size:9.5px;font-weight:800;padding:1px 7px;border-radius:999px;text-transform:uppercase;letter-spacing:0.05em;}
+  .rb-line .pill.buy{background:var(--fx-buy-50);color:var(--fx-buy);}
+  .rb-line .pill.sell{background:var(--fx-sell-50);color:var(--fx-sell);}
+  .rb-line .v{font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;font-size:14px;}
+  .rb-line.active .v{color:var(--primary);}
+
+  /* Margin sliders */
+  .margin-block{margin-top:16px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;background:var(--surface);}
+  .mb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+  .mb-head .mb-title{font-size:12px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:0.06em;}
+  .mb-head .mb-reset{font-size:11.5px;font-weight:700;color:var(--text-muted);background:none;border:0;cursor:pointer;font-family:inherit;padding:3px 8px;border-radius:6px;}
+  .mb-head .mb-reset:hover{background:var(--surface-2);color:var(--ink);}
+  .mb-row{display:grid;grid-template-columns:80px 1fr 110px 70px;gap:10px;align-items:center;padding:6px 0;}
+  @media (max-width:760px){.mb-row{grid-template-columns:80px 1fr 90px;}.mb-row .ms-bps{display:none;}}
+  .mb-row .ms-side{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;}
+  .mb-row.buy-row .ms-side{color:var(--fx-buy);}
+  .mb-row.sell-row .ms-side{color:var(--fx-sell);}
+  .ms-slider{-webkit-appearance:none;appearance:none;height:8px;border-radius:999px;outline:none;background:linear-gradient(90deg,#e2e8f0,#cbd5e1);}
+  .ms-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ink);border:3px solid #fff;box-shadow:0 2px 6px rgba(24,33,61,0.30);cursor:pointer;}
+  .ms-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--ink);border:3px solid #fff;box-shadow:0 2px 6px rgba(24,33,61,0.30);cursor:pointer;}
+  .buy-row .ms-slider{background:linear-gradient(90deg,var(--fx-buy-50),#5dc185);}
+  .buy-row .ms-slider::-webkit-slider-thumb{background:var(--fx-buy);box-shadow:0 2px 6px rgba(14,143,62,0.30);}
+  .sell-row .ms-slider{background:linear-gradient(90deg,var(--fx-sell-50),#7f93ff);}
+  .sell-row .ms-slider::-webkit-slider-thumb{background:var(--fx-sell);box-shadow:0 2px 6px rgba(29,52,184,0.30);}
+  .ms-input{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;padding:5px 8px;}
+  .ms-input input{width:100%;border:0;outline:0;font-family:inherit;font-size:13px;font-weight:800;color:var(--ink);background:transparent;text-align:right;-moz-appearance:textfield;}
+  .ms-input input::-webkit-outer-spin-button,.ms-input input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .ms-input .pct{color:var(--text-muted);font-size:12px;font-weight:700;margin-left:3px;}
+  .ms-bps{font-size:11px;color:var(--text-muted);font-weight:700;font-variant-numeric:tabular-nums;text-align:right;}
+  .mb-foot{margin-top:8px;padding-top:10px;border-top:1px dashed var(--border);font-size:11.5px;color:var(--text-muted);font-weight:500;display:flex;align-items:center;gap:6px;}
+  .mb-foot svg{flex-shrink:0;}
+  /* Show only the slider/line that matches the current direction */
+  body[data-dir="buy"]  #rowSellMargin,
+  body[data-dir="sell"] #rowBuyMargin{display:none;}
+  body[data-dir="buy"]  .rb-line[data-side="sell"],
+  body[data-dir="sell"] .rb-line[data-side="buy"]{display:none;}
+
+  /* Result block (you give / they get) */
+  .result-block{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;background:linear-gradient(135deg,#fff,var(--surface-2));border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-top:18px;}
+  @media (max-width:760px){.result-block{grid-template-columns:1fr;}.result-arrow{transform:rotate(90deg);justify-self:center;}}
+  .res-cell .res-lbl{font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;}
+  .res-cell .res-amt{font-size:26px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-0.02em;line-height:1.1;margin-top:3px;}
+  .res-cell .res-amt .ccy{font-size:13px;color:var(--text-muted);font-weight:700;margin-left:5px;}
+  .res-cell .res-sub{font-size:11.5px;color:var(--text-soft);font-weight:600;margin-top:3px;}
+  .res-cell.client{text-align:right;}
+  .result-arrow{width:42px;height:42px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;flex-shrink:0;box-shadow:0 4px 12px rgba(59,92,255,0.30);}
+  body[data-dir="sell"] .result-arrow{background:var(--fx-sell);box-shadow:0 4px 12px rgba(29,52,184,0.30);}
+  body[data-dir="buy"] .result-arrow{background:var(--fx-buy);box-shadow:0 4px 12px rgba(14,143,62,0.30);}
+
+  /* Payout tiles */
+  .payout-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .payout-tile{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 12px;border:1px solid var(--border-strong);background:var(--surface);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.12s;text-align:center;font-family:inherit;}
+  .payout-tile:hover{border-color:var(--ink);}
+  .payout-tile.active{border-color:var(--c-bank);background:var(--success-50);}
+  .payout-tile .ico{width:32px;height:32px;border-radius:8px;background:var(--surface-2);color:var(--text-muted);display:grid;place-items:center;}
+  .payout-tile.active .ico{background:var(--c-bank);color:#fff;}
+  .payout-tile .lbl{font-size:13px;font-weight:700;color:var(--ink);}
+  .payout-tile .sub{font-size:11px;color:var(--text-muted);font-weight:500;}
+
+  .textarea{width:100%;padding:11px 14px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:inherit;font-size:13.5px;color:var(--text);background:var(--surface);font-weight:500;resize:vertical;min-height:74px;}
+  .textarea:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 4px rgba(59,92,255,0.12);}
+
+  /* Summary right rail */
+  .summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 1px 3px rgba(24,33,61,0.04),0 8px 24px rgba(24,33,61,0.06);overflow:hidden;position:sticky;top:88px;}
+  .summary-head{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;justify-content:space-between;}
+  .summary-head h4{margin:0;font-size:13px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:0.06em;}
+  .summary-head .pill{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--fx-buy-50);color:var(--fx-buy);border:1px solid #5dc185;}
+  body[data-dir="sell"] .summary-head .pill{background:var(--fx-sell-50);color:var(--fx-sell);border-color:#7f93ff;}
+  .summary-body{padding:18px;}
+  .summary-amt{text-align:center;padding:8px 0 18px;}
+  .summary-amt .lbl{font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;}
+  .summary-amt .num{font-size:32px;font-weight:800;letter-spacing:-0.025em;color:var(--ink);margin-top:4px;line-height:1;font-variant-numeric:tabular-nums;}
+  .summary-amt .num .ccy{font-size:14px;color:var(--text-muted);font-weight:700;margin-left:5px;}
+  .summary-amt .sub{font-size:12px;color:var(--text-muted);font-weight:600;margin-top:6px;}
+  .summary-list{border-top:1px dashed var(--border);padding-top:14px;}
+  .summary-row{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;}
+  .summary-row .k{color:var(--text-muted);font-weight:500;}
+  .summary-row .v{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;}
+  .summary-row.total{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;}
+  .summary-row.total .k{color:var(--ink);font-weight:700;}
+  .summary-row.total .v{font-size:15px;font-weight:800;color:var(--c-bank);}
+  .summary-note{display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:10px 12px;background:var(--surface-2);border:1px dashed var(--border-strong);border-radius:8px;font-size:11.5px;color:var(--text-muted);font-weight:500;line-height:1.4;}
+  .summary-note svg{flex-shrink:0;margin-top:1px;color:var(--text-muted);}
+  .summary-actions{padding:14px 18px;border-top:1px solid var(--border);background:var(--surface-2);}
+
+  /* Footer */
+  .footer-bar{position:sticky;bottom:20px;margin-top:24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 22px;box-shadow:0 4px 14px rgba(24,33,61,0.08);display:flex;align-items:center;justify-content:space-between;z-index:5;flex-wrap:wrap;gap:16px;}
+  .footer-bar .info{font-size:13px;color:var(--text-muted);font-weight:500;}
+  .footer-bar .info strong{color:var(--ink);font-weight:700;}
+
+  /* Submit modal */
+  .modal-bd{position:fixed;inset:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
+  .modal-bd.show{display:flex;}
+  .modal{background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:540px;overflow:hidden;box-shadow:0 24px 60px rgba(24,33,61,0.30);}
+  .modal-head{padding:28px 28px 18px;text-align:center;background:linear-gradient(135deg,var(--success-50),#fff);}
+  .modal-head .check{width:60px;height:60px;border-radius:50%;background:var(--success);color:#fff;display:grid;place-items:center;margin:0 auto 12px;box-shadow:0 6px 18px rgba(14,143,62,0.30);}
+  .modal-head h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);}
+  .modal-head .ref{font-size:13px;color:var(--text-muted);font-weight:600;margin-top:6px;}
+  .modal-head .ref strong{color:var(--ink);}
+  .modal-body{padding:18px 28px 22px;}
+  .modal-body .question{font-size:13.5px;font-weight:700;color:var(--ink);margin:0 0 12px;text-align:center;}
+  .modal-actions{display:flex;flex-direction:column;gap:10px;}
+  .ma{display:flex;align-items:center;gap:14px;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);padding:12px 14px;background:var(--surface);cursor:pointer;font-family:inherit;text-align:left;}
+  .ma:hover{border-color:var(--ink);}
+  .ma .ico-wrap{width:38px;height:38px;border-radius:10px;background:var(--surface-2);color:var(--text-muted);display:grid;place-items:center;flex-shrink:0;}
+  .ma .meta{flex:1;}
+  .ma .meta .t{display:block;font-size:13.5px;font-weight:800;color:var(--ink);}
+  .ma .meta .s{display:block;font-size:11.5px;color:var(--text-muted);font-weight:500;margin-top:2px;}
+  .ma .badge-rec{display:inline-block;font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:999px;background:var(--primary);color:#fff;margin-left:6px;letter-spacing:0.04em;text-transform:uppercase;}
+  .ma .chev{color:var(--text-muted);}
+  .ma.ma-recommended{border-color:var(--primary);background:linear-gradient(135deg,var(--primary-50),#fff);}
+  .ma.ma-recommended .ico-wrap{background:var(--primary);color:#fff;}
+  .ma.ma-payout .ico-wrap{background:var(--success);color:#fff;}
+  .modal-foot{padding:14px 28px;background:var(--surface-2);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--text-muted);font-weight:500;}
+  .modal-close{background:transparent;border:0;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--text-muted);cursor:pointer;padding:6px 10px;border-radius:6px;}
+  .modal-close:hover{color:var(--ink);background:var(--surface);}
+
+  /* Toast */
+  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:10px;box-shadow:0 14px 30px rgba(24,33,61,0.30);transition:transform 0.28s ease;z-index:300;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast .ico{width:22px;height:22px;border-radius:50%;background:var(--success);display:grid;place-items:center;}
+</style>
+</head>
+<body data-dir="buy">
+
+<div class="app-shell">
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo">V</div>
+    <div class="name">Vayoo<span>.ai</span></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">Workspace</div>
+    <a class="nav-item" href="index.html#dashboard"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span>Dashboard</span></a>
+    <a class="nav-item" href="index.html#clients" data-label="Clients"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Clients</span></a>
+    <a class="nav-item" href="companies-list.html"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg></span><span>Companies</span></a>
+    <div class="nav-section">Modules</div>
+    <a class="nav-item" href="loan-new.html"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span>Loans</span></a>
+    <a class="nav-item" href="cheque-cashing-new.html"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 4H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M3 8h18"/></svg></span><span>Cheque Cashing</span></a>
+    <a class="nav-item" href="gold-buy-new.html"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 22 8.5 17 21 7 21 2 8.5 12 2"/></svg></span><span>Gold &amp; Silver</span></a>
+    <a class="nav-item active" href="currency-exchange-new.html"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span><span>Currency Exchange</span></a>
+    <div class="nav-section">Insights</div>
+    <a class="nav-item" href="#"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span>Reports</span></a>
+    <div class="nav-section">Account</div>
+    <a class="nav-item" href="#"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span>Settings</span></a>
+  </div>
+  <div class="sidebar-profile">
+    <div class="pf-avatar">SK</div>
+    <div>
+      <div class="pf-name">Simran Kaur</div>
+      <div class="pf-role">Loan officer</div>
+    </div>
+    <div class="pf-menu"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="5" r="1.4" fill="currentColor"/><circle cx="12" cy="19" r="1.4" fill="currentColor"/></svg></div>
+  </div>
+  <button class="sb-collapse" id="sbCollapse" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+</aside>
+<div class="sidebar-overlay" id="sbOverlay"></div>
+
+<!-- Main -->
+<main class="main-area">
+  <!-- Topbar -->
+  <div class="topbar">
+    <button class="menu-toggle" id="menuToggle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <div class="crumbs"><a href="index.html#dashboard">Dashboard</a><span class="sep">›</span><a href="#">Currency Exchange</a><span class="sep">›</span><span class="current">New transaction</span></div>
+    <div class="gsearch">
+      <span class="gs-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input type="search" placeholder="Search clients, transactions, companies…" />
+      <span class="gs-kbd"><kbd>⌘</kbd><kbd>K</kbd></span>
+    </div>
+    <div class="right">
+      <button class="icon-btn" title="Notifications"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+      <div class="avatar">SK</div>
+    </div>
+  </div>
+
+  <div class="page">
+    <!-- Page header -->
+    <div class="page-header">
+      <div>
+        <h1>Currency Exchange</h1>
+        <div class="sub">Live spot rates · buy 0–15% under spot, sell 0–15% over spot · cash, e-transfer or bank wire</div>
+      </div>
+      <div class="ph-actions">
+        <a class="btn ghost" href="client-list.html">Cancel</a>
+        <button class="btn">Save draft</button>
+        <button class="btn primary" id="submitBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Submit
+        </button>
+      </div>
+    </div>
+
+    <!-- Client strip -->
+    <div class="client-strip">
+      <div class="av">AS</div>
+      <div class="who">
+        <div class="nm">Aman Singh</div>
+        <div class="meta">CL-003821 · Tier <b>Standard</b> · Verified · Last visit <b>3 days ago</b></div>
+      </div>
+      <a class="change" href="client-list.html">Change client</a>
+    </div>
+
+    <!-- Spot rates panel -->
+    <div class="rates-panel">
+      <div class="rates-head">
+        <div class="rh-title">
+          <span class="live-dot"></span>
+          <h3>Spot rates · vs CAD</h3>
+          <span class="updated" id="lastUpdated">Updated just now · refreshes every 60s</span>
+        </div>
+        <div class="actions">
+          <button class="icon-mini" id="refreshRates"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Refresh</button>
+          <button class="icon-mini" id="rateSrc">Source: Mid-market</button>
+        </div>
+      </div>
+      <div class="rates-grid" id="ratesGrid"></div>
+    </div>
+
+    <!-- Two col -->
+    <div class="form-grid">
+      <!-- Main -->
+      <div>
+        <div class="card">
+          <div class="card-head"><div style="display:flex;align-items:center;"><span class="stripe"></span><h3>Transaction</h3></div></div>
+          <div class="card-body">
+
+            <!-- Direction -->
+            <div class="dir-toggle" id="dirToggle">
+              <button class="dir-tile active" data-dir="buy" type="button">
+                <span class="dt-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="19 12 12 19 5 12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></span>
+                <span class="dt-meta">
+                  <span class="dt-t">We BUY from client</span>
+                  <span class="dt-s">Client brings foreign currency, we hand out CAD at our buy rate.</span>
+                </span>
+              </button>
+              <button class="dir-tile" data-dir="sell" type="button">
+                <span class="dt-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="5 12 12 5 19 12"/><line x1="12" y1="19" x2="12" y2="5"/></svg></span>
+                <span class="dt-meta">
+                  <span class="dt-t">We SELL to client</span>
+                  <span class="dt-s">Client pays CAD, we hand out foreign currency at our sell rate.</span>
+                </span>
+              </button>
+            </div>
+
+            <!-- Currency picker row -->
+            <div class="ccy-row">
+              <div class="field">
+                <label id="fromLabel">Foreign currency <span class="req">*</span></label>
+                <div class="ccy-select" id="fxFrom" data-side="foreign">
+                  <span class="flag" data-out="flag">🇺🇸</span>
+                  <div class="ccy-meta">
+                    <div class="code" data-out="code">USD</div>
+                    <div class="name" data-out="name">US Dollar</div>
+                  </div>
+                  <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg></span>
+                </div>
+              </div>
+              <button class="swap-btn" id="swapBtn" title="Swap currencies"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
+              <div class="field">
+                <label id="toLabel">Settlement currency</label>
+                <div class="ccy-select" data-locked="1" style="cursor:default;background:var(--surface-2);">
+                  <span class="flag">🇨🇦</span>
+                  <div class="ccy-meta">
+                    <div class="code">CAD</div>
+                    <div class="name">Canadian Dollar · base</div>
+                  </div>
+                  <span class="chev" style="opacity:0.3;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Amount -->
+            <div class="field">
+              <label id="amountLabel">Amount client brings (USD) <span class="req">*</span></label>
+              <div class="amount-input">
+                <input type="number" id="amountInput" placeholder="0.00" step="any" />
+                <span class="ai-suffix" id="amountSuffix">USD</span>
+              </div>
+              <div class="amount-helper" id="amountHelper">Type the foreign currency amount the client is exchanging.</div>
+            </div>
+
+            <!-- Rate breakdown -->
+            <div class="rate-breakdown">
+              <div class="rb-line spot">
+                <span class="k">Spot rate</span>
+                <span class="v" id="rbSpot">1 USD = 1.3850 CAD</span>
+              </div>
+              <div class="rb-line" data-side="buy">
+                <span class="k"><span class="pill buy">Buy</span> Our buy rate</span>
+                <span class="v" id="rbBuy">1 USD = 1.3712 CAD</span>
+              </div>
+              <div class="rb-line" data-side="sell">
+                <span class="k"><span class="pill sell">Sell</span> Our sell rate</span>
+                <span class="v" id="rbSell">1 USD = 1.3989 CAD</span>
+              </div>
+            </div>
+
+            <!-- Margin block -->
+            <div class="margin-block">
+              <div class="mb-head">
+                <span class="mb-title">Margin · adjust per side</span>
+                <button class="mb-reset" id="mbReset" type="button">Reset to default (1%)</button>
+              </div>
+              <div class="mb-row buy-row" id="rowBuyMargin">
+                <span class="ms-side">Buy −</span>
+                <input type="range" class="ms-slider" id="msBuy" min="0" max="15" step="1" value="1" />
+                <div class="ms-input"><input type="number" id="msBuyNum" min="0" max="15" step="1" value="1" /><span class="pct">%</span></div>
+                <div class="ms-bps" id="msBuyBps">100 bps</div>
+              </div>
+              <div class="mb-row sell-row" id="rowSellMargin">
+                <span class="ms-side">Sell +</span>
+                <input type="range" class="ms-slider" id="msSell" min="0" max="15" step="1" value="1" />
+                <div class="ms-input"><input type="number" id="msSellNum" min="0" max="15" step="1" value="1" /><span class="pct">%</span></div>
+                <div class="ms-bps" id="msSellBps">100 bps</div>
+              </div>
+              <div class="mb-foot">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16.5" r="1" fill="currentColor" stroke="none"/></svg>
+                <span><span id="mbFootStatic">Buy rate runs 0–15% under spot (whole %). Currently </span><strong id="totalSpread">1% under</strong>.</span>
+              </div>
+            </div>
+
+            <!-- Result -->
+            <div class="result-block" id="resultBlock">
+              <div class="res-cell">
+                <div class="res-lbl" id="resGiveLbl">Client gives</div>
+                <div class="res-amt" id="resGive">0.00 <span class="ccy">USD</span></div>
+                <div class="res-sub" id="resGiveSub">at our buy rate</div>
+              </div>
+              <div class="result-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+              <div class="res-cell client">
+                <div class="res-lbl" id="resReceiveLbl">Client receives</div>
+                <div class="res-amt" id="resReceive">0.00 <span class="ccy">CAD</span></div>
+                <div class="res-sub" id="resReceiveSub">net of margin</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payout -->
+        <div class="card">
+          <div class="card-head"><div style="display:flex;align-items:center;"><span class="stripe" style="background:var(--c-bank);"></span><h3>Payout method &amp; notes</h3></div></div>
+          <div class="card-body">
+            <div class="field" style="margin-bottom:14px;">
+              <label>How is the client receiving funds? <span class="req">*</span></label>
+              <div class="payout-grid" id="payoutGrid">
+                <button type="button" class="payout-tile active" data-method="cash">
+                  <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg></span>
+                  <span class="lbl">Cash</span>
+                  <span class="sub">From the till</span>
+                </button>
+                <button type="button" class="payout-tile" data-method="etransfer">
+                  <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+                  <span class="lbl">E-transfer</span>
+                  <span class="sub">Interac · same day</span>
+                </button>
+                <button type="button" class="payout-tile" data-method="bank">
+                  <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="21" x2="21" y2="21"/><polygon points="12 3 22 9 2 9 12 3"/><line x1="6" y1="13" x2="6" y2="17"/><line x1="10" y1="13" x2="10" y2="17"/><line x1="14" y1="13" x2="14" y2="17"/><line x1="18" y1="13" x2="18" y2="17"/></svg></span>
+                  <span class="lbl">Bank wire</span>
+                  <span class="sub">1–2 business days</span>
+                </button>
+              </div>
+            </div>
+            <div class="field">
+              <label>Internal notes <span class="opt">Optional</span></label>
+              <textarea class="textarea" rows="3" placeholder="ID type checked, source of funds, denominations received…"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right rail -->
+      <aside>
+        <div class="summary-card">
+          <div class="summary-head">
+            <h4>Transaction summary</h4>
+            <span class="pill" id="sumPill">We BUY</span>
+          </div>
+          <div class="summary-body">
+            <div class="summary-amt">
+              <div class="lbl" id="sumLbl">Net to client</div>
+              <div class="num" id="sumNet">0.00 <span class="ccy" id="sumCcy">CAD</span></div>
+              <div class="sub" id="sumSub">0.00 USD @ — </div>
+            </div>
+            <div class="summary-list">
+              <div class="summary-row"><span class="k">Spot rate</span><span class="v" id="sumSpot">1.3850</span></div>
+              <div class="summary-row"><span class="k">Margin applied</span><span class="v" id="sumMargin">−1.00%</span></div>
+              <div class="summary-row"><span class="k">Effective rate</span><span class="v" id="sumEff">1.3712</span></div>
+              <div class="summary-row total"><span class="k">Net payout</span><span class="v" id="sumNet2">0.00</span></div>
+            </div>
+            <div class="summary-note">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16.5" r="1" fill="currentColor" stroke="none"/></svg>
+              <span>Default margin is 1% off spot. Buy slides 0–15% under, sell slides 0–15% over — only the side that matches the current direction is shown.</span>
+            </div>
+          </div>
+          <div class="summary-actions">
+            <button class="btn primary" id="submitBtn2" style="width:100%;justify-content:center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Submit
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-bar">
+      <div class="info"><strong id="footDir">We BUY</strong> · <span id="footMethod">Cash</span> · Net <strong id="footNet">$0.00</strong></div>
+      <div style="display:flex;gap:10px;">
+        <a class="btn ghost" href="client-list.html">Cancel</a>
+        <button class="btn">Save draft</button>
+        <button class="btn primary" id="footSubmitBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Submit
+        </button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</div>
+
+<!-- Submit modal -->
+<div class="modal-bd" id="submitModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <h2 id="modalTitle">Exchange recorded</h2>
+      <div class="ref">Reference <strong id="modalRef">#FX-94182</strong> · Aman Singh · <span id="modalSummary">— USD → CAD</span> · Net <strong id="modalNet">$0.00</strong></div>
+    </div>
+    <div class="modal-body">
+      <p class="question">How would you like to finalize this transaction?</p>
+      <div class="modal-actions">
+        <button type="button" class="ma" data-action="print"><span class="ico-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span><span class="meta"><span class="t">Print receipt</span><span class="s">Print at the branch with rate breakdown.</span></span><span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></button>
+        <button type="button" class="ma ma-recommended" data-action="print-email"><span class="ico-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><span class="meta"><span class="t">Print and email receipt <span class="badge-rec">Recommended</span></span><span class="s">Print here and email PDF to <strong>aman@example.com</strong>.</span></span><span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></button>
+        <button type="button" class="ma ma-payout" data-action="payout"><span class="ico-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span class="meta"><span class="t">Release payout now</span><span class="s">Skip print · client gets payout immediately.</span></span><span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span>Margin and rate snapshot are stored with the transaction.</span>
+      <button type="button" class="modal-close" id="modalCloseBtn">Skip for now</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add currency modal -->
+<div class="modal-bd" id="addCcyModal">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-head" style="background:linear-gradient(135deg,var(--primary-50),#fff);">
+      <h2 style="margin-top:0;">Add currency</h2>
+      <div class="ref">Pin another currency to your spot-rate panel</div>
+    </div>
+    <div class="modal-body" style="padding-top:0;">
+      <div class="ccy-search" style="padding:0 0 10px;border:0;">
+        <input type="search" id="addCcySearch" placeholder="Search by code or country…" />
+      </div>
+      <div class="ccy-options" id="addCcyOptions" style="max-height:340px;border:1px solid var(--border);border-radius:10px;"></div>
+    </div>
+    <div class="modal-foot">
+      <span>You can pin up to 8 currencies.</span>
+      <button type="button" class="modal-close" id="addCcyClose">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+  <span id="toastMsg">Done.</span>
+</div>
+
+<script>
+  // ===== Sidebar =====
+  (function(){
+    const sidebar=document.getElementById('sidebar');const overlay=document.getElementById('sbOverlay');const menuToggle=document.getElementById('menuToggle');const sbCollapse=document.getElementById('sbCollapse');
+    if(menuToggle){menuToggle.addEventListener('click',(e)=>{e.stopPropagation();sidebar.classList.toggle('open');overlay.classList.toggle('show');});overlay.addEventListener('click',()=>{sidebar.classList.remove('open');overlay.classList.remove('show');});}
+    document.querySelectorAll('.nav-item.has-sub').forEach(nav=>{nav.addEventListener('click',()=>{if(sidebar.classList.contains('collapsed'))return;nav.classList.toggle('expanded');});});
+    try{if(localStorage.getItem('vayoo:sb-collapsed')==='1')sidebar.classList.add('collapsed');}catch(e){}
+    if(sbCollapse){sbCollapse.addEventListener('click',(e)=>{e.stopPropagation();sidebar.classList.toggle('collapsed');try{localStorage.setItem('vayoo:sb-collapsed',sidebar.classList.contains('collapsed')?'1':'0');}catch(e){}});}
+  })();
+
+  // ===== Currency catalogue =====
+  // Spot = CAD per 1 unit of foreign currency (mid-market).
+  // For very small units (INR, JPY) we display per-100 in the rate panel.
+  const CCY = {
+    USD: { code:'USD', name:'US Dollar',         flag:'🇺🇸', spot:1.3850, dp:4, prev:1.3740 },
+    EUR: { code:'EUR', name:'Euro',              flag:'🇪🇺', spot:1.4920, dp:4, prev:1.4960 },
+    GBP: { code:'GBP', name:'British Pound',     flag:'🇬🇧', spot:1.7350, dp:4, prev:1.7290 },
+    INR: { code:'INR', name:'Indian Rupee',      flag:'🇮🇳', spot:0.0166, dp:6, prev:0.0167, base:100 },
+    AED: { code:'AED', name:'UAE Dirham',        flag:'🇦🇪', spot:0.3771, dp:4, prev:0.3742 },
+    AUD: { code:'AUD', name:'Australian Dollar', flag:'🇦🇺', spot:0.9170, dp:4, prev:0.9148 },
+    CHF: { code:'CHF', name:'Swiss Franc',       flag:'🇨🇭', spot:1.5240, dp:4, prev:1.5212 },
+    CNY: { code:'CNY', name:'Chinese Yuan',      flag:'🇨🇳', spot:0.1923, dp:4, prev:0.1918 },
+    JPY: { code:'JPY', name:'Japanese Yen',      flag:'🇯🇵', spot:0.0091, dp:5, prev:0.0089, base:100 },
+    MXN: { code:'MXN', name:'Mexican Peso',      flag:'🇲🇽', spot:0.0816, dp:4, prev:0.0820 },
+    NZD: { code:'NZD', name:'NZ Dollar',         flag:'🇳🇿', spot:0.8412, dp:4, prev:0.8398 },
+    PHP: { code:'PHP', name:'Philippine Peso',   flag:'🇵🇭', spot:0.0246, dp:5, prev:0.0245 },
+    PKR: { code:'PKR', name:'Pakistani Rupee',   flag:'🇵🇰', spot:0.0050, dp:5, prev:0.0050, base:100 },
+    SGD: { code:'SGD', name:'Singapore Dollar',  flag:'🇸🇬', spot:1.0190, dp:4, prev:1.0142 },
+    ZAR: { code:'ZAR', name:'South African Rand',flag:'🇿🇦', spot:0.0742, dp:4, prev:0.0747 },
+    HKD: { code:'HKD', name:'Hong Kong Dollar',  flag:'🇭🇰', spot:0.1771, dp:4, prev:0.1768 },
+    KRW: { code:'KRW', name:'South Korean Won',  flag:'🇰🇷', spot:0.0010, dp:5, prev:0.0010, base:100 },
+    BRL: { code:'BRL', name:'Brazilian Real',    flag:'🇧🇷', spot:0.2611, dp:4, prev:0.2620 },
+    SAR: { code:'SAR', name:'Saudi Riyal',       flag:'🇸🇦', spot:0.3691, dp:4, prev:0.3687 },
+    NGN: { code:'NGN', name:'Nigerian Naira',    flag:'🇳🇬', spot:0.0009, dp:5, prev:0.0009, base:100 },
+  };
+
+  // Pinned currencies in the spot-rate panel
+  let pinned = ['USD','EUR','GBP','INR'];
+
+  // Active state
+  let state = {
+    dir: 'buy',        // 'buy' = we buy from client, 'sell' = we sell to client
+    fromCcy: 'USD',
+    amount: 0,
+    buyMarginPct: 1,    // whole-% below spot on our buy rate (0–15)
+    sellMarginPct: 1,   // whole-% above spot on our sell rate (0–15)
+    payoutMethod: 'cash',
+  };
+
+  const fmtCAD = (n) => '$' + (n||0).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtAmt = (n, dp=2) => (n||0).toLocaleString('en-CA',{minimumFractionDigits:dp,maximumFractionDigits:dp});
+  const formatRate = (n, dp=4) => n.toFixed(dp);
+
+  // ===== Render spot rate cards =====
+  function renderRates() {
+    const grid = document.getElementById('ratesGrid');
+    grid.innerHTML = '';
+    pinned.forEach(code => {
+      const c = CCY[code]; if (!c) return;
+      const base = c.base || 1;
+      const buyR = c.spot * (1 - state.buyMarginPct/100);
+      const sellR = c.spot * (1 + state.sellMarginPct/100);
+      const change = ((c.spot - c.prev) / c.prev) * 100;
+      const up = change >= 0;
+      const card = document.createElement('div');
+      card.className = 'rate-card' + (code === state.fromCcy ? ' active' : '');
+      card.dataset.code = code;
+      card.innerHTML = `
+        <div class="rc-head">
+          <span class="flag">${c.flag}</span>
+          <div>
+            <div class="ccy-code">${base > 1 ? base + ' ' : ''}${c.code}</div>
+            <div class="ccy-name">${c.name}</div>
+          </div>
+          <span class="trend ${up?'up':'dn'}">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">${up ? '<polyline points="6 15 12 9 18 15"/>' : '<polyline points="6 9 12 15 18 9"/>'}</svg>
+            ${up?'+':''}${change.toFixed(2)}%
+          </span>
+        </div>
+        <div class="spot-line">${formatRate(c.spot * base, c.dp)} <span class="unit">CAD</span></div>
+        <div class="bs-row">
+          <div class="bs buy"><div class="lbl">Buy</div><div class="v">${formatRate(buyR * base, c.dp)}</div></div>
+          <div class="bs sell"><div class="lbl">Sell</div><div class="v">${formatRate(sellR * base, c.dp)}</div></div>
+        </div>
+      `;
+      card.addEventListener('click', () => selectCcy(code));
+      grid.appendChild(card);
+    });
+    // Add-currency tile
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'add-rate-card';
+    add.innerHTML = `
+      <span class="plus"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+      <span>Add<br/>currency</span>
+    `;
+    add.addEventListener('click', openAddCcyModal);
+    grid.appendChild(add);
+  }
+
+  // ===== From-currency picker (in main form) =====
+  const fxFrom = document.getElementById('fxFrom');
+  function buildFromDropdown() {
+    // Clear any previous dropdown
+    const old = fxFrom.querySelector('.ccy-dropdown'); if (old) old.remove();
+    const dd = document.createElement('div');
+    dd.className = 'ccy-dropdown';
+    dd.innerHTML = `
+      <div class="ccy-search"><input type="search" placeholder="Search code or country…" id="fxFromSearch" /></div>
+      <div class="ccy-options" id="fxFromOptions"></div>
+    `;
+    fxFrom.appendChild(dd);
+    const opts = dd.querySelector('#fxFromOptions');
+    const search = dd.querySelector('#fxFromSearch');
+    const renderOptions = (q='') => {
+      const ql = q.toLowerCase();
+      opts.innerHTML = '';
+      Object.values(CCY).filter(c =>
+        !ql || c.code.toLowerCase().includes(ql) || c.name.toLowerCase().includes(ql)
+      ).forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'ccy-opt' + (c.code === state.fromCcy ? ' active' : '');
+        row.innerHTML = `<span class="flag">${c.flag}</span><span class="code">${c.code}</span><span class="name">${c.name}</span><span class="rate">${formatRate(c.spot, c.dp)}</span>`;
+        row.addEventListener('click', (e) => { e.stopPropagation(); selectCcy(c.code); fxFrom.classList.remove('open'); });
+        opts.appendChild(row);
+      });
+    };
+    renderOptions();
+    search.addEventListener('input', () => renderOptions(search.value));
+    search.addEventListener('click', (e) => e.stopPropagation());
+  }
+  buildFromDropdown();
+  fxFrom.addEventListener('click', () => {
+    fxFrom.classList.toggle('open');
+    if (fxFrom.classList.contains('open')) {
+      const s = fxFrom.querySelector('#fxFromSearch'); if (s) setTimeout(()=>s.focus(), 60);
+    }
+  });
+  document.addEventListener('click', (e) => { if (!fxFrom.contains(e.target)) fxFrom.classList.remove('open'); });
+
+  function selectCcy(code) {
+    if (!CCY[code]) return;
+    state.fromCcy = code;
+    if (!pinned.includes(code)) pinned.unshift(code);
+    pinned = pinned.slice(0, 8);
+    const c = CCY[code];
+    fxFrom.querySelector('[data-out="flag"]').textContent = c.flag;
+    fxFrom.querySelector('[data-out="code"]').textContent = c.code;
+    fxFrom.querySelector('[data-out="name"]').textContent = c.name;
+    document.getElementById('amountSuffix').textContent = (state.dir === 'buy') ? c.code : 'CAD';
+    renderRates();
+    buildFromDropdown();
+    recalc();
+  }
+
+  // ===== Direction toggle =====
+  document.getElementById('dirToggle').addEventListener('click', (e) => {
+    const t = e.target.closest('.dir-tile'); if (!t) return;
+    document.querySelectorAll('#dirToggle .dir-tile').forEach(x => x.classList.toggle('active', x === t));
+    state.dir = t.dataset.dir;
+    document.body.dataset.dir = state.dir;
+    updateLabels();
+    recalc();
+  });
+
+  function updateLabels() {
+    const c = CCY[state.fromCcy];
+    const buyMode = state.dir === 'buy';
+    document.getElementById('amountLabel').innerHTML = (buyMode
+      ? `Amount client brings (${c.code})`
+      : `Amount client wants (${c.code})`) + ' <span class="req">*</span>';
+    document.getElementById('amountSuffix').textContent = c.code;
+    document.getElementById('amountHelper').textContent = buyMode
+      ? 'Type the foreign currency amount the client is exchanging for CAD.'
+      : 'Type the foreign currency amount the client wants to receive — they pay CAD.';
+    document.getElementById('resGiveLbl').textContent  = buyMode ? 'Client gives' : 'Client pays';
+    document.getElementById('resReceiveLbl').textContent = buyMode ? 'Client receives' : 'Client receives';
+    document.getElementById('resGiveSub').textContent  = buyMode ? `at our buy rate (${c.code})` : `in CAD`;
+    document.getElementById('resReceiveSub').textContent = buyMode ? 'in CAD' : `at our sell rate (${c.code})`;
+    document.getElementById('sumPill').textContent = buyMode ? 'We BUY' : 'We SELL';
+    document.getElementById('footDir').textContent = buyMode ? 'We BUY' : 'We SELL';
+    document.getElementById('sumLbl').textContent = buyMode ? 'Net to client (CAD)' : `Net to client (${c.code})`;
+  }
+
+  // ===== Margin sliders =====
+  // 0–15% in whole percent. Slider value IS the percent.
+  function wireMargin(sliderId, numId, bpsId, key) {
+    const s = document.getElementById(sliderId);
+    const n = document.getElementById(numId);
+    const b = document.getElementById(bpsId);
+    const setPct = (pct) => {
+      pct = Math.round(pct);
+      if (isNaN(pct) || pct < 0) pct = 0; if (pct > 15) pct = 15;
+      state[key] = pct;
+      s.value = pct;
+      n.value = pct;
+      b.textContent = (pct * 100) + ' bps';
+      recalc();
+    };
+    s.addEventListener('input', () => setPct(parseInt(s.value)));
+    n.addEventListener('input', () => setPct(parseInt(n.value)));
+    n.addEventListener('blur',  () => setPct(parseInt(n.value)));
+  }
+  wireMargin('msBuy', 'msBuyNum', 'msBuyBps', 'buyMarginPct');
+  wireMargin('msSell','msSellNum','msSellBps','sellMarginPct');
+
+  document.getElementById('mbReset').addEventListener('click', () => {
+    state.buyMarginPct = 1; state.sellMarginPct = 1;
+    document.getElementById('msBuy').value = 1;  document.getElementById('msBuyNum').value = '1';  document.getElementById('msBuyBps').textContent = '100 bps';
+    document.getElementById('msSell').value = 1; document.getElementById('msSellNum').value = '1'; document.getElementById('msSellBps').textContent = '100 bps';
+    recalc();
+  });
+
+  // ===== Amount =====
+  document.getElementById('amountInput').addEventListener('input', (e) => {
+    state.amount = parseFloat(e.target.value) || 0;
+    recalc();
+  });
+
+  // ===== Swap =====
+  document.getElementById('swapBtn').addEventListener('click', () => {
+    state.dir = state.dir === 'buy' ? 'sell' : 'buy';
+    document.body.dataset.dir = state.dir;
+    document.querySelectorAll('#dirToggle .dir-tile').forEach(t => t.classList.toggle('active', t.dataset.dir === state.dir));
+    updateLabels();
+    recalc();
+  });
+
+  // ===== Payout =====
+  document.querySelectorAll('#payoutGrid .payout-tile').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('#payoutGrid .payout-tile').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      state.payoutMethod = t.dataset.method;
+      document.getElementById('footMethod').textContent = ({cash:'Cash', etransfer:'E-transfer', bank:'Bank wire'})[state.payoutMethod] || 'Cash';
+    });
+  });
+
+  // ===== Add currency modal =====
+  const addModal = document.getElementById('addCcyModal');
+  function openAddCcyModal() {
+    addModal.classList.add('show');
+    renderAddOptions('');
+    setTimeout(() => document.getElementById('addCcySearch').focus(), 80);
+  }
+  function renderAddOptions(q) {
+    const ql = (q||'').toLowerCase();
+    const opts = document.getElementById('addCcyOptions');
+    opts.innerHTML = '';
+    Object.values(CCY).filter(c => !pinned.includes(c.code))
+      .filter(c => !ql || c.code.toLowerCase().includes(ql) || c.name.toLowerCase().includes(ql))
+      .forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'ccy-opt';
+        row.innerHTML = `<span class="flag">${c.flag}</span><span class="code">${c.code}</span><span class="name">${c.name}</span><span class="rate">${formatRate(c.spot, c.dp)}</span>`;
+        row.addEventListener('click', () => {
+          if (pinned.length >= 8) { showToast('Pin limit reached (8). Remove one first.'); return; }
+          pinned.push(c.code);
+          renderRates();
+          renderAddOptions(document.getElementById('addCcySearch').value);
+          showToast(c.code + ' pinned to spot rates');
+        });
+        opts.appendChild(row);
+      });
+    if (!opts.children.length) {
+      opts.innerHTML = '<div style="padding:14px;color:var(--text-muted);font-size:13px;text-align:center;">All matching currencies are already pinned.</div>';
+    }
+  }
+  document.getElementById('addCcySearch')?.addEventListener('input', (e) => renderAddOptions(e.target.value));
+  document.getElementById('addCcyClose').addEventListener('click', () => addModal.classList.remove('show'));
+  addModal.addEventListener('click', (e) => { if (e.target === addModal) addModal.classList.remove('show'); });
+
+  // ===== Recalc =====
+  function recalc() {
+    const c = CCY[state.fromCcy];
+    const buyR  = c.spot * (1 - state.buyMarginPct/100);
+    const sellR = c.spot * (1 + state.sellMarginPct/100);
+    const buyMode = state.dir === 'buy';
+
+    // Rate breakdown
+    document.getElementById('rbSpot').textContent = `1 ${c.code} = ${formatRate(c.spot, c.dp)} CAD`;
+    document.getElementById('rbBuy').textContent  = `1 ${c.code} = ${formatRate(buyR,  c.dp)} CAD`;
+    document.getElementById('rbSell').textContent = `1 ${c.code} = ${formatRate(sellR, c.dp)} CAD`;
+    document.querySelectorAll('.rb-line').forEach(el => el.classList.remove('active'));
+    document.querySelector(`.rb-line[data-side="${buyMode?'buy':'sell'}"]`)?.classList.add('active');
+    const activePct = buyMode ? state.buyMarginPct : state.sellMarginPct;
+    // NOTE: don't innerHTML a parent that contains an element we look up by id later;
+    // it deletes the child node and breaks the next recalc. Update fragments separately.
+    document.getElementById('mbFootStatic').textContent = buyMode
+      ? 'Buy rate runs 0–15% under spot (whole %). Currently '
+      : 'Sell rate runs 0–15% over spot (whole %). Currently ';
+    document.getElementById('totalSpread').textContent = activePct + '% ' + (buyMode ? 'under' : 'over');
+
+    // Compute amounts
+    let give, receive, giveCcy, receiveCcy, effRate, marginPct;
+    if (buyMode) {
+      // Client gives foreign, receives CAD at buy rate
+      giveCcy = c.code; receiveCcy = 'CAD';
+      give = state.amount;
+      receive = state.amount * buyR;
+      effRate = buyR;
+      marginPct = state.buyMarginPct;
+    } else {
+      // Client wants foreign, pays CAD at sell rate
+      giveCcy = 'CAD'; receiveCcy = c.code;
+      receive = state.amount;
+      give = state.amount * sellR;
+      effRate = sellR;
+      marginPct = state.sellMarginPct;
+    }
+
+    // Result block
+    document.getElementById('resGive').innerHTML    = `${fmtAmt(give, giveCcy === 'CAD' ? 2 : 2)} <span class="ccy">${giveCcy}</span>`;
+    document.getElementById('resReceive').innerHTML = `${fmtAmt(receive, receiveCcy === 'CAD' ? 2 : 2)} <span class="ccy">${receiveCcy}</span>`;
+
+    // Right-rail summary
+    const netVal   = buyMode ? receive : receive;
+    const netCcy   = buyMode ? 'CAD' : c.code;
+    // (innerHTML on sumNet wipes the inner <span> — don't lookup #sumCcy after this)
+    document.getElementById('sumNet').innerHTML   = `${fmtAmt(netVal)} <span class="ccy">${netCcy}</span>`;
+    document.getElementById('sumNet2').textContent = (netCcy === 'CAD' ? '$' : '') + fmtAmt(netVal) + (netCcy === 'CAD' ? '' : ' ' + netCcy);
+    document.getElementById('sumSub').textContent = `${fmtAmt(state.amount)} ${buyMode ? c.code : 'CAD'} @ ${formatRate(effRate, c.dp)}`;
+    document.getElementById('sumSpot').textContent = formatRate(c.spot, c.dp);
+    document.getElementById('sumMargin').textContent = (buyMode ? '−' : '+') + marginPct + '%';
+    document.getElementById('sumEff').textContent = formatRate(effRate, c.dp);
+    document.getElementById('footNet').textContent = (netCcy === 'CAD' ? fmtCAD(netVal) : fmtAmt(netVal) + ' ' + netCcy);
+  }
+
+  // ===== Submit modal =====
+  const modal = document.getElementById('submitModal');
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toastMsg');
+  function showToast(msg){ toastMsg.textContent = msg; toast.classList.add('show'); clearTimeout(showToast._t); showToast._t = setTimeout(()=>toast.classList.remove('show'), 3200); }
+  function showSubmit() {
+    const c = CCY[state.fromCcy];
+    const buyMode = state.dir === 'buy';
+    document.getElementById('modalRef').textContent = '#FX-' + (90000 + Math.floor(Math.random() * 5000));
+    document.getElementById('modalTitle').textContent = buyMode ? 'Currency purchase recorded' : 'Currency sale recorded';
+    document.getElementById('modalSummary').textContent = buyMode ? `${c.code} → CAD` : `CAD → ${c.code}`;
+    document.getElementById('modalNet').textContent = document.getElementById('sumNet').textContent.replace(/<[^>]+>/g,'').trim();
+    modal.classList.add('show');
+  }
+  document.getElementById('submitBtn').addEventListener('click', showSubmit);
+  document.getElementById('submitBtn2').addEventListener('click', showSubmit);
+  document.getElementById('footSubmitBtn').addEventListener('click', showSubmit);
+  document.getElementById('modalCloseBtn').addEventListener('click', () => modal.classList.remove('show'));
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+  modal.querySelectorAll('.ma').forEach(b => b.addEventListener('click', () => {
+    const a = b.dataset.action;
+    modal.classList.remove('show');
+    if (a === 'print') showToast('Opening print preview…');
+    else if (a === 'print-email') showToast('Printing and emailing receipt to aman@example.com');
+    else if (a === 'payout') showToast('Payout released · client receives funds now');
+  }));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { modal.classList.remove('show'); addModal.classList.remove('show'); } });
+
+  // ===== Refresh + simulate live tick =====
+  document.getElementById('refreshRates').addEventListener('click', () => {
+    Object.values(CCY).forEach(c => {
+      const drift = (Math.random() - 0.5) * 0.002;
+      c.prev = c.spot;
+      c.spot = Math.max(0.0001, c.spot * (1 + drift));
+    });
+    document.getElementById('lastUpdated').textContent = 'Updated just now · refreshes every 60s';
+    renderRates(); recalc();
+    showToast('Spot rates refreshed');
+  });
+
+  // ===== Bootstrap =====
+  renderRates();
+  updateLabels();
+  recalc();
+</script>
+
+</body>
+</html>
